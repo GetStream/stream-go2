@@ -104,8 +104,8 @@ func WithActivityCopyLimitQuery(limit int) RequestOption {
 }
 
 type followFeedOptions struct {
-	Target            string `json:"target"`
-	ActivityCopyLimit int    `json:"activity_copy_limit"`
+	Target            string `json:"target,omitempty"`
+	ActivityCopyLimit int    `json:"activity_copy_limit,omitempty"`
 }
 
 // FollowFeedOption is a function used to customize FollowFeed API calls.
