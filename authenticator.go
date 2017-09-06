@@ -22,13 +22,13 @@ const (
 	feedResource       resource = "feed"
 )
 
-const (
-	readAction   = "read"
-	writeAction  = "write"
-	deleteAction = "delete"
-)
-
 type action string
+
+const (
+	readAction   action = "read"
+	writeAction  action = "write"
+	deleteAction action = "delete"
+)
 
 var actions = map[string]action{
 	http.MethodGet:     readAction,
