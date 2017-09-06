@@ -90,8 +90,6 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 	if err := authFn(req); err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Api-Key", c.key)
 
 	resp, err := c.cl.Do(req)
 	if err != nil {

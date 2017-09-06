@@ -60,6 +60,7 @@ func (a authenticator) feedAuth(resource resource) authFunc {
 
 func (a authenticator) applicationAuth(key string) authFunc {
 	return func(req *http.Request) error {
+		req.Header.Set("x-api-key", key)
 		signer, err := httpsig.NewRequestSigner(key, a.secret, "hmac-sha256")
 		if err != nil {
 			return fmt.Errorf("cannot sign request: %s", err)
