@@ -40,12 +40,6 @@ var actions = map[string]action{
 	http.MethodDelete:  deleteAction,
 }
 
-func newAuthenticator(secret string) authenticator {
-	return authenticator{
-		secret: secret,
-	}
-}
-
 func (a authenticator) feedAuth(resource resource, method string) authFunc {
 	return func(req *http.Request) error {
 		claims := jwt.MapClaims{

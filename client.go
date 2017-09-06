@@ -27,7 +27,7 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 	c := &Client{
 		key:           key,
 		cl:            &http.Client{},
-		authenticator: newAuthenticator(secret),
+		authenticator: authenticator{secret: secret},
 	}
 
 	for _, opt := range opts {
