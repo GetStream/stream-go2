@@ -32,6 +32,12 @@
   version = "v1.1.4"
 
 [[projects]]
+  name = "gopkg.in/LeisureLink/httpsig.v1"
+  packages = ["."]
+  revision = "6ea498b1c82dfe8c96d45df6c5877a520ace0494"
+  version = "v1.2.0"
+
+[[projects]]
   name = "gopkg.in/dgrijalva/jwt-go.v3"
   packages = ["."]
   revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
@@ -40,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "585a59e33ddbc434c736f01ef9e63cc9b4f0e99eb5bea7d2568a4720e17d4268"
+  inputs-digest = "283c7d3e907a9822985c752168f370b13a67fac32f75302c538d348d4378f40d"
   solver-name = "gps-cdcl"
   solver-version = 1
