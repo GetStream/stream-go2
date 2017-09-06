@@ -79,6 +79,7 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 		if err != nil {
 			return nil, fmt.Errorf("cannot marshal request: %s", err)
 		}
+		fmt.Println(string(payload))
 		reader = bytes.NewReader(payload)
 	}
 
@@ -86,10 +87,12 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 	if err != nil {
 		return nil, fmt.Errorf("cannot create request: %s", err)
 	}
+	req.Header.Set("Content-type", "application/json")
 
 	if err := authFn(req); err != nil {
 		return nil, err
 	}
+	fmt.Println(req.URL)
 
 	resp, err := c.cl.Do(req)
 	if err != nil {
@@ -107,7 +110,7 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 
 func (c *Client) addActivities(slug, userID string, activities ...Activity) (*AddActivitiesResponse, error) {
 	reqBody := struct {
-		Activities []Activity `json:"activities"`
+		Activities []Activity `json:"activities,omitempty"`
 	}{
 		Activities: activities,
 	}
@@ -125,7 +128,7 @@ func (c *Client) addActivities(slug, userID string, activities ...Activity) (*Ad
 
 func (c *Client) updateActivities(activities ...Activity) error {
 	req := struct {
-		Activities []Activity `json:"activities"`
+		Activities []Activity `json:"activities,omitempty"`
 	}{
 		Activities: activities,
 	}
