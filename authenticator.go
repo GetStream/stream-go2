@@ -10,10 +10,6 @@ import (
 
 type authFunc func(*http.Request) error
 
-type authenticator struct {
-	secret string
-}
-
 type resource string
 
 const (
@@ -38,6 +34,10 @@ var actions = map[string]action{
 	http.MethodPut:     writeAction,
 	http.MethodPatch:   writeAction,
 	http.MethodDelete:  deleteAction,
+}
+
+type authenticator struct {
+	secret string
 }
 
 func (a authenticator) feedAuth(resource resource, method string) authFunc {
