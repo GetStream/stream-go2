@@ -39,7 +39,7 @@ func (a *Activity) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON encodes the Activity to a valid JSON bytes slice.
-func (a *Activity) MarshalJSON() ([]byte, error) {
+func (a Activity) MarshalJSON() ([]byte, error) {
 	data := structs.New(a).Map()
 	for k, v := range a.Extra {
 		data[k] = v
