@@ -40,11 +40,11 @@ type authenticator struct {
 	secret string
 }
 
-func (a authenticator) feedAuth(resource resource, method string) authFunc {
+func (a authenticator) feedAuth(resource resource) authFunc {
 	return func(req *http.Request) error {
 		claims := jwt.MapClaims{
 			"resource": resource,
-			"action":   actions[method],
+			"action":   actions[req.Method],
 			"feed_id":  "*",
 		}
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

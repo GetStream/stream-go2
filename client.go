@@ -114,7 +114,7 @@ func (c *Client) addActivities(slug, userID string, activities ...Activity) (*Ad
 		Activities: activities,
 	}
 	endpoint := c.makeEndpoint("/feed/%s/%s/", slug, userID)
-	resp, err := c.request(http.MethodPost, endpoint, reqBody, c.authenticator.feedAuth(feedResource, http.MethodPost))
+	resp, err := c.request(http.MethodPost, endpoint, reqBody, c.authenticator.feedAuth(feedResource))
 	if err != nil {
 		return nil, err
 	}
@@ -132,20 +132,20 @@ func (c *Client) updateActivities(activities ...Activity) error {
 		Activities: activities,
 	}
 	endpoint := c.makeEndpoint("/activities/")
-	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.feedAuth(activitiesResource, http.MethodPost))
+	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.feedAuth(activitiesResource))
 	return err
 }
 
 func (c *Client) removeActivityByID(slug, userID, activityID string) error {
 	endpoint := c.makeEndpoint("/feed/%s/%s/%s/", slug, userID, activityID)
-	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(feedResource, http.MethodDelete))
+	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(feedResource))
 	return err
 }
 
 func (c *Client) removeActivityByForeignID(slug, userID, foreignID string) error {
 	endpoint := c.makeEndpoint("/feed/%s/%s/%s/", slug, userID, foreignID)
 	endpoint += "&foreign_id=1"
-	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(feedResource, http.MethodDelete))
+	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(feedResource))
 	return err
 }
 
@@ -154,12 +154,12 @@ func (c *Client) getActivities(slug, userID string, opts ...RequestOption) ([]by
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
-	return c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(feedResource, http.MethodGet))
+	return c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(feedResource))
 }
 
 func (c *Client) follow(slug, userID string, opts *followFeedOptions) error {
 	endpoint := c.makeEndpoint("/feed/%s/%s/follows/", slug, userID)
-	_, err := c.request(http.MethodPost, endpoint, opts, c.authenticator.feedAuth(followerResource, http.MethodPost))
+	_, err := c.request(http.MethodPost, endpoint, opts, c.authenticator.feedAuth(followerResource))
 	return err
 }
 
@@ -168,7 +168,7 @@ func (c *Client) getFollowers(slug, userID string, opts ...RequestOption) (*Foll
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
-	resp, err := c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(followerResource, http.MethodGet))
+	resp, err := c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(followerResource))
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (c *Client) getFollowing(slug, userID string, opts ...RequestOption) (*Foll
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
-	resp, err := c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(followerResource, http.MethodGet))
+	resp, err := c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(followerResource))
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +200,7 @@ func (c *Client) unfollow(slug, userID, target string, opts ...RequestOption) er
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
-	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(followerResource, http.MethodDelete))
+	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(followerResource))
 	return err
 }
 
