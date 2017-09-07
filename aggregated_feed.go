@@ -1,6 +1,8 @@
 package stream
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // AggregatedFeed is a Stream aggregated feed, which contains activities grouped
 // based on the grouping function defined on the dashboard.

@@ -54,6 +54,31 @@ func (c *Client) AggregatedFeed(slug, userID string) *AggregatedFeed {
 	return &AggregatedFeed{newFeed(slug, userID, c)}
 }
 
+// AddToMany adds an activity to multiple feeds at once.
+func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
+	endpoint := c.makeEndpoint("/feed/add_to_many/")
+	ids := make([]string, len(feeds))
+	for i := range feeds {
+		ids[i] = feeds[i].ID()
+	}
+	req := AddToManyRequest{
+		Activity: activity,
+		Feeds:    ids,
+	}
+	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.applicationAuth(c.key))
+	return err
+}
+
+// FollowMany creates multiple follows at once.
+func (c *Client) FollowMany(relationships []FollowRelationship, opts ...RequestOption) error { // TODO test activity_copy_limit
+	endpoint := c.makeEndpoint("/follow_many/")
+	for _, opt := range opts {
+		endpoint += opt.String()
+	}
+	_, err := c.request(http.MethodPost, endpoint, relationships, c.authenticator.applicationAuth(c.key))
+	return err
+}
+
 func (c *Client) makeStreamError(body io.ReadCloser) error {
 	errBody, err := ioutil.ReadAll(body)
 	if err != nil {
@@ -79,7 +104,6 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 		if err != nil {
 			return nil, fmt.Errorf("cannot marshal request: %s", err)
 		}
-		fmt.Println(string(payload))
 		reader = bytes.NewReader(payload)
 	}
 
@@ -92,7 +116,6 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 	if err := authFn(req); err != nil {
 		return nil, err
 	}
-	fmt.Println(req.URL)
 
 	resp, err := c.cl.Do(req)
 	if err != nil {
@@ -202,30 +225,5 @@ func (c *Client) unfollow(slug, userID, target string, opts ...RequestOption) er
 		endpoint += opt.String()
 	}
 	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(followerResource))
-	return err
-}
-
-// AddToMany adds an activity to multiple feeds at once.
-func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
-	endpoint := c.makeEndpoint("/feed/add_to_many/")
-	ids := make([]string, len(feeds))
-	for i := range feeds {
-		ids[i] = feeds[i].ID()
-	}
-	req := AddToManyRequest{
-		Activity: activity,
-		Feeds:    ids,
-	}
-	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.applicationAuth(c.key))
-	return err
-}
-
-// FollowMany creates multiple follows at once.
-func (c *Client) FollowMany(relationships []FollowRelationship, opts ...RequestOption) error { // TODO test activity_copy_limit
-	endpoint := c.makeEndpoint("/follow_many/")
-	for _, opt := range opts {
-		endpoint += opt.String()
-	}
-	_, err := c.request(http.MethodPost, endpoint, relationships, c.authenticator.applicationAuth(c.key))
 	return err
 }

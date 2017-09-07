@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	timeLayout  = "2006-01-02T15:04:05.999999"
+	// TimeLayout is the default time parse layout for Stream API JSON time fields
+	TimeLayout  = "2006-01-02T15:04:05.999999"
 	defaultHost = "https://getstream.io/api/v1.0"
 )
 
