@@ -44,6 +44,9 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 	for k, v := range a.Extra {
 		data[k] = v
 	}
+	if _, ok := data["time"]; ok {
+		data["time"] = a.Time.Format(TimeLayout)
+	}
 	return json.Marshal(data)
 }
 
@@ -54,7 +57,7 @@ func (a *Activity) decodeStringToTime(f reflect.Type, t reflect.Type, data inter
 	if t != reflect.TypeOf(time.Time{}) {
 		return data, nil
 	}
-	tt, err := time.Parse(timeLayout, data.(string))
+	tt, err := time.Parse(TimeLayout, data.(string))
 	return tt, err
 }
 
@@ -71,9 +74,11 @@ func (a *Activity) decode(data map[string]interface{}) error {
 	if err := dec.Decode(data); err != nil {
 		return err
 	}
-	a.Extra = make(map[string]interface{})
-	for _, k := range meta.Unused {
-		a.Extra[k] = data[k]
+	if len(meta.Unused) > 0 {
+		a.Extra = make(map[string]interface{})
+		for _, k := range meta.Unused {
+			a.Extra[k] = data[k]
+		}
 	}
 	return nil
 }
