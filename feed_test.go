@@ -1,7 +1,6 @@
 package stream_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -44,6 +43,5 @@ func TestUpdateActivities(t *testing.T) {
 	resp, err := flat.GetActivities()
 	require.NoError(t, err)
 	assert.Len(t, resp.Results, 1)
-	fmt.Println(resp.Results)
 	assert.NotEmpty(t, resp.Results[0].Extra)
 }

@@ -104,7 +104,6 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 		if err != nil {
 			return nil, fmt.Errorf("cannot marshal request: %s", err)
 		}
-		fmt.Println(method, endpoint, string(payload))
 		reader = bytes.NewReader(payload)
 	}
 
