@@ -53,12 +53,16 @@ func (a *Activity) decode(data map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
+
+	// this block must become an anonymous function parameter so to generalize
+	// the whole process
 	if len(meta.Unused) > 0 {
 		a.Extra = make(map[string]interface{})
 		for _, k := range meta.Unused {
 			a.Extra[k] = data[k]
 		}
 	}
+
 	return nil
 }
 

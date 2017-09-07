@@ -1,0 +1,2 @@
+- [ ] Add tests for RequestOptions
+- [ ] Refactor RequestOptions so not to have too generic options

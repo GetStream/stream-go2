@@ -18,7 +18,8 @@ type FlatFeedResponse struct {
 
 // UnmarshalJSON decodes the provided JSON payload into the FlatFeedResponse.
 func (r *FlatFeedResponse) UnmarshalJSON(b []byte) error {
-	return unmarshalWithDuration(b, r)
+	_, err := unmarshalJSON(b, r)
+	return err
 }
 
 // AggregatedFeedResponse is the API response obtained when retrieving
@@ -31,7 +32,8 @@ type AggregatedFeedResponse struct {
 // UnmarshalJSON decodes the provided JSON payload into the
 // AggregatedFeedResponse.
 func (r *AggregatedFeedResponse) UnmarshalJSON(b []byte) error {
-	return unmarshalWithDuration(b, r)
+	_, err := unmarshalJSON(b, r)
+	return err
 }
 
 // AddActivitiesResponse is the API response obtained when adding activities to
@@ -44,7 +46,8 @@ type AddActivitiesResponse struct {
 // UnmarshalJSON decodes the provided JSON payload into the
 // AddActivitiesResponse.
 func (r *AddActivitiesResponse) UnmarshalJSON(b []byte) error {
-	return unmarshalWithDuration(b, r)
+	_, err := unmarshalJSON(b, r)
+	return err
 }
 
 // Follower is the representation of a feed following another feed.
@@ -71,7 +74,8 @@ type FollowingResponse struct {
 }
 
 func (r *followResponse) UnmarshalJSON(b []byte) error {
-	return unmarshalWithDuration(b, r)
+	_, err := unmarshalJSON(b, r)
+	return err
 }
 
 // AddToManyRequest is the API request body for adding an activity to multiple

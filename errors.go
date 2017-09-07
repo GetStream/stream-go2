@@ -25,7 +25,8 @@ func (e APIError) Error() string {
 
 // UnmarshalJSON decodes the provided JSON byte payload to the APIError.
 func (e *APIError) UnmarshalJSON(b []byte) error {
-	return unmarshalWithDuration(b, e)
+	_, err := unmarshalJSON(b, e)
+	return err
 }
 
 // ToAPIError tries to cast the provided error to APIError type, returning the

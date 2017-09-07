@@ -2,6 +2,7 @@ package stream_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -22,4 +23,33 @@ func TestErrorUnmarshal(t *testing.T) {
 		StatusCode: 123,
 	}
 	assert.Equal(t, expected, apiErr)
+}
+
+func TestErrorString(t *testing.T) {
+	apiErr := stream.APIError{Detail: "boom"}
+	assert.Equal(t, "boom", apiErr.Error())
+}
+
+func TestToAPIError(t *testing.T) {
+	testCases := []struct {
+		err   error
+		match bool
+	}{
+		{
+			err:   fmt.Errorf("this is an error"),
+			match: false,
+		},
+		{
+			err:   stream.APIError{},
+			match: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		err, ok := stream.ToAPIError(tc.err)
+		assert.Equal(t, tc.match, ok)
+		if ok {
+			assert.IsType(t, stream.APIError{}, err)
+		}
+	}
 }

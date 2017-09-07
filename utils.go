@@ -38,11 +38,10 @@ func decodeData(data map[string]interface{}, target interface{}) (*mapstructure.
 	return cfg.Metadata, nil
 }
 
-func unmarshalWithDuration(b []byte, e interface{}) error {
+func unmarshalJSON(b []byte, e interface{}) (*mapstructure.Metadata, error) {
 	var data map[string]interface{}
 	if err := json.Unmarshal(b, &data); err != nil {
-		return err
+		return nil, err
 	}
-	_, err := decodeData(data, e)
-	return err
+	return decodeData(data, e)
 }
