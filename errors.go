@@ -1,7 +1,6 @@
 package stream
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -26,20 +25,7 @@ func (e APIError) Error() string {
 
 // UnmarshalJSON decodes the provided JSON byte payload to the APIError.
 func (e *APIError) UnmarshalJSON(b []byte) error {
-	type alias APIError
-	aux := &struct {
-		Duration string `json:"duration,omitempty"`
-		*alias
-	}{alias: (*alias)(e)}
-	err := json.Unmarshal(b, &aux)
-	if err != nil {
-		return err
-	}
-	e.Duration, err = time.ParseDuration(aux.Duration)
-	if err != nil {
-		return err
-	}
-	return nil
+	return unmarshalWithDuration(b, e)
 }
 
 // ToAPIError tries to cast the provided error to APIError type, returning the

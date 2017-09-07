@@ -1,7 +1,6 @@
 package stream
 
 import (
-	"encoding/json"
 	"time"
 )
 
@@ -19,20 +18,7 @@ type FlatFeedResponse struct {
 
 // UnmarshalJSON decodes the provided JSON payload into the FlatFeedResponse.
 func (r *FlatFeedResponse) UnmarshalJSON(b []byte) error {
-	type alias FlatFeedResponse
-	aux := &struct {
-		Duration string `json:"duration,omitempty"`
-		*alias
-	}{alias: (*alias)(r)}
-	err := json.Unmarshal(b, &aux)
-	if err != nil {
-		return err
-	}
-	r.Duration, err = time.ParseDuration(aux.Duration)
-	if err != nil {
-		return err
-	}
-	return nil
+	return unmarshalWithDuration(b, r)
 }
 
 // AggregatedFeedResponse is the API response obtained when retrieving
@@ -45,20 +31,7 @@ type AggregatedFeedResponse struct {
 // UnmarshalJSON decodes the provided JSON payload into the
 // AggregatedFeedResponse.
 func (r *AggregatedFeedResponse) UnmarshalJSON(b []byte) error {
-	type alias AggregatedFeedResponse
-	aux := &struct {
-		Duration string `json:"duration,omitempty"`
-		*alias
-	}{alias: (*alias)(r)}
-	err := json.Unmarshal(b, &aux)
-	if err != nil {
-		return err
-	}
-	r.Duration, err = time.ParseDuration(aux.Duration)
-	if err != nil {
-		return err
-	}
-	return nil
+	return unmarshalWithDuration(b, r)
 }
 
 // AddActivitiesResponse is the API response obtained when adding activities to
@@ -71,20 +44,7 @@ type AddActivitiesResponse struct {
 // UnmarshalJSON decodes the provided JSON payload into the
 // AddActivitiesResponse.
 func (r *AddActivitiesResponse) UnmarshalJSON(b []byte) error {
-	type alias AddActivitiesResponse
-	aux := &struct {
-		Duration string `json:"duration,omitempty"`
-		*alias
-	}{alias: (*alias)(r)}
-	err := json.Unmarshal(b, &aux)
-	if err != nil {
-		return err
-	}
-	r.Duration, err = time.ParseDuration(aux.Duration)
-	if err != nil {
-		return err
-	}
-	return nil
+	return unmarshalWithDuration(b, r)
 }
 
 // Follower is the representation of a feed following another feed.
@@ -111,20 +71,7 @@ type FollowingResponse struct {
 }
 
 func (r *followResponse) UnmarshalJSON(b []byte) error {
-	type alias followResponse
-	aux := &struct {
-		Duration string `json:"duration,omitempty"`
-		*alias
-	}{alias: (*alias)(r)}
-	err := json.Unmarshal(b, &aux)
-	if err != nil {
-		return err
-	}
-	r.Duration, err = time.ParseDuration(aux.Duration)
-	if err != nil {
-		return err
-	}
-	return nil
+	return unmarshalWithDuration(b, r)
 }
 
 // AddToManyRequest is the API request body for adding an activity to multiple
