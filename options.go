@@ -165,8 +165,11 @@ func WithActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 	}
 }
 
+// UpdateToTargetsOption is used for configuring an UpdateToTargets API call.
 type UpdateToTargetsOption func(*UpdateToTargetsRequest)
 
+// NewToTargets sets the new to targets for an UpdateToTargets request. They will replace
+// all previous to targets.
 func NewToTargets(targets []Feed) UpdateToTargetsOption {
 	return func(r *UpdateToTargetsRequest) {
 		r.New = make([]string, len(targets))
@@ -176,6 +179,8 @@ func NewToTargets(targets []Feed) UpdateToTargetsOption {
 	}
 }
 
+// AddToTargets sets the to targets additions for an UpdateToTargets request. They
+// will be added to the existing to targets.
 func AddToTargets(targets []Feed) UpdateToTargetsOption {
 	return func(r *UpdateToTargetsRequest) {
 		r.Adds = make([]string, len(targets))
@@ -185,6 +190,7 @@ func AddToTargets(targets []Feed) UpdateToTargetsOption {
 	}
 }
 
+// RemoveToTargets sets the targets to be removed for an UpdateToTargets request.
 func RemoveToTargets(targets []Feed) UpdateToTargetsOption {
 	return func(r *UpdateToTargetsRequest) {
 		r.Removes = make([]string, len(targets))

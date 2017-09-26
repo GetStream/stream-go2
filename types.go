@@ -5,10 +5,13 @@ import (
 	"time"
 )
 
+// Duration wraps time.Duration, used because of JSON marshaling and
+// unmarshaling.
 type Duration struct {
 	time.Duration
 }
 
+// UnmarshalJSON for Duration is required because of the incoming duration string.
 func (d *Duration) UnmarshalJSON(b []byte) error {
 	var err error
 	*d, err = durationFromString(strings.Replace(string(b), `"`, "", -1))
@@ -20,10 +23,13 @@ func durationFromString(s string) (Duration, error) {
 	return Duration{dd}, err
 }
 
+// Time wraps time.Time, used because of custom API time format in JSON marshaling
+// and unmarshaling.
 type Time struct {
 	time.Time
 }
 
+// UnmarshalJSON for Time is required because of the incoming time string format.
 func (t *Time) UnmarshalJSON(b []byte) error {
 	var err error
 	*t, err = timeFromString(strings.Replace(string(b), `"`, "", -1))
@@ -106,6 +112,7 @@ func NewFollowRelationship(source, target Feed) FollowRelationship {
 	}
 }
 
+// UpdateToTargetsRequest is the payload for an UpdateToTargets API request.
 type UpdateToTargetsRequest struct {
 	ForeignID string   `json:"foreign_id,omitempty"`
 	Time      string   `json:"time,omitempty"`
