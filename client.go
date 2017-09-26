@@ -85,7 +85,7 @@ func (c *Client) AggregatedFeed(slug, userID string) *AggregatedFeed {
 
 // AddToMany adds an activity to multiple feeds at once.
 func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
-	endpoint := c.makeEndpoint("feed/add_to_many/")
+	endpoint := c.makeEndpoint("feed/add_to_many")
 	ids := make([]string, len(feeds))
 	for i := range feeds {
 		ids[i] = feeds[i].ID()
@@ -100,7 +100,7 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 
 // FollowMany creates multiple follows at once.
 func (c *Client) FollowMany(relationships []FollowRelationship, opts ...RequestOption) error { // TODO test activity_copy_limit
-	endpoint := c.makeEndpoint("follow_many/")
+	endpoint := c.makeEndpoint("follow_many")
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
