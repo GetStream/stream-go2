@@ -13,7 +13,7 @@ type AggregatedFeed struct {
 // GetActivities requests and retrieves the activities and groups for the
 // aggregated feed.
 func (f *AggregatedFeed) GetActivities(opts ...GetActivitiesOption) (*AggregatedFeedResponse, error) {
-	body, err := f.client.getActivities(f.Slug(), f.UserID(), opts...)
+	body, err := f.client.getActivities(f, opts...)
 	if err != nil {
 		return nil, err
 	}

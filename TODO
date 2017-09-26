@@ -1,6 +1,6 @@
 - [ ] Add tests for RequestOptions
-- [ ] Refactor RequestOptions so not to have too generic options
+- [x] Refactor RequestOptions so not to have too generic options
 - [ ] Create client init function with no arguments, using only env vars
 - [ ] Support Heroku
 - [ ] Nice README/wiki
-- [ ] UpdateToTargets endpoint
+- [x] UpdateToTargets endpoint

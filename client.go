@@ -130,14 +130,14 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 	return body, nil
 }
 
-func (c *Client) addActivities(slug, userID string, activities ...Activity) (*AddActivitiesResponse, error) {
+func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitiesResponse, error) {
 	reqBody := struct {
 		Activities []Activity `json:"activities,omitempty"`
 	}{
 		Activities: activities,
 	}
-	endpoint := c.makeEndpoint("/feed/%s/%s/", slug, userID)
-	resp, err := c.request(http.MethodPost, endpoint, reqBody, c.authenticator.feedAuth(feedResource))
+	endpoint := c.makeEndpoint("/feed/%s/%s/", feed.Slug(), feed.UserID())
+	resp, err := c.request(http.MethodPost, endpoint, reqBody, c.authenticator.feedAuth(resFeed))
 	if err != nil {
 		return nil, err
 	}
@@ -155,43 +155,43 @@ func (c *Client) updateActivities(activities ...Activity) error {
 		Activities: activities,
 	}
 	endpoint := c.makeEndpoint("/activities/")
-	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.feedAuth(activitiesResource))
+	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.feedAuth(resActivities))
 	return err
 }
 
-func (c *Client) removeActivityByID(slug, userID, activityID string) error {
-	endpoint := c.makeEndpoint("/feed/%s/%s/%s/", slug, userID, activityID)
-	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(feedResource))
+func (c *Client) removeActivityByID(feed Feed, activityID string) error {
+	endpoint := c.makeEndpoint("/feed/%s/%s/%s/", feed.Slug(), feed.UserID(), activityID)
+	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(resFeed))
 	return err
 }
 
-func (c *Client) removeActivityByForeignID(slug, userID, foreignID string) error {
-	endpoint := c.makeEndpoint("/feed/%s/%s/%s/", slug, userID, foreignID)
+func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) error {
+	endpoint := c.makeEndpoint("/feed/%s/%s/%s/", feed.Slug(), feed.UserID(), foreignID)
 	endpoint += "&foreign_id=1"
-	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(feedResource))
+	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(resFeed))
 	return err
 }
 
-func (c *Client) getActivities(slug, userID string, opts ...GetActivitiesOption) ([]byte, error) {
-	endpoint := c.makeEndpoint("/feed/%s/%s/", slug, userID)
+func (c *Client) getActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
+	endpoint := c.makeEndpoint("/feed/%s/%s/", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
-	return c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(feedResource))
+	return c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(resFeed))
 }
 
-func (c *Client) follow(slug, userID string, opts *followFeedOptions) error {
-	endpoint := c.makeEndpoint("/feed/%s/%s/follows/", slug, userID)
-	_, err := c.request(http.MethodPost, endpoint, opts, c.authenticator.feedAuth(followerResource))
+func (c *Client) follow(feed Feed, opts *followFeedOptions) error {
+	endpoint := c.makeEndpoint("/feed/%s/%s/follows/", feed.Slug(), feed.UserID())
+	_, err := c.request(http.MethodPost, endpoint, opts, c.authenticator.feedAuth(resFollower))
 	return err
 }
 
-func (c *Client) getFollowers(slug, userID string, opts ...FollowersOption) (*FollowersResponse, error) {
-	endpoint := c.makeEndpoint("/feed/%s/%s/followers/", slug, userID)
+func (c *Client) getFollowers(feed Feed, opts ...FollowersOption) (*FollowersResponse, error) {
+	endpoint := c.makeEndpoint("/feed/%s/%s/followers/", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
-	resp, err := c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(followerResource))
+	resp, err := c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(resFollower))
 	if err != nil {
 		return nil, err
 	}
@@ -202,12 +202,12 @@ func (c *Client) getFollowers(slug, userID string, opts ...FollowersOption) (*Fo
 	return &out, nil
 }
 
-func (c *Client) getFollowing(slug, userID string, opts ...FollowingOption) (*FollowingResponse, error) {
-	endpoint := c.makeEndpoint("/feed/%s/%s/follows/", slug, userID)
+func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingResponse, error) {
+	endpoint := c.makeEndpoint("/feed/%s/%s/follows/", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
-	resp, err := c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(followerResource))
+	resp, err := c.request(http.MethodGet, endpoint, nil, c.authenticator.feedAuth(resFollower))
 	if err != nil {
 		return nil, err
 	}
@@ -218,11 +218,29 @@ func (c *Client) getFollowing(slug, userID string, opts ...FollowingOption) (*Fo
 	return &out, nil
 }
 
-func (c *Client) unfollow(slug, userID, target string, opts ...UnfollowOption) error {
-	endpoint := c.makeEndpoint("/feed/%s/%s/follows/%s/", slug, userID, target)
+func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) error {
+	endpoint := c.makeEndpoint("/feed/%s/%s/follows/%s/", feed.Slug(), feed.UserID(), target)
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
-	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(followerResource))
+	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(resFollower))
+	return err
+}
+
+func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToTargetsOption) error {
+	if activity.Time.IsZero() {
+		return fmt.Errorf("activity time cannot be zero")
+	}
+	endpoint := c.makeEndpoint("/feed_targets/%s/%s/activity_to_targets/", feed.Slug(), feed.UserID())
+
+	req := &UpdateToTargetsRequest{
+		ForeignID: activity.ForeignID,
+		Time:      activity.Time.Format(TimeLayout),
+	}
+	for _, opt := range opts {
+		opt(req)
+	}
+
+	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.feedAuth(resFeedTargets))
 	return err
 }

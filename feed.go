@@ -16,6 +16,7 @@ type Feed interface {
 	GetFollowers(...FollowersOption) (*FollowersResponse, error)
 	GetFollowing(...FollowingOption) (*FollowingResponse, error) // TODO test filter param
 	Unfollow(Feed, ...UnfollowOption) error                      // TODO test heep_history param
+	UpdateToTargets(Activity, ...UpdateToTargetsOption) error
 }
 
 type feed struct {
@@ -33,7 +34,7 @@ func newFeed(slug, userID string, client *Client) feed {
 }
 
 func (f feed) AddActivities(activities ...Activity) (*AddActivitiesResponse, error) {
-	return f.client.addActivities(f.Slug(), f.UserID(), activities...)
+	return f.client.addActivities(f, activities...)
 }
 
 func (f feed) UpdateActivities(activities ...Activity) error {
@@ -41,11 +42,11 @@ func (f feed) UpdateActivities(activities ...Activity) error {
 }
 
 func (f feed) RemoveActivityByID(id string) error {
-	return f.client.removeActivityByID(f.Slug(), f.UserID(), id)
+	return f.client.removeActivityByID(f, id)
 }
 
 func (f feed) RemoveActivityByForeignID(foreignID string) error {
-	return f.client.removeActivityByForeignID(f.Slug(), f.UserID(), foreignID)
+	return f.client.removeActivityByForeignID(f, foreignID)
 }
 
 func (f feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
@@ -56,17 +57,21 @@ func (f feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
 	for _, opt := range opts {
 		opt(followOptions)
 	}
-	return f.client.follow(f.Slug(), f.UserID(), followOptions)
+	return f.client.follow(f, followOptions)
 }
 
 func (f feed) GetFollowers(opts ...FollowersOption) (*FollowersResponse, error) {
-	return f.client.getFollowers(f.Slug(), f.UserID(), opts...)
+	return f.client.getFollowers(f, opts...)
 }
 
 func (f feed) GetFollowing(opts ...FollowingOption) (*FollowingResponse, error) {
-	return f.client.getFollowing(f.Slug(), f.UserID(), opts...)
+	return f.client.getFollowing(f, opts...)
 }
 
 func (f feed) Unfollow(target Feed, opts ...UnfollowOption) error {
-	return f.client.unfollow(f.Slug(), f.UserID(), target.ID(), opts...)
+	return f.client.unfollow(f, target.ID(), opts...)
+}
+
+func (f feed) UpdateToTargets(activity Activity, opts ...UpdateToTargetsOption) error {
+	return f.client.updateToTargets(f, activity, opts...)
 }

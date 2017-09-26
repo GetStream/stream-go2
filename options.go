@@ -164,3 +164,32 @@ func WithActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 		o.ActivityCopyLimit = activityCopyLimit
 	}
 }
+
+type UpdateToTargetsOption func(*UpdateToTargetsRequest)
+
+func NewToTargets(targets []Feed) UpdateToTargetsOption {
+	return func(r *UpdateToTargetsRequest) {
+		r.New = make([]string, len(targets))
+		for i := range targets {
+			r.New[i] = targets[i].ID()
+		}
+	}
+}
+
+func AddToTargets(targets []Feed) UpdateToTargetsOption {
+	return func(r *UpdateToTargetsRequest) {
+		r.Adds = make([]string, len(targets))
+		for i := range targets {
+			r.Adds[i] = targets[i].ID()
+		}
+	}
+}
+
+func RemoveToTargets(targets []Feed) UpdateToTargetsOption {
+	return func(r *UpdateToTargetsRequest) {
+		r.Removes = make([]string, len(targets))
+		for i := range targets {
+			r.Removes[i] = targets[i].ID()
+		}
+	}
+}

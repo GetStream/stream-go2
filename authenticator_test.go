@@ -14,7 +14,7 @@ func TestFeedAuth(t *testing.T) {
 	req, err := http.NewRequest(http.MethodPost, "", nil)
 	require.NoError(t, err)
 
-	err = a.feedAuth(feedResource)(req)
+	err = a.feedAuth(resFeed)(req)
 	assert.NoError(t, err)
 	assert.Equal(t, "jwt", req.Header.Get("stream-auth-type"))
 	expectedAuth := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiJ3cml0ZSIsImZlZWRfaWQiOiIqIiwicmVzb3VyY2UiOiJmZWVkIn0.LnWdqnKryMuXEX3p8HepCBRVGfvhdzINmA2jU1j3TUA"

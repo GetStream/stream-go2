@@ -10,7 +10,7 @@ type FlatFeed struct {
 // GetActivities returns the activities for the given FlatFeed, filtering
 // results with the provided GetActivitiesOption parameters.
 func (f *FlatFeed) GetActivities(opts ...GetActivitiesOption) (*FlatFeedResponse, error) {
-	body, err := f.client.getActivities(f.Slug(), f.UserID(), opts...)
+	body, err := f.client.getActivities(f, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -100,3 +100,11 @@ func NewFollowRelationship(source, target Feed) FollowRelationship {
 		Target: target.ID(),
 	}
 }
+
+type UpdateToTargetsRequest struct {
+	ForeignID string   `json:"foreign_id,omitempty"`
+	Time      string   `json:"time,omitempty"`
+	New       []string `json:"new_targets,omitempty"`
+	Adds      []string `json:"added_targets,omitempty"`
+	Removes   []string `json:"removed_targets,omitempty"`
+}
