@@ -6,9 +6,6 @@ import (
 	"github.com/fatih/structs"
 )
 
-// Activities is a slice of Activity.
-type Activities []Activity
-
 // Activity is a Stream activity entity.
 type Activity struct {
 	ID        string                 `json:"id,omitempty"`
@@ -60,6 +57,9 @@ func (a *Activity) decode(data map[string]interface{}) error {
 	}
 	return nil
 }
+
+// Activities is a slice of Activity.
+type Activities []Activity
 
 // ActivityGroup is a group of Activity obtained from aggregated feeds.
 type ActivityGroup struct {

@@ -13,8 +13,8 @@ func TestAddToMany(t *testing.T) {
 	var (
 		client     = newClient(t)
 		activity   = stream.Activity{Actor: "bob", Verb: "like", Object: "cake"}
-		flat       = client.FlatFeed("flat", randString(10))
-		aggregated = client.AggregatedFeed("timeline_aggregated", randString(10))
+		flat       = newFlatFeed(client)
+		aggregated = newAggregatedFeed(client)
 	)
 
 	err := client.AddToMany(activity, flat, aggregated)

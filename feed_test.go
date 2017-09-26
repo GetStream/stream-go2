@@ -45,3 +45,36 @@ func TestUpdateActivities(t *testing.T) {
 	assert.Len(t, resp.Results, 1)
 	assert.NotEmpty(t, resp.Results[0].Extra)
 }
+
+func TestUpdateToTargets(t *testing.T) {
+	client := newClient(t)
+	flat := newFlatFeed(client)
+	f1, f2, f3 := newFlatFeed(client), newFlatFeed(client), newFlatFeed(client)
+	activity := stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}}
+	_, err := flat.AddActivity(activity)
+	require.NoError(t, err)
+
+	resp, err := flat.GetActivities()
+	require.NoError(t, err)
+	assert.Len(t, resp.Results, 1)
+	assert.Len(t, resp.Results[0].To, 1)
+	assert.Equal(t, f1.ID(), resp.Results[0].To[0])
+
+	err = flat.UpdateToTargets(activity, stream.UpdateToTargetsWithAdd(f2))
+	require.NoError(t, err)
+	assert.Len(t, resp.Results, 1)
+	assert.Len(t, resp.Results[0].To, 2)
+	assert.Equal(t, f1.ID(), resp.Results[0].To[0])
+	assert.Equal(t, f2.ID(), resp.Results[0].To[1])
+
+	err = flat.UpdateToTargets(activity, stream.UpdateToTargetsWithNew(f3))
+	require.NoError(t, err)
+	assert.Len(t, resp.Results, 1)
+	assert.Len(t, resp.Results[0].To, 1)
+	assert.Equal(t, f3.ID(), resp.Results[0].To[0])
+
+	err = flat.UpdateToTargets(activity, stream.UpdateToTargetsWithRemove(f3))
+	require.NoError(t, err)
+	assert.Len(t, resp.Results, 1)
+	assert.Len(t, resp.Results[0].To, 0)
+}

@@ -32,5 +32,13 @@ func randString(n int) string {
 
 func getTime(t time.Time) stream.Time {
 	st, _ := time.Parse(stream.TimeLayout, t.Truncate(time.Second).Format(stream.TimeLayout))
-	return stream.Time{st}
+	return stream.Time{Time: st}
+}
+
+func newFlatFeed(c *stream.Client) *stream.FlatFeed {
+	return c.FlatFeed("flat", randString(10))
+}
+
+func newAggregatedFeed(c *stream.Client) *stream.AggregatedFeed {
+	return c.AggregatedFeed("timeline_aggregated", randString(10))
 }

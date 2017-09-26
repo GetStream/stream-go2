@@ -33,6 +33,10 @@ func newFeed(slug, userID string, client *Client) feed {
 	return feed{userID: userID, slug: slug, client: client}
 }
 
+func (f feed) AddActivity(activity Activity) (*AddActivitiesResponse, error) {
+	return f.AddActivities(activity)
+}
+
 func (f feed) AddActivities(activities ...Activity) (*AddActivitiesResponse, error) {
 	return f.client.addActivities(f, activities...)
 }

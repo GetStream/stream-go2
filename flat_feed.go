@@ -24,5 +24,5 @@ func (f *FlatFeed) GetActivities(opts ...GetActivitiesOption) (*FlatFeedResponse
 // GetActivitiesWithRanking returns the activities (filtered) for the given FlatFeed,
 // using the provided ranking method.
 func (f *FlatFeed) GetActivitiesWithRanking(ranking string, opts ...GetActivitiesOption) (*FlatFeedResponse, error) {
-	return f.GetActivities(append(opts, withRanking(ranking))...)
+	return f.GetActivities(append(opts, getActivitiesWithRanking(ranking))...)
 }

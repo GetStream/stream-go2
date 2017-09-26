@@ -3,6 +3,8 @@ package stream_test
 import (
 	"testing"
 
+	"github.com/reifcode/stream-go2"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,7 +19,27 @@ func TestAggregatedFeedGetActivities(t *testing.T) {
 	resp, err := aggregated.GetActivities()
 	require.NoError(t, err)
 	assert.Len(t, resp.Results, 2)
-	assert.Len(t, resp.Results[0].Activities, size/2)
-	assert.Len(t, resp.Results[1].Activities, size/2)
-	// TODO test read options
+
+	resp, err = aggregated.GetActivities(stream.GetActivitiesWithLimit(1))
+	require.NoError(t, err)
+	assert.Len(t, resp.Results, 1)
+
+	_, err = aggregated.AddActivities(
+		stream.Activity{
+			Actor:  "test",
+			Verb:   randString(10),
+			Object: randString(10)},
+	)
+	require.NoError(t, err)
+
+	resp, err = aggregated.GetActivities(stream.GetActivitiesWithOffset(0))
+	require.NoError(t, err)
+	assert.Len(t, resp.Results, 3)
+
+	resp, err = aggregated.GetActivities(
+		stream.GetActivitiesWithOffset(0),
+		stream.GetActivitiesWithLimit(2),
+	)
+	require.NoError(t, err)
+	assert.Len(t, resp.Results, 2)
 }
