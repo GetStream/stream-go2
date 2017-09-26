@@ -13,27 +13,28 @@ type authFunc func(*http.Request) error
 type resource string
 
 const (
-	followerResource   resource = "follower"
-	activitiesResource resource = "activities"
-	feedResource       resource = "feed"
+	resFollower    resource = "follower"
+	resActivities  resource = "activities"
+	resFeed        resource = "feed"
+	resFeedTargets resource = "feed_targets"
 )
 
 type action string
 
 const (
-	readAction   action = "read"
-	writeAction  action = "write"
-	deleteAction action = "delete"
+	actionRead   action = "read"
+	actionWrite  action = "write"
+	actionDelete action = "delete"
 )
 
 var actions = map[string]action{
-	http.MethodGet:     readAction,
-	http.MethodOptions: readAction,
-	http.MethodHead:    readAction,
-	http.MethodPost:    writeAction,
-	http.MethodPut:     writeAction,
-	http.MethodPatch:   writeAction,
-	http.MethodDelete:  deleteAction,
+	http.MethodGet:     actionRead,
+	http.MethodOptions: actionRead,
+	http.MethodHead:    actionRead,
+	http.MethodPost:    actionWrite,
+	http.MethodPut:     actionWrite,
+	http.MethodPatch:   actionWrite,
+	http.MethodDelete:  actionDelete,
 }
 
 type authenticator struct {
