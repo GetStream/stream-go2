@@ -33,5 +33,9 @@ func TestFlatFeedGetActivities(t *testing.T) {
 	resp, err := flat.GetActivities()
 	require.NoError(t, err)
 	assert.Len(t, resp.Results, size)
-	// TODO test read options
+
+	limit := 2
+	resp, err = flat.GetActivities(stream.WithLimit(limit))
+	require.NoError(t, err)
+	assert.Len(t, resp.Results, limit)
 }

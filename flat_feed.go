@@ -8,8 +8,8 @@ type FlatFeed struct {
 }
 
 // GetActivities returns the activities for the given FlatFeed, filtering
-// results with the provided RequestOption parameters.
-func (f *FlatFeed) GetActivities(opts ...RequestOption) (*FlatFeedResponse, error) {
+// results with the provided GetActivitiesOption parameters.
+func (f *FlatFeed) GetActivities(opts ...GetActivitiesOption) (*FlatFeedResponse, error) {
 	body, err := f.client.getActivities(f.Slug(), f.UserID(), opts...)
 	if err != nil {
 		return nil, err
@@ -19,4 +19,10 @@ func (f *FlatFeed) GetActivities(opts ...RequestOption) (*FlatFeedResponse, erro
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// GetActivitiesWithRanking returns the activities (filtered) for the given FlatFeed,
+// using the provided ranking method.
+func (f *FlatFeed) GetActivitiesWithRanking(ranking string, opts ...GetActivitiesOption) (*FlatFeedResponse, error) {
+	return f.GetActivities(append(opts, withRanking(ranking))...)
 }

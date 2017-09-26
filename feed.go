@@ -13,9 +13,9 @@ type Feed interface {
 	RemoveActivityByID(string) error
 	RemoveActivityByForeignID(string) error
 	Follow(*FlatFeed, ...FollowFeedOption) error
-	GetFollowers(...RequestOption) (*FollowersResponse, error)
-	GetFollowing(...RequestOption) (*FollowingResponse, error) // TODO test filter param
-	Unfollow(Feed, ...RequestOption) error                     // TODO test heep_history param
+	GetFollowers(...FollowersOption) (*FollowersResponse, error)
+	GetFollowing(...FollowingOption) (*FollowingResponse, error) // TODO test filter param
+	Unfollow(Feed, ...UnfollowOption) error                      // TODO test heep_history param
 }
 
 type feed struct {
@@ -59,14 +59,14 @@ func (f feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
 	return f.client.follow(f.Slug(), f.UserID(), followOptions)
 }
 
-func (f feed) GetFollowers(opts ...RequestOption) (*FollowersResponse, error) {
+func (f feed) GetFollowers(opts ...FollowersOption) (*FollowersResponse, error) {
 	return f.client.getFollowers(f.Slug(), f.UserID(), opts...)
 }
 
-func (f feed) GetFollowing(opts ...RequestOption) (*FollowingResponse, error) {
+func (f feed) GetFollowing(opts ...FollowingOption) (*FollowingResponse, error) {
 	return f.client.getFollowing(f.Slug(), f.UserID(), opts...)
 }
 
-func (f feed) Unfollow(target Feed, opts ...RequestOption) error {
+func (f feed) Unfollow(target Feed, opts ...UnfollowOption) error {
 	return f.client.unfollow(f.Slug(), f.UserID(), target.ID(), opts...)
 }

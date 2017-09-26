@@ -172,7 +172,7 @@ func (c *Client) removeActivityByForeignID(slug, userID, foreignID string) error
 	return err
 }
 
-func (c *Client) getActivities(slug, userID string, opts ...RequestOption) ([]byte, error) {
+func (c *Client) getActivities(slug, userID string, opts ...GetActivitiesOption) ([]byte, error) {
 	endpoint := c.makeEndpoint("/feed/%s/%s/", slug, userID)
 	for _, opt := range opts {
 		endpoint += opt.String()
@@ -186,7 +186,7 @@ func (c *Client) follow(slug, userID string, opts *followFeedOptions) error {
 	return err
 }
 
-func (c *Client) getFollowers(slug, userID string, opts ...RequestOption) (*FollowersResponse, error) {
+func (c *Client) getFollowers(slug, userID string, opts ...FollowersOption) (*FollowersResponse, error) {
 	endpoint := c.makeEndpoint("/feed/%s/%s/followers/", slug, userID)
 	for _, opt := range opts {
 		endpoint += opt.String()
@@ -202,7 +202,7 @@ func (c *Client) getFollowers(slug, userID string, opts ...RequestOption) (*Foll
 	return &out, nil
 }
 
-func (c *Client) getFollowing(slug, userID string, opts ...RequestOption) (*FollowingResponse, error) {
+func (c *Client) getFollowing(slug, userID string, opts ...FollowingOption) (*FollowingResponse, error) {
 	endpoint := c.makeEndpoint("/feed/%s/%s/follows/", slug, userID)
 	for _, opt := range opts {
 		endpoint += opt.String()
@@ -218,7 +218,7 @@ func (c *Client) getFollowing(slug, userID string, opts ...RequestOption) (*Foll
 	return &out, nil
 }
 
-func (c *Client) unfollow(slug, userID, target string, opts ...RequestOption) error {
+func (c *Client) unfollow(slug, userID, target string, opts ...UnfollowOption) error {
 	endpoint := c.makeEndpoint("/feed/%s/%s/follows/%s/", slug, userID, target)
 	for _, opt := range opts {
 		endpoint += opt.String()
