@@ -23,7 +23,7 @@ type Client struct {
 // * `STREAM_API_KEY`
 // * `STREAM_API_SECRET`
 // * `STREAM_API_REGION`
-func NewClienFromEnv() (*Client, error) {
+func NewClientFromEnv() (*Client, error) {
 	return NewClient(
 		os.Getenv("STREAM_API_KEY"),
 		os.Getenv("STREAM_API_SECRET"),
