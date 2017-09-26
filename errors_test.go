@@ -18,7 +18,7 @@ func TestErrorUnmarshal(t *testing.T) {
 	expected := stream.APIError{
 		Code:       42,
 		Detail:     "the details",
-		Duration:   10 * time.Millisecond,
+		Duration:   stream.Duration{10 * time.Millisecond},
 		Exception:  "boom",
 		StatusCode: 123,
 	}

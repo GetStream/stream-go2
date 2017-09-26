@@ -2,7 +2,6 @@ package stream
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/fatih/structs"
 )
@@ -18,7 +17,7 @@ type Activity struct {
 	Object    string                 `json:"object,omitempty"`
 	ForeignID string                 `json:"foreign_id,omitempty"`
 	Target    string                 `json:"target,omitempty"`
-	Time      time.Time              `json:"time,omitempty"`
+	Time      Time                   `json:"time,omitempty"`
 	To        []string               `json:"to,omitempty"`
 	Score     string                 `json:"score,omitempty"`
 	Extra     map[string]interface{} `json:"-"`
@@ -53,16 +52,12 @@ func (a *Activity) decode(data map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-
-	// this block must become an anonymous function parameter so to generalize
-	// the whole process
 	if len(meta.Unused) > 0 {
 		a.Extra = make(map[string]interface{})
 		for _, k := range meta.Unused {
 			a.Extra[k] = data[k]
 		}
 	}
-
 	return nil
 }
 

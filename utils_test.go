@@ -30,7 +30,7 @@ func randString(n int) string {
 	return string(b)
 }
 
-func getTime(t time.Time) time.Time {
+func getTime(t time.Time) stream.Time {
 	st, _ := time.Parse(stream.TimeLayout, t.Truncate(time.Second).Format(stream.TimeLayout))
-	return st
+	return stream.Time{st}
 }

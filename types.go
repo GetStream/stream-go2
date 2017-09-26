@@ -1,53 +1,62 @@
 package stream
 
 import (
+	"strings"
 	"time"
 )
 
-type response struct {
-	Duration time.Duration `json:"duration,omitempty"`
-	Next     string        `json:"next,omitempty"`
+type Duration struct {
+	time.Duration
+}
+
+func (d *Duration) UnmarshalJSON(b []byte) error {
+	var err error
+	*d, err = durationFromString(strings.Replace(string(b), `"`, "", -1))
+	return err
+}
+
+func durationFromString(s string) (Duration, error) {
+	dd, err := time.ParseDuration(s)
+	return Duration{dd}, err
+}
+
+type Time struct {
+	time.Time
+}
+
+func (t *Time) UnmarshalJSON(b []byte) error {
+	var err error
+	*t, err = timeFromString(strings.Replace(string(b), `"`, "", -1))
+	return err
+}
+
+func timeFromString(s string) (Time, error) {
+	tt, err := time.Parse(TimeLayout, s)
+	return Time{tt}, err
 }
 
 // FlatFeedResponse is the API response obtained when retrieving activities from
 // a flat feed.
 type FlatFeedResponse struct {
-	response
-	Results Activities `json:"results,omitempty"`
-}
-
-// UnmarshalJSON decodes the provided JSON payload into the FlatFeedResponse.
-func (r *FlatFeedResponse) UnmarshalJSON(b []byte) error {
-	_, err := unmarshalJSON(b, r)
-	return err
+	Duration Duration   `json:"duration,omitempty"`
+	Next     string     `json:"next,omitempty"`
+	Results  Activities `json:"results,omitempty"`
 }
 
 // AggregatedFeedResponse is the API response obtained when retrieving
 // activities from an aggregated feed.
 type AggregatedFeedResponse struct {
-	response
-	Results ActivityGroups `json:"results,omitempty"`
-}
-
-// UnmarshalJSON decodes the provided JSON payload into the
-// AggregatedFeedResponse.
-func (r *AggregatedFeedResponse) UnmarshalJSON(b []byte) error {
-	_, err := unmarshalJSON(b, r)
-	return err
+	Duration Duration       `json:"duration,omitempty"`
+	Next     string         `json:"next,omitempty"`
+	Results  ActivityGroups `json:"results,omitempty"`
 }
 
 // AddActivitiesResponse is the API response obtained when adding activities to
 // a feed.
 type AddActivitiesResponse struct {
-	response
+	Duration   Duration   `json:"duration,omitempty"`
+	Next       string     `json:"next,omitempty"`
 	Activities []Activity `json:"activities,omitempty"`
-}
-
-// UnmarshalJSON decodes the provided JSON payload into the
-// AddActivitiesResponse.
-func (r *AddActivitiesResponse) UnmarshalJSON(b []byte) error {
-	_, err := unmarshalJSON(b, r)
-	return err
 }
 
 // Follower is the representation of a feed following another feed.
@@ -57,8 +66,9 @@ type Follower struct {
 }
 
 type followResponse struct {
-	response
-	Results []Follower `json:"results,omitempty"`
+	Duration Duration   `json:"duration,omitempty"`
+	Next     string     `json:"next,omitempty"`
+	Results  []Follower `json:"results,omitempty"`
 }
 
 // FollowersResponse is the API response obtained when retrieving followers from
@@ -71,11 +81,6 @@ type FollowersResponse struct {
 // feeds from a feed.
 type FollowingResponse struct {
 	followResponse
-}
-
-func (r *followResponse) UnmarshalJSON(b []byte) error {
-	_, err := unmarshalJSON(b, r)
-	return err
 }
 
 // AddToManyRequest is the API request body for adding an activity to multiple

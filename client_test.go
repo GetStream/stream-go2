@@ -14,11 +14,11 @@ func TestAddToMany(t *testing.T) {
 		client     = newClient(t)
 		activity   = stream.Activity{Actor: "bob", Verb: "like", Object: "cake"}
 		flat       = client.FlatFeed("flat", randString(10))
-		aggregated = client.AggregatedFeed("aggregated", randString(10))
+		aggregated = client.AggregatedFeed("timeline_aggregated", randString(10))
 	)
 
 	err := client.AddToMany(activity, flat, aggregated)
-	assert.NoError(t, err)
+	require.Nil(t, err)
 
 	flatActivities, err := flat.GetActivities()
 	require.NoError(t, err)
@@ -42,7 +42,7 @@ func TestFollowMany(t *testing.T) {
 	}
 
 	err := client.FollowMany(relationships)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	follows, err := flat.GetFollowers()
 	require.NoError(t, err)

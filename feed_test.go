@@ -25,7 +25,7 @@ func TestAddActivities(t *testing.T) {
 	bobActivity := stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream"}
 	aliceActivity := stream.Activity{Actor: "alice", Verb: "dislike", Object: "ice-cream"}
 	resp, err := flat.AddActivities(bobActivity, aliceActivity)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Len(t, resp.Activities, 2)
 }
 

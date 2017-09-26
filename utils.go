@@ -1,9 +1,7 @@
 package stream
 
 import (
-	"encoding/json"
 	"reflect"
-	"time"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -13,10 +11,10 @@ func decodeJSONStringTimes(f reflect.Type, typ reflect.Type, data interface{}) (
 		return data, nil
 	}
 	switch typ {
-	case reflect.TypeOf(time.Time{}):
-		return time.Parse(TimeLayout, data.(string))
-	case reflect.TypeOf(time.Millisecond):
-		return time.ParseDuration(data.(string))
+	case reflect.TypeOf(Time{}):
+		return timeFromString(data.(string))
+	case reflect.TypeOf(Duration{}):
+		return durationFromString(data.(string))
 	}
 	return data, nil
 }
@@ -36,12 +34,4 @@ func decodeData(data map[string]interface{}, target interface{}) (*mapstructure.
 		return nil, err
 	}
 	return cfg.Metadata, nil
-}
-
-func unmarshalJSON(b []byte, e interface{}) (*mapstructure.Metadata, error) {
-	var data map[string]interface{}
-	if err := json.Unmarshal(b, &data); err != nil {
-		return nil, err
-	}
-	return decodeData(data, e)
 }
