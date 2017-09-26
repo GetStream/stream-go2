@@ -4,3 +4,5 @@
 - [ ] Support Heroku
 - [ ] Nice README/wiki
 - [x] UpdateToTargets endpoint
+- [x] client options
+- [x] better URLs

@@ -7,15 +7,28 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 // Client is a Stream API client used for retrieving feeds and performing API
 // calls.
 type Client struct {
 	key           string
-	appID         string
 	cl            *http.Client
 	authenticator authenticator
+	url           *apiURL
+}
+
+// NewClientFromEnv build a new Client using environment variables values, being:
+// * `STREAM_API_KEY`
+// * `STREAM_API_SECRET`
+// * `STREAM_API_REGION`
+func NewClienFromEnv() (*Client, error) {
+	return NewClient(
+		os.Getenv("STREAM_API_KEY"),
+		os.Getenv("STREAM_API_SECRET"),
+		WithRegion(os.Getenv("STREAM_API_REGION")),
+	)
 }
 
 // NewClient builds a new Client with the provided API key and secret. It can be
@@ -28,8 +41,8 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		key:           key,
 		cl:            &http.Client{},
 		authenticator: authenticator{secret: secret},
+		url:           &apiURL{},
 	}
-
 	for _, opt := range opts {
 		err := opt(c)
 		if err != nil {
@@ -42,6 +55,22 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 // ClientOption is a function used for adding specific configuration options to
 // a Stream client.
 type ClientOption func(*Client) error
+
+// WithRegion sets the region for a given Client.
+func WithRegion(region string) ClientOption {
+	return func(c *Client) error {
+		c.url.region = region
+		return nil
+	}
+}
+
+// WithVersion sets the version for a given Client.
+func WithVersion(version string) ClientOption {
+	return func(c *Client) error {
+		c.url.version = version
+		return nil
+	}
+}
 
 // FlatFeed returns a new Flat Feed with the provided slug and userID.
 func (c *Client) FlatFeed(slug, userID string) *FlatFeed {
@@ -56,7 +85,7 @@ func (c *Client) AggregatedFeed(slug, userID string) *AggregatedFeed {
 
 // AddToMany adds an activity to multiple feeds at once.
 func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
-	endpoint := c.makeEndpoint("/feed/add_to_many/")
+	endpoint := c.makeEndpoint("feed/add_to_many/")
 	ids := make([]string, len(feeds))
 	for i := range feeds {
 		ids[i] = feeds[i].ID()
@@ -71,7 +100,7 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 
 // FollowMany creates multiple follows at once.
 func (c *Client) FollowMany(relationships []FollowRelationship, opts ...RequestOption) error { // TODO test activity_copy_limit
-	endpoint := c.makeEndpoint("/follow_many/")
+	endpoint := c.makeEndpoint("follow_many/")
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
@@ -92,9 +121,14 @@ func (c *Client) makeStreamError(body io.ReadCloser) error {
 }
 
 func (c *Client) makeEndpoint(f string, a ...interface{}) string {
-	format := fmt.Sprintf("%s%s?api_key=%s", host, f, c.key)
-	k := fmt.Sprintf(format, a...)
-	return k
+	var host string
+	if envHost := os.Getenv("STREAM_API_URL"); envHost != "" {
+		host = envHost
+	} else {
+		host = c.url.String()
+	}
+	format := fmt.Sprintf("%s%s/?api_key=%s", host, f, c.key)
+	return fmt.Sprintf(format, a...)
 }
 
 func (c *Client) request(method, endpoint string, data interface{}, authFn authFunc) ([]byte, error) {
@@ -115,7 +149,6 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 		return nil, err
 	}
 	req.Header.Set("Content-type", "application/json")
-
 	resp, err := c.cl.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot perform request: %s", err)
@@ -136,7 +169,7 @@ func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitie
 	}{
 		Activities: activities,
 	}
-	endpoint := c.makeEndpoint("/feed/%s/%s/", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s", feed.Slug(), feed.UserID())
 	resp, err := c.request(http.MethodPost, endpoint, reqBody, c.authenticator.feedAuth(resFeed))
 	if err != nil {
 		return nil, err
@@ -154,26 +187,26 @@ func (c *Client) updateActivities(activities ...Activity) error {
 	}{
 		Activities: activities,
 	}
-	endpoint := c.makeEndpoint("/activities/")
+	endpoint := c.makeEndpoint("activities")
 	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.feedAuth(resActivities))
 	return err
 }
 
 func (c *Client) removeActivityByID(feed Feed, activityID string) error {
-	endpoint := c.makeEndpoint("/feed/%s/%s/%s/", feed.Slug(), feed.UserID(), activityID)
+	endpoint := c.makeEndpoint("feed/%s/%s/%s", feed.Slug(), feed.UserID(), activityID)
 	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(resFeed))
 	return err
 }
 
 func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) error {
-	endpoint := c.makeEndpoint("/feed/%s/%s/%s/", feed.Slug(), feed.UserID(), foreignID)
+	endpoint := c.makeEndpoint("feed/%s/%s/%s", feed.Slug(), feed.UserID(), foreignID)
 	endpoint += "&foreign_id=1"
 	_, err := c.request(http.MethodDelete, endpoint, nil, c.authenticator.feedAuth(resFeed))
 	return err
 }
 
 func (c *Client) getActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
-	endpoint := c.makeEndpoint("/feed/%s/%s/", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
@@ -181,13 +214,13 @@ func (c *Client) getActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, 
 }
 
 func (c *Client) follow(feed Feed, opts *followFeedOptions) error {
-	endpoint := c.makeEndpoint("/feed/%s/%s/follows/", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/follows", feed.Slug(), feed.UserID())
 	_, err := c.request(http.MethodPost, endpoint, opts, c.authenticator.feedAuth(resFollower))
 	return err
 }
 
 func (c *Client) getFollowers(feed Feed, opts ...FollowersOption) (*FollowersResponse, error) {
-	endpoint := c.makeEndpoint("/feed/%s/%s/followers/", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/followers", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
@@ -203,7 +236,7 @@ func (c *Client) getFollowers(feed Feed, opts ...FollowersOption) (*FollowersRes
 }
 
 func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingResponse, error) {
-	endpoint := c.makeEndpoint("/feed/%s/%s/follows/", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/follows", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
@@ -219,7 +252,7 @@ func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingRes
 }
 
 func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) error {
-	endpoint := c.makeEndpoint("/feed/%s/%s/follows/%s/", feed.Slug(), feed.UserID(), target)
+	endpoint := c.makeEndpoint("feed/%s/%s/follows/%s", feed.Slug(), feed.UserID(), target)
 	for _, opt := range opts {
 		endpoint += opt.String()
 	}
@@ -231,7 +264,7 @@ func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToT
 	if activity.Time.IsZero() {
 		return fmt.Errorf("activity time cannot be zero")
 	}
-	endpoint := c.makeEndpoint("/feed_targets/%s/%s/activity_to_targets/", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets", feed.Slug(), feed.UserID())
 
 	req := &UpdateToTargetsRequest{
 		ForeignID: activity.ForeignID,

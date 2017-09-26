@@ -38,7 +38,7 @@ func TestUpdateActivities(t *testing.T) {
 
 	bobActivity.Extra = map[string]interface{}{"influence": 42}
 	err = flat.UpdateActivities(bobActivity)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	resp, err := flat.GetActivities()
 	require.NoError(t, err)
