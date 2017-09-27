@@ -84,6 +84,7 @@ resp, err := flat.GetActivities()
 if err != nil {
     // ...
 }
+
 fmt.Println("Duration:", resp.Duration)
 fmt.Println("Next:", resp.Next)
 fmt.Println("Activities:")
@@ -106,6 +107,7 @@ resp, err := aggregated.GetActivities()
 if err != nil {
     // ...
 }
+
 fmt.Println("Duration:", resp.Duration)
 fmt.Println("Next:", resp.Next)
 fmt.Println("Groups:")
@@ -134,6 +136,7 @@ resp, err := feed.AddActivity(&stream.Activity{Actor: "bob", ...})
 if err != nil {
     // ...
 }
+
 fmt.Println("Duration:", resp.Duration)
 fmt.Println("Activity:", resp.Activity) // resp wraps the stream.Activity type
 ```
@@ -148,6 +151,7 @@ resp, err := feed.AddActivities(a1, a2, a3)
 if err != nil {
     // ...
 }
+
 fmt.Println("Duration:", resp.Duration)
 fmt.Println("Activities:")
 for _, activity := range resp.Activities {
@@ -203,6 +207,7 @@ resp, err := feed.GetFollowings()
 if err != nil {
     // ...
 }
+
 fmt.Println("Duration:", resp.Duration)
 for _, followed := range resp.Results {
     fmt.Println(followed.FeedID, followed.TargetID)
@@ -223,6 +228,7 @@ resp, err := flat.GetFollowers()
 if err != nil {
     // ...
 }
+
 fmt.Println("Duration:", resp.Duration)
 for _, follower := range resp.Results {
     fmt.Println(follower.FeedID, follower.TargetID)
@@ -271,8 +277,7 @@ if err != nil {
 ### Batch adding activities
 You can add the same activities to multiple feeds at once with the `(*Client).AddToMany` method ([docs](https://getstream.io/docs_rest/#add_to_many)):
 ```go
-err := client.AddToMany(
-    activity,
+err := client.AddToMany(activity,
     feed1, feed2, ...,
 )
 if err != nil {
