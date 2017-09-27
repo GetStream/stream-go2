@@ -41,40 +41,42 @@ func timeFromString(s string) (Time, error) {
 	return Time{tt}, err
 }
 
-type response struct {
+// Response is the part of StreamAPI responses common throughout the API.
+type Response struct {
 	Duration Duration `json:"duration,omitempty"`
 }
 
-type readResponse struct {
-	response
+// ReadResponse is the part of StreamAPI responses common for GetActivities API requests.
+type ReadResponse struct {
+	Response
 	Next string `json:"next,omitempty"`
 }
 
 // FlatFeedResponse is the API response obtained when retrieving activities from
 // a flat feed.
 type FlatFeedResponse struct {
-	readResponse
+	ReadResponse
 	Results Activities `json:"results,omitempty"`
 }
 
 // AggregatedFeedResponse is the API response obtained when retrieving
 // activities from an aggregated feed.
 type AggregatedFeedResponse struct {
-	readResponse
+	ReadResponse
 	Results ActivityGroups `json:"results,omitempty"`
 }
 
 // AddActivityResponse is the API response obtained when adding a single activity
 // to a feed.
 type AddActivityResponse struct {
-	response
+	Response
 	Activity
 }
 
 // AddActivitiesResponse is the API response obtained when adding activities to
 // a feed.
 type AddActivitiesResponse struct {
-	response
+	Response
 	Activities []Activity `json:"activities,omitempty"`
 }
 
@@ -85,7 +87,7 @@ type Follower struct {
 }
 
 type followResponse struct {
-	response
+	Response
 	Results []Follower `json:"results,omitempty"`
 }
 
@@ -105,7 +107,7 @@ type FollowingResponse struct {
 // feeds at once.
 type AddToManyRequest struct {
 	Activity Activity `json:"activity,omitempty"`
-	Feeds    []string `json:"feeds,omitempty"`
+	FeedIDs  []string `json:"feeds,omitempty"`
 }
 
 // FollowRelationship represents a follow relationship between a source

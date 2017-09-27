@@ -26,7 +26,7 @@ func prepareFeedForTestGetActivities(t *testing.T, feed stream.Feed, size int) {
 func TestFlatFeedGetActivities(t *testing.T) {
 	var (
 		client = newClient(t)
-		flat   = client.FlatFeed("flat", randString(10))
+		flat   = newFlatFeed(client)
 		size   = 15
 	)
 	prepareFeedForTestGetActivities(t, flat, size)

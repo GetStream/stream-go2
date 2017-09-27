@@ -33,11 +33,11 @@ func TestFollowMany(t *testing.T) {
 	var (
 		client        = newClient(t)
 		relationships = make([]stream.FollowRelationship, 10)
-		flat          = client.FlatFeed("flat", randString(10))
+		flat          = newFlatFeed(client)
 	)
 
 	for i := range relationships {
-		other := client.AggregatedFeed("aggregated", randString(10))
+		other := newAggregatedFeed(client)
 		relationships[i] = stream.NewFollowRelationship(other, flat)
 	}
 

@@ -2,7 +2,6 @@ package stream_test
 
 import (
 	"math/rand"
-	"os"
 	"testing"
 	"time"
 
@@ -15,7 +14,7 @@ func init() {
 }
 
 func newClient(t *testing.T) *stream.Client {
-	client, err := stream.NewClient(os.Getenv("STREAM_API_KEY"), os.Getenv("STREAM_API_SECRET"))
+	client, err := stream.NewClientFromEnv()
 	require.NoError(t, err)
 	return client
 }

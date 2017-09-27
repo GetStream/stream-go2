@@ -22,7 +22,7 @@ func TestFeedID(t *testing.T) {
 
 func TestAddActivities(t *testing.T) {
 	client := newClient(t)
-	flat := client.FlatFeed("flat", randString(10))
+	flat := newFlatFeed(client)
 	bobActivity := stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream"}
 	aliceActivity := stream.Activity{Actor: "alice", Verb: "dislike", Object: "ice-cream"}
 	resp, err := flat.AddActivities(bobActivity, aliceActivity)
@@ -32,7 +32,7 @@ func TestAddActivities(t *testing.T) {
 
 func TestUpdateActivities(t *testing.T) {
 	client := newClient(t)
-	flat := client.FlatFeed("flat", randString(10))
+	flat := newFlatFeed(client)
 	bobActivity := stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream", ForeignID: "bob:123", Time: getTime(time.Now()), Extra: map[string]interface{}{"influence": 42}}
 	_, err := flat.AddActivities(bobActivity)
 	require.NoError(t, err)
@@ -45,6 +45,38 @@ func TestUpdateActivities(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, resp.Results, 1)
 	assert.NotEmpty(t, resp.Results[0].Extra)
+}
+
+func TestRemoveActivities(t *testing.T) {
+	client := newClient(t)
+	flat := newFlatFeed(client)
+	activities := []stream.Activity{
+		stream.Activity{
+			Actor:  "john",
+			Verb:   "like",
+			Object: "something",
+		},
+		stream.Activity{
+			Actor:     "bob",
+			Verb:      "like",
+			Object:    "something",
+			ForeignID: "bob:123",
+		},
+	}
+	added, err := flat.AddActivities(activities...)
+	require.NoError(t, err)
+	activities = added.Activities
+
+	err = flat.RemoveActivityByID(activities[0].ID)
+	assert.NoError(t, err)
+	resp, err := flat.GetActivities()
+	assert.Len(t, resp.Results, 1)
+	assert.Equal(t, activities[1].ID, resp.Results[0].ID)
+
+	err = flat.RemoveActivityByForeignID("bob:123")
+	assert.NoError(t, err)
+	resp, err = flat.GetActivities()
+	assert.Len(t, resp.Results, 0)
 }
 
 func TestUpdateToTargets(t *testing.T) {
