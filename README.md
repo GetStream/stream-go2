@@ -34,7 +34,11 @@ $ vg init && vg ensure
 ```go
 key := "YOUR_API_KEY"
 secret := "YOUR_API_SECRET"
+
 client, err := stream.NewClient(key, secret)
+if err != nil {
+    // ...
+}
 ```
 
 You can pass additional options when creating a client using the available `ClientOption` functions:
