@@ -28,7 +28,11 @@ client, err := stream.NewClient(key, secret)
 You can pass additional options when creating a client using the available `ClientOption` functions:
 
 ```go
-client, err := stream.NewClient(key, secret, WithRegion("us-east"), WithVersion("1.0"))
+client, err := stream.NewClient(key, secret, 
+    ClientWithRegion("us-east"),
+    ClientWithVersion("1.0"),
+    ...,
+)
 ```
 
 You can also create a client using environment variables:

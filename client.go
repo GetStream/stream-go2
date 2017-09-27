@@ -50,23 +50,23 @@ func NewClientFromEnv() (*Client, error) {
 	secret := os.Getenv("STREAM_API_SECRET")
 	region := os.Getenv("STREAM_API_REGION")
 	version := os.Getenv("STREAM_API_VERSION")
-	return NewClient(key, secret, WithRegion(region), WithVersion(version))
+	return NewClient(key, secret, ClientWithRegion(region), ClientWithVersion(version))
 }
 
 // ClientOption is a function used for adding specific configuration options to
 // a Stream client.
 type ClientOption func(*Client) error
 
-// WithRegion sets the region for a given Client.
-func WithRegion(region string) ClientOption {
+// ClientWithRegion sets the region for a given Client.
+func ClientWithRegion(region string) ClientOption {
 	return func(c *Client) error {
 		c.url.region = region
 		return nil
 	}
 }
 
-// WithVersion sets the version for a given Client.
-func WithVersion(version string) ClientOption {
+// ClientWithVersion sets the version for a given Client.
+func ClientWithVersion(version string) ClientOption {
 	return func(c *Client) error {
 		c.url.version = version
 		return nil
