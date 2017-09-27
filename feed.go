@@ -8,15 +8,16 @@ type Feed interface {
 	ID() string
 	Slug() string
 	UserID() string
+	AddActivity(Activity) (*AddActivityResponse, error)
 	AddActivities(...Activity) (*AddActivitiesResponse, error)
 	UpdateActivities(...Activity) error
 	RemoveActivityByID(string) error
 	RemoveActivityByForeignID(string) error
 	Follow(*FlatFeed, ...FollowFeedOption) error
-	GetFollowers(...FollowersOption) (*FollowersResponse, error)
 	GetFollowing(...FollowingOption) (*FollowingResponse, error) // TODO test filter param
 	Unfollow(Feed, ...UnfollowOption) error                      // TODO test heep_history param
-	UpdateToTargets(Activity, ...UpdateToTargetsOption) error
+	ReplaceToTargets(Activity, []Feed) error
+	UpdateToTargets(Activity, []Feed, []Feed) error
 }
 
 type feed struct {
@@ -33,8 +34,8 @@ func newFeed(slug, userID string, client *Client) feed {
 	return feed{userID: userID, slug: slug, client: client}
 }
 
-func (f feed) AddActivity(activity Activity) (*AddActivitiesResponse, error) {
-	return f.AddActivities(activity)
+func (f feed) AddActivity(activity Activity) (*AddActivityResponse, error) {
+	return f.client.addActivity(f, activity)
 }
 
 func (f feed) AddActivities(activities ...Activity) (*AddActivitiesResponse, error) {
@@ -64,10 +65,6 @@ func (f feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
 	return f.client.follow(f, followOptions)
 }
 
-func (f feed) GetFollowers(opts ...FollowersOption) (*FollowersResponse, error) {
-	return f.client.getFollowers(f, opts...)
-}
-
 func (f feed) GetFollowing(opts ...FollowingOption) (*FollowingResponse, error) {
 	return f.client.getFollowing(f, opts...)
 }
@@ -76,6 +73,10 @@ func (f feed) Unfollow(target Feed, opts ...UnfollowOption) error {
 	return f.client.unfollow(f, target.ID(), opts...)
 }
 
-func (f feed) UpdateToTargets(activity Activity, opts ...UpdateToTargetsOption) error {
-	return f.client.updateToTargets(f, activity, opts...)
+func (f feed) ReplaceToTargets(activity Activity, new []Feed) error {
+	return f.client.updateToTargets(f, activity, updateToTargetsWithNew(new...))
+}
+
+func (f feed) UpdateToTargets(activity Activity, add []Feed, remove []Feed) error {
+	return f.client.updateToTargets(f, activity, updateToTargetsWithAdd(add...), updateToTargetsWithRemove(remove...))
 }

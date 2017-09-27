@@ -19,18 +19,6 @@ type Client struct {
 	url           *apiURL
 }
 
-// NewClientFromEnv build a new Client using environment variables values, being:
-// * `STREAM_API_KEY`
-// * `STREAM_API_SECRET`
-// * `STREAM_API_REGION`
-func NewClientFromEnv() (*Client, error) {
-	return NewClient(
-		os.Getenv("STREAM_API_KEY"),
-		os.Getenv("STREAM_API_SECRET"),
-		WithRegion(os.Getenv("STREAM_API_REGION")),
-	)
-}
-
 // NewClient builds a new Client with the provided API key and secret. It can be
 // configured further by passing any number of ClientOption parameters.
 func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
@@ -50,6 +38,19 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		}
 	}
 	return c, nil
+}
+
+// NewClientFromEnv build a new Client using environment variables values, being:
+// * `STREAM_API_KEY`
+// * `STREAM_API_SECRET`
+// * `STREAM_API_REGION`
+// * `STREAM_API_VERSION`
+func NewClientFromEnv() (*Client, error) {
+	key := os.Getenv("STREAM_API_KEY")
+	secret := os.Getenv("STREAM_API_SECRET")
+	region := os.Getenv("STREAM_API_REGION")
+	version := os.Getenv("STREAM_API_VERSION")
+	return NewClient(key, secret, WithRegion(region), WithVersion(version))
 }
 
 // ClientOption is a function used for adding specific configuration options to
@@ -163,6 +164,25 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 	return body, nil
 }
 
+func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse, error) {
+	endpoint := c.makeEndpoint("feed/%s/%s", feed.Slug(), feed.UserID())
+	resp, err := c.request(http.MethodPost, endpoint, activity, c.authenticator.feedAuth(resFeed))
+	if err != nil {
+		return nil, err
+	}
+	var out AddActivityResponse
+	if err := json.Unmarshal(resp, &out); err != nil {
+		return nil, err
+	}
+	dur := out.Extra["duration"]
+	delete(out.Extra, "duration")
+	out.Duration, err = durationFromString(dur.(string))
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitiesResponse, error) {
 	reqBody := struct {
 		Activities []Activity `json:"activities,omitempty"`
@@ -260,13 +280,13 @@ func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) erro
 	return err
 }
 
-func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToTargetsOption) error {
+func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...updateToTargetsOption) error {
 	if activity.Time.IsZero() {
 		return fmt.Errorf("activity time cannot be zero")
 	}
 	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets", feed.Slug(), feed.UserID())
 
-	req := &UpdateToTargetsRequest{
+	req := &updateToTargetsRequest{
 		ForeignID: activity.ForeignID,
 		Time:      activity.Time.Format(TimeLayout),
 	}

@@ -165,13 +165,10 @@ func FollowWithActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 	}
 }
 
-// UpdateToTargetsOption is used for configuring an UpdateToTargets API call.
-type UpdateToTargetsOption func(*UpdateToTargetsRequest)
+type updateToTargetsOption func(*updateToTargetsRequest)
 
-// UpdateToTargetsWithNew sets the new to targets for an UpdateToTargets request. They will replace
-// all previous to targets.
-func UpdateToTargetsWithNew(targets ...Feed) UpdateToTargetsOption {
-	return func(r *UpdateToTargetsRequest) {
+func updateToTargetsWithNew(targets ...Feed) updateToTargetsOption {
+	return func(r *updateToTargetsRequest) {
 		r.New = make([]string, len(targets))
 		for i := range targets {
 			r.New[i] = targets[i].ID()
@@ -179,10 +176,8 @@ func UpdateToTargetsWithNew(targets ...Feed) UpdateToTargetsOption {
 	}
 }
 
-// UpdateToTargetsWithAdd sets the to targets additions for an UpdateToTargets request. They
-// will be added to the existing to targets.
-func UpdateToTargetsWithAdd(targets ...Feed) UpdateToTargetsOption {
-	return func(r *UpdateToTargetsRequest) {
+func updateToTargetsWithAdd(targets ...Feed) updateToTargetsOption {
+	return func(r *updateToTargetsRequest) {
 		r.Adds = make([]string, len(targets))
 		for i := range targets {
 			r.Adds[i] = targets[i].ID()
@@ -190,9 +185,8 @@ func UpdateToTargetsWithAdd(targets ...Feed) UpdateToTargetsOption {
 	}
 }
 
-// UpdateToTargetsWithRemove sets the targets to be removed for an UpdateToTargets request.
-func UpdateToTargetsWithRemove(targets ...Feed) UpdateToTargetsOption {
-	return func(r *UpdateToTargetsRequest) {
+func updateToTargetsWithRemove(targets ...Feed) updateToTargetsOption {
+	return func(r *updateToTargetsRequest) {
 		r.Removes = make([]string, len(targets))
 		for i := range targets {
 			r.Removes[i] = targets[i].ID()

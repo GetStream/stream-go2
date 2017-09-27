@@ -36,9 +36,17 @@ func getTime(t time.Time) stream.Time {
 }
 
 func newFlatFeed(c *stream.Client) *stream.FlatFeed {
-	return c.FlatFeed("flat", randString(10))
+	return newFlatFeedWithUserID(c, randString(10))
+}
+
+func newFlatFeedWithUserID(c *stream.Client, userID string) *stream.FlatFeed {
+	return c.FlatFeed("flat", userID)
 }
 
 func newAggregatedFeed(c *stream.Client) *stream.AggregatedFeed {
-	return c.AggregatedFeed("timeline_aggregated", randString(10))
+	return newAggregatedFeedWithUserID(c, randString(10))
+}
+
+func newAggregatedFeedWithUserID(c *stream.Client, userID string) *stream.AggregatedFeed {
+	return c.AggregatedFeed("timeline_aggregated", userID)
 }

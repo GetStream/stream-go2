@@ -41,27 +41,40 @@ func timeFromString(s string) (Time, error) {
 	return Time{tt}, err
 }
 
+type response struct {
+	Duration Duration `json:"duration,omitempty"`
+}
+
+type readResponse struct {
+	response
+	Next string `json:"next,omitempty"`
+}
+
 // FlatFeedResponse is the API response obtained when retrieving activities from
 // a flat feed.
 type FlatFeedResponse struct {
-	Duration Duration   `json:"duration,omitempty"`
-	Next     string     `json:"next,omitempty"`
-	Results  Activities `json:"results,omitempty"`
+	readResponse
+	Results Activities `json:"results,omitempty"`
 }
 
 // AggregatedFeedResponse is the API response obtained when retrieving
 // activities from an aggregated feed.
 type AggregatedFeedResponse struct {
-	Duration Duration       `json:"duration,omitempty"`
-	Next     string         `json:"next,omitempty"`
-	Results  ActivityGroups `json:"results,omitempty"`
+	readResponse
+	Results ActivityGroups `json:"results,omitempty"`
+}
+
+// AddActivityResponse is the API response obtained when adding a single activity
+// to a feed.
+type AddActivityResponse struct {
+	response
+	Activity
 }
 
 // AddActivitiesResponse is the API response obtained when adding activities to
 // a feed.
 type AddActivitiesResponse struct {
-	Duration   Duration   `json:"duration,omitempty"`
-	Next       string     `json:"next,omitempty"`
+	response
 	Activities []Activity `json:"activities,omitempty"`
 }
 
@@ -72,9 +85,8 @@ type Follower struct {
 }
 
 type followResponse struct {
-	Duration Duration   `json:"duration,omitempty"`
-	Next     string     `json:"next,omitempty"`
-	Results  []Follower `json:"results,omitempty"`
+	response
+	Results []Follower `json:"results,omitempty"`
 }
 
 // FollowersResponse is the API response obtained when retrieving followers from
@@ -112,8 +124,7 @@ func NewFollowRelationship(source, target Feed) FollowRelationship {
 	}
 }
 
-// UpdateToTargetsRequest is the payload for an UpdateToTargets API request.
-type UpdateToTargetsRequest struct {
+type updateToTargetsRequest struct {
 	ForeignID string   `json:"foreign_id,omitempty"`
 	Time      string   `json:"time,omitempty"`
 	New       []string `json:"new_targets,omitempty"`

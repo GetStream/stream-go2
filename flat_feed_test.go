@@ -38,4 +38,5 @@ func TestFlatFeedGetActivities(t *testing.T) {
 	resp, err = flat.GetActivities(stream.GetActivitiesWithLimit(limit))
 	require.NoError(t, err)
 	assert.Len(t, resp.Results, limit)
+	assert.NotZero(t, resp.Duration.Nanoseconds())
 }

@@ -26,3 +26,8 @@ func (f *FlatFeed) GetActivities(opts ...GetActivitiesOption) (*FlatFeedResponse
 func (f *FlatFeed) GetActivitiesWithRanking(ranking string, opts ...GetActivitiesOption) (*FlatFeedResponse, error) {
 	return f.GetActivities(append(opts, getActivitiesWithRanking(ranking))...)
 }
+
+// GetFollowers returns the feeds following the given FlatFeed.
+func (f *FlatFeed) GetFollowers(opts ...FollowersOption) (*FollowersResponse, error) {
+	return f.client.getFollowers(f, opts...)
+}
