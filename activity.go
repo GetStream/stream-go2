@@ -20,7 +20,8 @@ type Activity struct {
 	Extra     map[string]interface{} `json:"-"`
 }
 
-// UnmarshalJSON decodes the provided JSON payload into the Activity.
+// UnmarshalJSON decodes the provided JSON payload into the Activity. It's required
+// because of the custom JSON fields and time formats.
 func (a *Activity) UnmarshalJSON(b []byte) error {
 	var data map[string]interface{}
 	if err := json.Unmarshal(b, &data); err != nil {
@@ -32,7 +33,8 @@ func (a *Activity) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// MarshalJSON encodes the Activity to a valid JSON bytes slice.
+// MarshalJSON encodes the Activity to a valid JSON bytes slice. It's required because of
+// the custom JSON fields and time formats.
 func (a Activity) MarshalJSON() ([]byte, error) {
 	data := structs.New(a).Map()
 	for k, v := range a.Extra {

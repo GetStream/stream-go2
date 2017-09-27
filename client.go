@@ -93,7 +93,7 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 	}
 	req := AddToManyRequest{
 		Activity: activity,
-		Feeds:    ids,
+		FeedIDs:  ids,
 	}
 	_, err := c.request(http.MethodPost, endpoint, req, c.authenticator.applicationAuth(c.key))
 	return err

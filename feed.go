@@ -26,35 +26,51 @@ type feed struct {
 	client *Client
 }
 
-func (f feed) ID() string     { return fmt.Sprintf("%s:%s", f.slug, f.userID) }
-func (f feed) Slug() string   { return f.slug }
-func (f feed) UserID() string { return f.userID }
+// ID returns the feed ID, as slug:user_id.
+func (f *feed) ID() string {
+	return fmt.Sprintf("%s:%s", f.slug, f.userID)
+}
+
+// Slug returns the feed's slug.
+func (f *feed) Slug() string { return f.slug }
+
+// UserID returns the feed's user_id.
+func (f *feed) UserID() string { return f.userID }
 
 func newFeed(slug, userID string, client *Client) feed {
 	return feed{userID: userID, slug: slug, client: client}
 }
 
-func (f feed) AddActivity(activity Activity) (*AddActivityResponse, error) {
+// AddActivity adds a new Activity to the feed.
+func (f *feed) AddActivity(activity Activity) (*AddActivityResponse, error) {
 	return f.client.addActivity(f, activity)
 }
 
-func (f feed) AddActivities(activities ...Activity) (*AddActivitiesResponse, error) {
+// AddActivities adds multiple activities to the feed.
+func (f *feed) AddActivities(activities ...Activity) (*AddActivitiesResponse, error) {
 	return f.client.addActivities(f, activities...)
 }
 
-func (f feed) UpdateActivities(activities ...Activity) error {
+// UpdateActivities updates existing activities in the feed.
+func (f *feed) UpdateActivities(activities ...Activity) error {
 	return f.client.updateActivities(activities...)
 }
 
-func (f feed) RemoveActivityByID(id string) error {
+// RemoveActivityByID removes an activity from the feed (if present), using the provided
+// id string argument as the ID field of the activity.
+func (f *feed) RemoveActivityByID(id string) error {
 	return f.client.removeActivityByID(f, id)
 }
 
-func (f feed) RemoveActivityByForeignID(foreignID string) error {
+// RemoveActivityByID removes an activity from the feed (if present), using the provided
+// foreignID string argument as the foreign_id field of the activity.
+func (f *feed) RemoveActivityByForeignID(foreignID string) error {
 	return f.client.removeActivityByForeignID(f, foreignID)
 }
 
-func (f feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
+// Follow follows the provided feed (which must be a FlatFeed), applying the provided FollowFeedOptions,
+// if any.
+func (f *feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
 	followOptions := &followFeedOptions{
 		Target:            fmt.Sprintf("%s:%s", feed.Slug(), f.UserID()),
 		ActivityCopyLimit: defaultActivityCopyLimit,
@@ -65,18 +81,25 @@ func (f feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
 	return f.client.follow(f, followOptions)
 }
 
-func (f feed) GetFollowing(opts ...FollowingOption) (*FollowingResponse, error) {
+// GetFollowing returns the list of the feeds following the feed, applying the provided FollowingOptions,
+// if any.
+func (f *feed) GetFollowing(opts ...FollowingOption) (*FollowingResponse, error) {
 	return f.client.getFollowing(f, opts...)
 }
 
-func (f feed) Unfollow(target Feed, opts ...UnfollowOption) error {
+// Unfollow unfollows the provided feed, applying the provided UnfollowOptions, if any.
+func (f *feed) Unfollow(target Feed, opts ...UnfollowOption) error {
 	return f.client.unfollow(f, target.ID(), opts...)
 }
 
-func (f feed) ReplaceToTargets(activity Activity, new []Feed) error {
+// ReplaceToTargets removes all the existing "to" targets from the provided activity, replacing
+// them with the ones in the provided new []Feed slice.
+func (f *feed) ReplaceToTargets(activity Activity, new []Feed) error {
 	return f.client.updateToTargets(f, activity, updateToTargetsWithNew(new...))
 }
 
-func (f feed) UpdateToTargets(activity Activity, add []Feed, remove []Feed) error {
+// UpdateToTargets updates the "to" targets for the provided activity, adding the feeds in the add []Feed slice
+// on top of the existing ones, and removing the ones in the remove []Feed slice.
+func (f *feed) UpdateToTargets(activity Activity, add []Feed, remove []Feed) error {
 	return f.client.updateToTargets(f, activity, updateToTargetsWithAdd(add...), updateToTargetsWithRemove(remove...))
 }
