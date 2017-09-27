@@ -132,7 +132,7 @@ resp, err := flat.GetActivities(
 ### Adding activities
 Add a single activity:
 ```go
-resp, err := feed.AddActivity(&stream.Activity{Actor: "bob", ...})
+resp, err := feed.AddActivity(stream.Activity{Actor: "bob", ...})
 if err != nil {
     // ...
 }
@@ -143,9 +143,9 @@ fmt.Println("Activity:", resp.Activity) // resp wraps the stream.Activity type
 
 Add multiple activities:
 ```go
-a1 := &stream.Activity{Actor: "bob", ...}
-a2 := &stream.Activity{Actor: "john", ...}
-a3 := &stream.Activity{Actor: "alice", ...}
+a1 := stream.Activity{Actor: "bob", ...}
+a2 := stream.Activity{Actor: "john", ...}
+a3 := stream.Activity{Actor: "alice", ...}
 
 resp, err := feed.AddActivities(a1, a2, a3)
 if err != nil {
