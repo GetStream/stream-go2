@@ -16,7 +16,7 @@ type Activity struct {
 	Target    string                 `json:"target,omitempty"`
 	Time      Time                   `json:"time,omitempty"`
 	To        []string               `json:"to,omitempty"`
-	Score     string                 `json:"score,omitempty"`
+	Score     float64                `json:"score,omitempty"`
 	Extra     map[string]interface{} `json:"-"`
 }
 
