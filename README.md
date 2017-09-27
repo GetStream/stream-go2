@@ -23,7 +23,7 @@ You can get required dependencies simply by running:
 $ dep ensure
 ```
 
-Even better: at Stream we have developed [vg](https://github.com/GetStream/vg), a powerful workspace manager for Go, based on `dep` itself.
+Even better: at Stream we have developed [vg](https://github.com/GetStream/vg), a powerful workspace manager for Go based on `dep` itself.
 If you use vg (and you should!) you can just:
 ```
 $ vg init && vg ensure
