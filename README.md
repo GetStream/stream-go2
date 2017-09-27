@@ -42,7 +42,6 @@ Available environment variables:
 * `STREAM_API_REGION`
 * `STREAM_API_VERSION`
 
-
 ### Creating a Feed
 
 Create a flat feed from slug and user ID:

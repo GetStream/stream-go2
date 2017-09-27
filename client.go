@@ -100,7 +100,7 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 }
 
 // FollowMany creates multiple follows at once.
-func (c *Client) FollowMany(relationships []FollowRelationship, opts ...RequestOption) error { // TODO test activity_copy_limit
+func (c *Client) FollowMany(relationships []FollowRelationship, opts ...RequestOption) error {
 	endpoint := c.makeEndpoint("follow_many")
 	for _, opt := range opts {
 		endpoint += opt.String()

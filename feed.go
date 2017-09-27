@@ -14,8 +14,8 @@ type Feed interface {
 	RemoveActivityByID(string) error
 	RemoveActivityByForeignID(string) error
 	Follow(*FlatFeed, ...FollowFeedOption) error
-	GetFollowing(...FollowingOption) (*FollowingResponse, error) // TODO test filter param
-	Unfollow(Feed, ...UnfollowOption) error                      // TODO test heep_history param
+	GetFollowing(...FollowingOption) (*FollowingResponse, error)
+	Unfollow(Feed, ...UnfollowOption) error
 	ReplaceToTargets(Activity, []Feed) error
 	UpdateToTargets(Activity, []Feed, []Feed) error
 }
