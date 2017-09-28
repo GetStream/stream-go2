@@ -1,9 +1,0 @@
-- [x] Refactor RequestOptions so not to have too generic options
-- [x] Create client init function with no arguments, using only env vars
-- [ ] Support Heroku
-- [x] Nice README/wiki
-- [x] UpdateToTargets endpoint
-- [x] client options
-- [x] better URLs
-- [ ] complete tests
-- [x] fix marshaling/unmarshaling
