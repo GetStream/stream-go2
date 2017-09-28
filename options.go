@@ -11,34 +11,34 @@ const (
 
 // RequestOption is an interface representing API request optional filters and
 // parameters.
-type RequestOption interface {
+type requestOption interface {
 	String() string
 }
 
-type requestOption struct {
+type baseRequestOption struct {
 	key   string
 	value interface{}
 }
 
-func makeRequestOption(key string, value interface{}) RequestOption {
-	return requestOption{key: key, value: value}
+func makeRequestOption(key string, value interface{}) requestOption {
+	return baseRequestOption{key: key, value: value}
 }
 
-func (o requestOption) String() string {
+func (o baseRequestOption) String() string {
 	return fmt.Sprintf("&%s=%v", o.key, o.value)
 }
 
-func withLimit(limit int) RequestOption {
+func withLimit(limit int) requestOption {
 	return makeRequestOption("limit", limit)
 }
 
-func withOffset(offset int) RequestOption {
+func withOffset(offset int) requestOption {
 	return makeRequestOption("offset", offset)
 }
 
 // GetActivitiesOption is an option usable by GetActivities methods for flat and aggregated feeds.
 type GetActivitiesOption struct {
-	RequestOption
+	requestOption
 }
 
 // GetActivitiesWithLimit adds the limit parameter to API calls which support it, limiting
@@ -109,7 +109,7 @@ func GetNotificationWithMarkRead(all bool, activityIDs ...string) GetActivitiesO
 
 // FollowingOption is an option usable by following feed methods.
 type FollowingOption struct {
-	RequestOption
+	requestOption
 }
 
 // FollowingWithFilter adds the filter parameter to API calls, used when retrieving
@@ -130,7 +130,7 @@ func FollowingWithOffset(offset int) FollowingOption {
 
 // FollowersOption is an option usable by followers feed methods.
 type FollowersOption struct {
-	RequestOption
+	requestOption
 }
 
 // FollowersWithLimit limits the number of followers in the response to the provided limit.
@@ -145,7 +145,7 @@ func FollowersWithOffset(offset int) FollowersOption {
 
 // UnfollowOption is an option usable with the Unfollow feed method.
 type UnfollowOption struct {
-	RequestOption
+	requestOption
 }
 
 // UnfollowWithKeepHistory adds the `keep_history` parameter to API calls, used to keep
@@ -161,6 +161,16 @@ func UnfollowWithKeepHistory(keepHistory bool) UnfollowOption {
 type followFeedOptions struct {
 	Target            string `json:"target,omitempty"`
 	ActivityCopyLimit int    `json:"activity_copy_limit,omitempty"`
+}
+
+// FollowManyOption is an option to customize behavior of Follow Many calls.
+type FollowManyOption struct {
+	requestOption
+}
+
+// FollowManyWithActivityCopyLimit sets how many activities should be copied from the target feed.
+func FollowManyWithActivityCopyLimit(activityCopyLimit int) FollowManyOption {
+	return FollowManyOption{makeRequestOption("activity_copy_limit", activityCopyLimit)}
 }
 
 // FollowFeedOption is a function used to customize FollowFeed API calls.

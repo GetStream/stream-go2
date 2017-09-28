@@ -45,11 +45,9 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 	return c, nil
 }
 
-// NewClientFromEnv build a new Client using environment variables values, being:
-// * `STREAM_API_KEY`
-// * `STREAM_API_SECRET`
-// * `STREAM_API_REGION`
-// * `STREAM_API_VERSION`
+// NewClientFromEnv build a new Client using environment variables values, with
+// possible values being STREAM_API_KEY, STREAM_API_SECRET, STREAM_API_REGION,
+// and STREAM_API_VERSION.
 func NewClientFromEnv() (*Client, error) {
 	key := os.Getenv("STREAM_API_KEY")
 	secret := os.Getenv("STREAM_API_SECRET")
@@ -119,7 +117,7 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 }
 
 // FollowMany creates multiple follows at once.
-func (c *Client) FollowMany(relationships []FollowRelationship, opts ...RequestOption) error {
+func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowManyOption) error {
 	endpoint := c.makeEndpoint("follow_many")
 	for _, opt := range opts {
 		endpoint += opt.String()
