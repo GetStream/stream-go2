@@ -66,6 +66,8 @@ type AggregatedFeedResponse struct {
 	Results ActivityGroups `json:"results,omitempty"`
 }
 
+// NotificationFeedResponse is the API response obtained when retrieving activities
+// from a notification feed.
 type NotificationFeedResponse struct {
 	ReadResponse
 	Unseen  int                      `json:"unseen"`
@@ -73,6 +75,8 @@ type NotificationFeedResponse struct {
 	Results []NotificationFeedResult `json:"results"`
 }
 
+// NotificationFeedResult is a notification-feed specific response, containing
+// the list of activities in the group, plus the extra fields about the group read+seen status.
 type NotificationFeedResult struct {
 	ID            string     `json:"id"`
 	Activities    Activities `json:"activities"`

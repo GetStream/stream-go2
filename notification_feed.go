@@ -2,6 +2,7 @@ package stream
 
 import "encoding/json"
 
+// NotificationFeed is a Stream notification feed.
 type NotificationFeed struct {
 	feed
 }

@@ -92,6 +92,8 @@ func getActivitiesWithRanking(ranking string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking", ranking)}
 }
 
+// GetNotificationWithMarkSeen marks as seen the given activity ids in a notification
+// feed. If the all parameter is true, every activity in the feed is marked as seen.
 func GetNotificationWithMarkSeen(all bool, activityIDs ...string) GetActivitiesOption {
 	if all {
 		return GetActivitiesOption{makeRequestOption("mark_seen", true)}
@@ -99,6 +101,8 @@ func GetNotificationWithMarkSeen(all bool, activityIDs ...string) GetActivitiesO
 	return GetActivitiesOption{makeRequestOption("mark_seen", strings.Join(activityIDs, ","))}
 }
 
+// GetNotificationWithMarkRead marks as read the given activity ids in a notification
+// feed. If the all parameter is true, every activity in the feed is marked as read.
 func GetNotificationWithMarkRead(all bool, activityIDs ...string) GetActivitiesOption {
 	if all {
 		return GetActivitiesOption{makeRequestOption("mark_read", true)}

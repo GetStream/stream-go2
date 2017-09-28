@@ -84,6 +84,8 @@ func (c *Client) AggregatedFeed(slug, userID string) *AggregatedFeed {
 	return &AggregatedFeed{newFeed(slug, userID, c)}
 }
 
+// NotificationFeed returns a new Notification Feed with the provided slug and
+// userID.
 func (c *Client) NotificationFeed(slug, userID string) *NotificationFeed {
 	return &NotificationFeed{newFeed(slug, userID, c)}
 }
