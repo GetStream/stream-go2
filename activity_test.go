@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/reifcode/stream-go2"
+	"github.com/GetStream/stream-go2"
 	"github.com/stretchr/testify/assert"
 )
 
