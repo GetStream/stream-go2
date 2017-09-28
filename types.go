@@ -67,14 +67,14 @@ type ReadResponse struct {
 // a flat feed.
 type FlatFeedResponse struct {
 	ReadResponse
-	Results Activities `json:"results,omitempty"`
+	Results []Activity `json:"results,omitempty"`
 }
 
 // AggregatedFeedResponse is the API response obtained when retrieving
 // activities from an aggregated feed.
 type AggregatedFeedResponse struct {
 	ReadResponse
-	Results ActivityGroups `json:"results,omitempty"`
+	Results []ActivityGroup `json:"results,omitempty"`
 }
 
 // NotificationFeedResponse is the API response obtained when retrieving activities
@@ -90,7 +90,7 @@ type NotificationFeedResponse struct {
 // the list of activities in the group, plus the extra fields about the group read+seen status.
 type NotificationFeedResult struct {
 	ID            string     `json:"id"`
-	Activities    Activities `json:"activities"`
+	Activities    []Activity `json:"activities"`
 	ActivityCount int        `json:"activity_count"`
 	ActorCount    int        `json:"actor_count"`
 	Group         string     `json:"group"`

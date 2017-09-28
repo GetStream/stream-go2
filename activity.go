@@ -60,9 +60,6 @@ func (a *Activity) decode(data map[string]interface{}) error {
 	return nil
 }
 
-// Activities is a slice of Activity.
-type Activities []Activity
-
 // ActivityGroup is a group of Activity obtained from aggregated feeds.
 type ActivityGroup struct {
 	Activities    []Activity `json:"activities,omitempty"`
@@ -72,6 +69,3 @@ type ActivityGroup struct {
 	ID            string     `json:"id,omitempty"`
 	Verb          string     `json:"verb,omitempty"`
 }
-
-// ActivityGroups is a slice of ActivityGroup.
-type ActivityGroups []ActivityGroup
