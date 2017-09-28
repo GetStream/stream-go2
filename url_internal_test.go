@@ -19,10 +19,6 @@ func Test_URLString(t *testing.T) {
 			url:      &apiURL{region: "eu-central", version: "2.0"},
 			expected: "https://eu-central-api.getstream.io/api/v2.0/",
 		},
-		{
-			url:      &apiURL{region: "localhost"},
-			expected: "http://localhost:8000/api/v1.0/",
-		},
 	}
 
 	for _, tc := range testCases {

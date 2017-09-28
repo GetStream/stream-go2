@@ -8,9 +8,6 @@ type apiURL struct {
 }
 
 func (u *apiURL) String() string {
-	if u.region == "localhost" {
-		return "http://localhost:8000/api/v1.0/"
-	}
 	return fmt.Sprintf("https://%s.getstream.io/api/v%s/", u.makeRegion(), u.makeVersion())
 }
 
