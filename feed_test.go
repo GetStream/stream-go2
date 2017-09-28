@@ -118,3 +118,26 @@ func TestUpdateToTargets(t *testing.T) {
 	assert.Len(t, resp.Results, 1)
 	assert.Len(t, resp.Results[0].To, 0)
 }
+
+func TestToken(t *testing.T) {
+	client, err := stream.NewClient("key", "super secret")
+	require.NoError(t, err)
+	flat := newFlatFeedWithUserID(client, "sample")
+	testCases := []struct {
+		readOnly bool
+		expected string
+	}{
+		{
+			readOnly: false,
+			expected: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiJ3cml0ZSIsImZlZWRfaWQiOiJmbGF0c2FtcGxlIiwicmVzb3VyY2UiOiJmZWVkIn0._7eLZ3-_6dmOoCKp8MvSoKCp0PA-gAerKnr8tuwut2M",
+		},
+		{
+			readOnly: true,
+			expected: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiJyZWFkIiwiZmVlZF9pZCI6ImZsYXRzYW1wbGUiLCJyZXNvdXJjZSI6ImZlZWQifQ.Ab6NX3dAGbBiXkQrEIWg9Z-WRm1R4710ont2y0OONiE",
+		},
+	}
+	for _, tc := range testCases {
+		token := flat.Token(tc.readOnly)
+		assert.Equal(t, tc.expected, token)
+	}
+}

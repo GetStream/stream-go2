@@ -18,6 +18,7 @@ type Feed interface {
 	Unfollow(Feed, ...UnfollowOption) error
 	ReplaceToTargets(Activity, []Feed) error
 	UpdateToTargets(Activity, []Feed, []Feed) error
+	Token(bool) string
 }
 
 type feed struct {
@@ -32,10 +33,14 @@ func (f *feed) ID() string {
 }
 
 // Slug returns the feed's slug.
-func (f *feed) Slug() string { return f.slug }
+func (f *feed) Slug() string {
+	return f.slug
+}
 
 // UserID returns the feed's user_id.
-func (f *feed) UserID() string { return f.userID }
+func (f *feed) UserID() string {
+	return f.userID
+}
 
 func newFeed(slug, userID string, client *Client) feed {
 	return feed{userID: userID, slug: slug, client: client}
@@ -102,4 +107,19 @@ func (f *feed) ReplaceToTargets(activity Activity, new []Feed) error {
 // on top of the existing ones, and removing the ones in the remove []Feed slice.
 func (f *feed) UpdateToTargets(activity Activity, add []Feed, remove []Feed) error {
 	return f.client.updateToTargets(f, activity, updateToTargetsWithAdd(add...), updateToTargetsWithRemove(remove...))
+}
+
+// Token returns a token that can be used client-side to listen in real-time to feed changes.
+func (f *feed) Token(readonly bool) string {
+	var action action
+	if readonly {
+		action = actionRead
+	} else {
+		action = actionWrite
+	}
+	token, err := f.client.authenticator.feedAuthToken(resFeed, action, f)
+	if err != nil {
+		return ""
+	}
+	return token
 }
