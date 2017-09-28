@@ -92,6 +92,20 @@ func getActivitiesWithRanking(ranking string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking", ranking)}
 }
 
+func GetNotificationWithMarkSeen(all bool, activityIDs ...string) GetActivitiesOption {
+	if all {
+		return GetActivitiesOption{makeRequestOption("mark_seen", true)}
+	}
+	return GetActivitiesOption{makeRequestOption("mark_seen", strings.Join(activityIDs, ","))}
+}
+
+func GetNotificationWithMarkRead(all bool, activityIDs ...string) GetActivitiesOption {
+	if all {
+		return GetActivitiesOption{makeRequestOption("mark_read", true)}
+	}
+	return GetActivitiesOption{makeRequestOption("mark_read", strings.Join(activityIDs, ","))}
+}
+
 // FollowingOption is an option usable by following feed methods.
 type FollowingOption struct {
 	RequestOption

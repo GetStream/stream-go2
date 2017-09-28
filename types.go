@@ -66,6 +66,24 @@ type AggregatedFeedResponse struct {
 	Results ActivityGroups `json:"results,omitempty"`
 }
 
+type NotificationFeedResponse struct {
+	ReadResponse
+	Unseen  int                      `json:"unseen"`
+	Unread  int                      `json:"unread"`
+	Results []NotificationFeedResult `json:"results"`
+}
+
+type NotificationFeedResult struct {
+	ID            string     `json:"id"`
+	Activities    Activities `json:"activities"`
+	ActivityCount int        `json:"activity_count"`
+	ActorCount    int        `json:"actor_count"`
+	Group         string     `json:"group"`
+	IsRead        bool       `json:"is_read"`
+	IsSeen        bool       `json:"is_seen"`
+	Verb          string     `json:"verb"`
+}
+
 // AddActivityResponse is the API response obtained when adding a single activity
 // to a feed.
 type AddActivityResponse struct {
