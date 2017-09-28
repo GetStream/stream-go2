@@ -148,7 +148,7 @@ type UnfollowOption struct {
 	requestOption
 }
 
-// UnfollowWithKeepHistory adds the `keep_history` parameter to API calls, used to keep
+// UnfollowWithKeepHistory adds the keep_history parameter to API calls, used to keep
 // history when unfollowing feeds, rather than purging it (default behavior).
 // If the keepHistory parameter is false, nothing happens.
 func UnfollowWithKeepHistory(keepHistory bool) UnfollowOption {
