@@ -41,15 +41,26 @@ type authenticator struct {
 	secret string
 }
 
-func (a authenticator) feedAuth(resource resource) authFunc {
+func (a authenticator) feedAuthToken(resource resource, action action, feed Feed) (string, error) {
+	claims := jwt.MapClaims{
+		"resource": resource,
+		"action":   action,
+		"feed_id":  a.feedID(feed),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(a.secret))
+}
+
+func (a authenticator) feedID(feed Feed) string {
+	if feed == nil {
+		return "*"
+	}
+	return fmt.Sprintf("%s%s", feed.Slug(), feed.UserID())
+}
+
+func (a authenticator) feedAuth(resource resource, feed Feed) authFunc {
 	return func(req *http.Request) error {
-		claims := jwt.MapClaims{
-			"resource": resource,
-			"action":   actions[req.Method],
-			"feed_id":  "*",
-		}
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		auth, err := token.SignedString([]byte(a.secret))
+		auth, err := a.feedAuthToken(resource, actions[req.Method], feed)
 		if err != nil {
 			return fmt.Errorf("cannot make auth: %s", err)
 		}
