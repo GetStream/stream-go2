@@ -14,9 +14,14 @@ import (
 // calls.
 type Client struct {
 	key           string
-	cl            *http.Client
+	requester     Requester
 	authenticator authenticator
 	url           *apiURL
+}
+
+// Requester performs HTTP requests.
+type Requester interface {
+	Do(*http.Request) (*http.Response, error)
 }
 
 // NewClient builds a new Client with the provided API key and secret. It can be
@@ -27,7 +32,7 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 	}
 	c := &Client{
 		key:           key,
-		cl:            &http.Client{},
+		requester:     &http.Client{},
 		authenticator: authenticator{secret: secret},
 		url:           &apiURL{},
 	}
@@ -50,25 +55,33 @@ func NewClientFromEnv() (*Client, error) {
 	secret := os.Getenv("STREAM_API_SECRET")
 	region := os.Getenv("STREAM_API_REGION")
 	version := os.Getenv("STREAM_API_VERSION")
-	return NewClient(key, secret, ClientWithRegion(region), ClientWithVersion(version))
+	return NewClient(key, secret, WithAPIRegion(region), WithAPIVersion(version))
 }
 
 // ClientOption is a function used for adding specific configuration options to
 // a Stream client.
 type ClientOption func(*Client) error
 
-// ClientWithRegion sets the region for a given Client.
-func ClientWithRegion(region string) ClientOption {
+// WithAPIRegion sets the region for a given Client.
+func WithAPIRegion(region string) ClientOption {
 	return func(c *Client) error {
 		c.url.region = region
 		return nil
 	}
 }
 
-// ClientWithVersion sets the version for a given Client.
-func ClientWithVersion(version string) ClientOption {
+// WithAPIVersion sets the version for a given Client.
+func WithAPIVersion(version string) ClientOption {
 	return func(c *Client) error {
 		c.url.version = version
+		return nil
+	}
+}
+
+// WithHTTPRequester sets the HTTP requester for a given client, used mostly for testing.
+func WithHTTPRequester(requester Requester) ClientOption {
+	return func(c *Client) error {
+		c.requester = requester
 		return nil
 	}
 }
@@ -168,7 +181,7 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 		return nil, err
 	}
 	req.Header.Set("Content-type", "application/json")
-	resp, err := c.cl.Do(req)
+	resp, err := c.requester.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot perform request: %s", err)
 	}
@@ -192,11 +205,13 @@ func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse
 	if err := json.Unmarshal(resp, &out); err != nil {
 		return nil, err
 	}
-	dur := out.Extra["duration"]
-	delete(out.Extra, "duration")
-	out.Duration, err = durationFromString(dur.(string))
-	if err != nil {
-		return nil, err
+	dur, ok := out.Extra["duration"].(string)
+	if ok {
+		delete(out.Extra, "duration")
+		out.Duration, err = durationFromString(dur)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &out, nil
 }

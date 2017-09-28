@@ -1,64 +1,42 @@
 package stream_test
 
 import (
-	"sort"
+	"net/http"
+	"strconv"
 	"testing"
 
-	"github.com/reifcode/stream-go2"
-	"github.com/stretchr/testify/assert"
+	stream "github.com/reifcode/stream-go2"
 	"github.com/stretchr/testify/require"
 )
 
 func TestAddToMany(t *testing.T) {
 	var (
-		client     = newClient(t)
-		activity   = stream.Activity{Actor: "bob", Verb: "like", Object: "cake"}
-		flat       = newFlatFeed(client)
-		aggregated = newAggregatedFeed(client)
+		client, requester = newClient(t)
+		activity          = stream.Activity{Actor: "bob", Verb: "like", Object: "cake"}
+		flat              = newFlatFeedWithUserID(client, "123")
+		aggregated        = newAggregatedFeedWithUserID(client, "123")
 	)
 
 	err := client.AddToMany(activity, flat, aggregated)
-	require.Nil(t, err)
-
-	flatActivities, err := flat.GetActivities()
 	require.NoError(t, err)
-	assert.Len(t, flatActivities.Results, 1)
-
-	aggregatedActivities, err := aggregated.GetActivities()
-	require.NoError(t, err)
-	assert.Len(t, aggregatedActivities.Results, 1)
+	body := `{"activity":{"actor":"bob","object":"cake","verb":"like"},"feeds":["flat:123","aggregated:123"]}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed/add_to_many/?api_key=key", body)
 }
 
 func TestFollowMany(t *testing.T) {
 	var (
-		client        = newClient(t)
-		relationships = make([]stream.FollowRelationship, 10)
-		flat          = newFlatFeed(client)
+		client, requester = newClient(t)
+		relationships     = make([]stream.FollowRelationship, 3)
+		flat              = newFlatFeedWithUserID(client, "123")
 	)
 
 	for i := range relationships {
-		other := newAggregatedFeed(client)
+		other := newAggregatedFeedWithUserID(client, strconv.Itoa(i))
 		relationships[i] = stream.NewFollowRelationship(other, flat)
 	}
 
 	err := client.FollowMany(relationships)
 	require.NoError(t, err)
-
-	follows, err := flat.GetFollowers()
-	require.NoError(t, err)
-	require.Len(t, follows.Results, 10)
-
-	expected := make([]string, 10)
-	for i := range expected {
-		expected[i] = relationships[i].Source
-	}
-	sort.Strings(expected)
-
-	actual := make([]string, 10)
-	for i := range actual {
-		actual[i] = follows.Results[i].FeedID
-	}
-	sort.Strings(actual)
-
-	assert.Equal(t, expected, actual)
+	body := `[{"source":"aggregated:0","target":"flat:123"},{"source":"aggregated:1","target":"flat:123"},{"source":"aggregated:2","target":"flat:123"}]`
+	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/follow_many/?api_key=key", body)
 }

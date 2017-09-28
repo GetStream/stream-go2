@@ -25,9 +25,6 @@ func makeRequestOption(key string, value interface{}) RequestOption {
 }
 
 func (o requestOption) String() string {
-	if o.key == "" {
-		return ""
-	}
 	return fmt.Sprintf("&%s=%v", o.key, o.value)
 }
 
@@ -131,12 +128,6 @@ func FollowingWithOffset(offset int) FollowingOption {
 	return FollowingOption{withOffset(offset)}
 }
 
-// FollowingWithActivityCopyLimit sets the activity copy threshold for Follow Many
-// API calls.
-func FollowingWithActivityCopyLimit(limit int) FollowingOption {
-	return FollowingOption{makeRequestOption("activity_copy_limit", limit)}
-}
-
 // FollowersOption is an option usable by followers feed methods.
 type FollowersOption struct {
 	RequestOption
@@ -162,7 +153,7 @@ type UnfollowOption struct {
 // If the keepHistory parameter is false, nothing happens.
 func UnfollowWithKeepHistory(keepHistory bool) UnfollowOption {
 	if !keepHistory {
-		return UnfollowOption{}
+		return UnfollowOption{nop{}}
 	}
 	return UnfollowOption{makeRequestOption("keep_history", 1)}
 }
@@ -175,9 +166,9 @@ type followFeedOptions struct {
 // FollowFeedOption is a function used to customize FollowFeed API calls.
 type FollowFeedOption func(*followFeedOptions)
 
-// FollowWithActivityCopyLimit sets the activity copy threshold for Follow Feed API
+// FollowFeedWithActivityCopyLimit sets the activity copy threshold for Follow Feed API
 // calls.
-func FollowWithActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
+func FollowFeedWithActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 	return func(o *followFeedOptions) {
 		o.ActivityCopyLimit = activityCopyLimit
 	}
@@ -210,4 +201,10 @@ func updateToTargetsWithRemove(targets ...Feed) updateToTargetsOption {
 			r.Removes[i] = targets[i].ID()
 		}
 	}
+}
+
+type nop struct{}
+
+func (nop) String() string {
+	return ""
 }

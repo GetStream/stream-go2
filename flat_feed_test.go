@@ -1,42 +1,48 @@
 package stream_test
 
 import (
+	"fmt"
+	"net/http"
 	"testing"
 
 	stream "github.com/reifcode/stream-go2"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-func prepareFeedForTestGetActivities(t *testing.T, feed stream.Feed, size int) {
-	activities := make(stream.Activities, size)
-	for i := range activities {
-		var verb string
-		if i%2 == 0 {
-			verb = "even"
-		} else {
-			verb = "odd"
-		}
-		activities[i] = stream.Activity{Actor: "test", Verb: verb, Object: randString(10)}
-	}
-	_, err := feed.AddActivities(activities...)
-	require.NoError(t, err)
-}
-
 func TestFlatFeedGetActivities(t *testing.T) {
-	var (
-		client = newClient(t)
-		flat   = newFlatFeed(client)
-		size   = 15
-	)
-	prepareFeedForTestGetActivities(t, flat, size)
-	resp, err := flat.GetActivities()
-	require.NoError(t, err)
-	assert.Len(t, resp.Results, size)
+	client, requester := newClient(t)
+	flat := newFlatFeedWithUserID(client, "123")
+	testCases := []struct {
+		opts []stream.GetActivitiesOption
+		url  string
+	}{
+		{
+			url: "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key",
+		},
+		{
+			opts: []stream.GetActivitiesOption{stream.GetActivitiesWithLimit(42)},
+			url:  "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key&limit=42",
+		},
+		{
+			opts: []stream.GetActivitiesOption{
+				stream.GetActivitiesWithLimit(42),
+				stream.GetActivitiesWithOffset(11),
+				stream.GetActivitiesWithIDGT("aabbcc"),
+				stream.GetActivitiesWithIDGTE("ccddee"),
+				stream.GetActivitiesWithIDLT("ffgghh"),
+				stream.GetActivitiesWithIDLTE("iijjkk"),
+			},
+			url: "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key&limit=42&offset=11&id_gt=aabbcc&id_gte=ccddee&id_lt=ffgghh&id_lte=iijjkk",
+		},
+	}
 
-	limit := 2
-	resp, err = flat.GetActivities(stream.GetActivitiesWithLimit(limit))
-	require.NoError(t, err)
-	assert.Len(t, resp.Results, limit)
-	assert.NotZero(t, resp.Duration.Nanoseconds())
+	for _, tc := range testCases {
+		_, err := flat.GetActivities(tc.opts...)
+		testRequest(t, requester.req, http.MethodGet, tc.url, "")
+		assert.NoError(t, err)
+
+		_, err = flat.GetActivitiesWithRanking("popularity", tc.opts...)
+		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.url), "")
+		assert.NoError(t, err)
+	}
 }

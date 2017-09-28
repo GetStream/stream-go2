@@ -77,7 +77,7 @@ func (f *feed) RemoveActivityByForeignID(foreignID string) error {
 // if any.
 func (f *feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
 	followOptions := &followFeedOptions{
-		Target:            fmt.Sprintf("%s:%s", feed.Slug(), f.UserID()),
+		Target:            fmt.Sprintf("%s:%s", feed.Slug(), feed.UserID()),
 		ActivityCopyLimit: defaultActivityCopyLimit,
 	}
 	for _, opt := range opts {

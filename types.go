@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -16,6 +17,11 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 	var err error
 	*d, err = durationFromString(strings.Replace(string(b), `"`, "", -1))
 	return err
+}
+
+// MarshalJSON marshals the Duration to a string like "30s".
+func (d Duration) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.String())
 }
 
 func durationFromString(s string) (Duration, error) {
@@ -34,6 +40,11 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 	var err error
 	*t, err = timeFromString(strings.Replace(string(b), `"`, "", -1))
 	return err
+}
+
+// MarshalJSON marshals Time into a string formatted with the TimeLayout format.
+func (t Time) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Format(TimeLayout))
 }
 
 func timeFromString(s string) (Time, error) {

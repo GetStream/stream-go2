@@ -7,7 +7,58 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestConfig(t *testing.T) {
+	testCases := []struct {
+		key             string
+		secret          string
+		shouldError     bool
+		opts            []ClientOption
+		expectedRegion  string
+		expectedVersion string
+	}{
+		{
+			shouldError: true,
+		},
+		{
+			key: "k", secret: "s",
+			expectedRegion:  "",
+			expectedVersion: "",
+		},
+		{
+			key: "k", secret: "s",
+			opts:            []ClientOption{WithAPIRegion("test")},
+			expectedRegion:  "test",
+			expectedVersion: "",
+		},
+		{
+			key: "k", secret: "s",
+			opts:            []ClientOption{WithAPIVersion("test")},
+			expectedRegion:  "",
+			expectedVersion: "test",
+		},
+		{
+			key: "k", secret: "s",
+			opts:            []ClientOption{WithAPIRegion("test"), WithAPIVersion("more")},
+			expectedRegion:  "test",
+			expectedVersion: "more",
+		},
+	}
+	for _, tc := range testCases {
+		c, err := NewClient(tc.key, tc.secret, tc.opts...)
+		if tc.shouldError {
+			assert.Error(t, err)
+			continue
+		}
+		assert.NoError(t, err)
+		assert.Equal(t, tc.expectedRegion, c.url.region)
+		assert.Equal(t, tc.expectedVersion, c.url.version)
+	}
+}
+
 func Test_makeEndpoint(t *testing.T) {
+	prev := os.Getenv("STREAM_API_URL")
+	defer os.Setenv("STREAM_API_URL", prev)
+
 	testCases := []struct {
 		url      *apiURL
 		format   string
