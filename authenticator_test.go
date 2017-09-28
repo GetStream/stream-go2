@@ -28,7 +28,7 @@ func TestApplicationAuth(t *testing.T) {
 
 	err = a.applicationAuth("my key")(req)
 	assert.NoError(t, err)
-	assert.Equal(t, "my key", req.Header.Get("x-api-key"))
+	assert.Equal(t, "my key", req.Header.Get("X-API-Key"))
 	expectedAuthRe := regexp.MustCompile(`Signature keyId="my key",algorithm="hmac-sha256",headers="date",signature="[0-9a-zA-Z/+]{43}="`)
 	assert.Regexp(t, expectedAuthRe, req.Header.Get("authorization"))
 }
