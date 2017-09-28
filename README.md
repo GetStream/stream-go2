@@ -74,7 +74,15 @@ Create an aggregated feed from slug and user ID:
 aggr := client.AggregatedFeed("aggregated", "123")
 ```
 
-Both flat and aggregated feeds implement the `Feed` interface methods.
+Create a notification feed from slug and user ID:
+```go
+notif := client.NotificationFeed("notification", "123")
+```
+
+Flat, aggregated, and notification feeds implement the `Feed` interface methods.
+
+In the snippets below, `feed` indicates any kind of feed, while `flat`, `aggregated`, and `notification` are used
+to indicate that only that kind of feed has certain methods or can perform certain operations.
 
 ### Retrieving activities
 
@@ -119,6 +127,28 @@ for _, group := range resp.Results {
     }
 }
 ```
+
+#### Notification feeds
+```go
+resp, err := notification.GetActivities()
+if err != nil {
+    // ...
+}
+
+fmt.Println("Duration:", resp.Duration)
+fmt.Println("Next:", resp.Next)
+fmt.Println("Unseen:", resp.Unseen, "Unread:", resp.Unread)
+fmt.Println("Groups:")
+for _, group := range resp.Results {
+    fmt.Println("Group:", group.Group, "ID:", group.ID, "Verb:", group.Verb)
+    fmt.Println("Seen:", group.IsSeen, "Read:", group.IsRead)
+    fmt.Println("Activities:", group.ActivityCount, "Actors:", group.ActorCount)
+    for _, activity := range group.Activities {
+        // ...
+    }
+}
+```
+
 
 #### Options
 You can pass supported options and filters when retrieving activities. For example:
@@ -297,6 +327,16 @@ err := client.FollowMany(relationships)
 if err != nil {
     // ...
 }
+```
+
+### Realtime tokens
+You can get a token suitable for client-side [real-time feed updates](https://getstream.io/docs/go/#realtime) as:
+```go
+// Read+Write token
+token := feed.Token(false)
+
+// Read-only token
+readonlyToken := feed.Token(true)
 ```
 
 ## License
