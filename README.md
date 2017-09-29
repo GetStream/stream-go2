@@ -151,11 +151,12 @@ for _, group := range resp.Results {
 
 
 #### Options
-You can pass supported options and filters when retrieving activities. For example:
+You can pass supported options and filters when retrieving activities:
 ```go
 resp, err := flat.GetActivities(
-    stream.GetActivitiesWithIDGTE("f505b3fb-a212-11e7-..."),
-    stream.GetActivitiesWithLimit(5), 
+    stream.WithActivitiesIDGTE("f505b3fb-a212-11e7-..."),
+    stream.WithActivitiesLimit(5), 
+    ...,
 )
 ```
 
@@ -224,7 +225,7 @@ Beware that it's possible to follow only flat feeds.
 You can pass options to the `Follow` method. For example:
 ```go
 err := feed.Follow(anotherFeed, 
-    stream.FollowWithActivityCopyLimit(15), 
+    stream.WithFollowFeedActivityCopyLimit(15), 
     ...,
 )
 ```
@@ -246,8 +247,8 @@ for _, followed := range resp.Results {
 
 You can pass options to `GetFollowings`:
 ```go
-resp, err := feed.GetFollowings(
-    stream.FollowingWithLimit(5),
+resp, err := feed.GetFollowing(
+    stream.WithFollowingLimit(5),
     ...,
 )
 ```
@@ -266,6 +267,14 @@ for _, follower := range resp.Results {
 ```
 Note: this is only possible for `FlatFeed` types.
 
+You can pass options to `GetFollowers`:
+```go
+resp, err := feed.GetFollowing(
+    stream.WithFollowersLimit(5),
+    ...,
+)
+```
+
 ### Unfollowing a feed
 ```go
 err := flat.Unfollow(anotherFeed)
@@ -277,7 +286,7 @@ if err != nil {
 You can pass options to `Unfollow`:
 ```go
 err := flat.Unfollow(anotherFeed,
-    stream.UnfollowWithKeepHistory(true),
+    stream.WithUnfollowKeepHistory(true),
     ...,
 )
 ```
@@ -287,7 +296,7 @@ Remove all old targets and set new ones (replace):
 ```go
 newTargets := []stream.Feed{f1, f2}
 
-err := feed.ReplaceToTargets(activity, newTargets)
+err := feed.UpdateToTargets(activity, stream.WithToTargetsNew(newTargets...))
 if err != nil {
     // ...
 }
@@ -298,11 +307,18 @@ Add some targets and remove some others:
 add := []stream.Feed{target1, target2}
 remove := []stream.Feed{oldTarget1, oldTarget2}
 
-err := feed.UpdateToTargets(activity, add, remove)
+err := feed.UpdateToTargets(
+    activity, 
+    stream.WithToTargetsAdd(add),
+    stream.WithToTargetsRemove(remove),
+)
 if err != nil {
     // ...
 }
 ```
+
+Note: you can't mix `stream.WithToTargetsNew` with `stream.WithToTargetsAdd` or `stream.WithToTargetsRemove`.
+
 
 ### Batch adding activities
 You can add the same activities to multiple feeds at once with the `(*Client).AddToMany` method ([docs](https://getstream.io/docs_rest/#add_to_many)):
