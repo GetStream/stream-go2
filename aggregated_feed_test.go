@@ -24,7 +24,7 @@ func TestAggregatedFeedGetActivities(t *testing.T) {
 			url:  "https://api.getstream.io/api/v1.0/feed/aggregated/123/?api_key=key&limit=42",
 		},
 		{
-			opts: []stream.GetActivitiesOption{stream.WithActivitiesLimit(42), stream.WithActivitiesOffset(11), stream.WithIDGT("aabbcc")},
+			opts: []stream.GetActivitiesOption{stream.WithActivitiesLimit(42), stream.WithActivitiesOffset(11), stream.WithActivitiesIDGT("aabbcc")},
 			url:  "https://api.getstream.io/api/v1.0/feed/aggregated/123/?api_key=key&limit=42&offset=11&id_gt=aabbcc",
 		},
 	}

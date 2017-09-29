@@ -57,31 +57,31 @@ func WithActivitiesOffset(offset int) GetActivitiesOption {
 	return GetActivitiesOption{withOffset(offset)}
 }
 
-// WithIDGTE adds the id_gte parameter to API calls, used when retrieving
+// WithActivitiesIDGTE adds the id_gte parameter to API calls, used when retrieving
 // paginated activities from feeds, returning activities with ID greater or
 // equal than the provided id.
-func WithIDGTE(id string) GetActivitiesOption {
+func WithActivitiesIDGTE(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_gte", id)}
 }
 
-// WithIDGT adds the id_gt parameter to API calls, used when retrieving
+// WithActivitiesIDGT adds the id_gt parameter to API calls, used when retrieving
 // paginated activities from feeds, returning activities with ID greater than
 // the provided id.
-func WithIDGT(id string) GetActivitiesOption {
+func WithActivitiesIDGT(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_gt", id)}
 }
 
-// WithIDLTE adds the id_lte parameter to API calls, used when retrieving
+// WithActivitiesIDLTE adds the id_lte parameter to API calls, used when retrieving
 // paginated activities from feeds, returning activities with ID lesser or equal
 // than the provided id.
-func WithIDLTE(id string) GetActivitiesOption {
+func WithActivitiesIDLTE(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_lte", id)}
 }
 
-// WithIDLT adds the id_lt parameter to API calls, used when retrieving
+// WithActivitiesIDLT adds the id_lt parameter to API calls, used when retrieving
 // paginated activities from feeds, returning activities with ID lesser than the
 // provided id.
-func WithIDLT(id string) GetActivitiesOption {
+func WithActivitiesIDLT(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_lt", id)}
 }
 
@@ -89,18 +89,18 @@ func getActivitiesWithRanking(ranking string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking", ranking)}
 }
 
-// WithMarkSeen marks as seen the given activity ids in a notification
+// WithNotificationsMarkSeen marks as seen the given activity ids in a notification
 // feed. If the all parameter is true, every activity in the feed is marked as seen.
-func WithMarkSeen(all bool, activityIDs ...string) GetActivitiesOption {
+func WithNotificationsMarkSeen(all bool, activityIDs ...string) GetActivitiesOption {
 	if all {
 		return GetActivitiesOption{makeRequestOption("mark_seen", true)}
 	}
 	return GetActivitiesOption{makeRequestOption("mark_seen", strings.Join(activityIDs, ","))}
 }
 
-// WithMarkRead marks as read the given activity ids in a notification
+// WithNotificationsMarkRead marks as read the given activity ids in a notification
 // feed. If the all parameter is true, every activity in the feed is marked as read.
-func WithMarkRead(all bool, activityIDs ...string) GetActivitiesOption {
+func WithNotificationsMarkRead(all bool, activityIDs ...string) GetActivitiesOption {
 	if all {
 		return GetActivitiesOption{makeRequestOption("mark_read", true)}
 	}
@@ -148,10 +148,10 @@ type UnfollowOption struct {
 	requestOption
 }
 
-// WithKeepHistory adds the keep_history parameter to API calls, used to keep
+// WithUnfollowKeepHistory adds the keep_history parameter to API calls, used to keep
 // history when unfollowing feeds, rather than purging it (default behavior).
 // If the keepHistory parameter is false, nothing happens.
-func WithKeepHistory(keepHistory bool) UnfollowOption {
+func WithUnfollowKeepHistory(keepHistory bool) UnfollowOption {
 	if !keepHistory {
 		return UnfollowOption{nop{}}
 	}
@@ -187,22 +187,22 @@ func WithFollowFeedActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 // UpdateToTargetsOption determines what operations perform during an UpdateToTargets API call.
 type UpdateToTargetsOption func(*updateToTargetsRequest)
 
-// WithNewToTargets sets the new to targets, replacing all the existing ones. It cannot be used in combination with any other UpdateToTargetsOption.
-func WithNewToTargets(targets ...string) UpdateToTargetsOption {
+// WithUpdateNewToTargets sets the new to targets, replacing all the existing ones. It cannot be used in combination with any other UpdateToTargetsOption.
+func WithUpdateNewToTargets(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.New = targets
 	}
 }
 
-// WithAddToTargets sets the add to targets, adding them to the activity's existing ones.
-func WithAddToTargets(targets ...string) UpdateToTargetsOption {
+// WithUpdateAddToTargets sets the add to targets, adding them to the activity's existing ones.
+func WithUpdateAddToTargets(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.Adds = targets
 	}
 }
 
-// WithRemoveToTargets sets the remove to targets, removing them from activity's the existing ones.
-func WithRemoveToTargets(targets ...string) UpdateToTargetsOption {
+// WithUpdateRemoveToTargets sets the remove to targets, removing them from activity's the existing ones.
+func WithUpdateRemoveToTargets(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.Removes = targets
 	}
