@@ -16,8 +16,7 @@ type Feed interface {
 	Follow(*FlatFeed, ...FollowFeedOption) error
 	GetFollowing(...FollowingOption) (*FollowingResponse, error)
 	Unfollow(Feed, ...UnfollowOption) error
-	ReplaceToTargets(Activity, []string) error
-	UpdateToTargets(Activity, []string, []string) error
+	UpdateToTargets(Activity, ...UpdateToTargetsOption) error
 	Token(bool) string
 }
 
@@ -97,16 +96,10 @@ func (f *feed) Unfollow(target Feed, opts ...UnfollowOption) error {
 	return f.client.unfollow(f, target.ID(), opts...)
 }
 
-// ReplaceToTargets removes all the existing "to" targets from the provided activity, replacing
-// them with the ones in the provided new slice of feed IDs.
-func (f *feed) ReplaceToTargets(activity Activity, new []string) error {
-	return f.client.updateToTargets(f, activity, updateToTargetsWithNew(new...))
-}
-
-// UpdateToTargets updates the "to" targets for the provided activity, adding the feeds in the add slice of feed IDs
-// on top of the existing ones, and removing the ones in the remove slice of feed IDs.
-func (f *feed) UpdateToTargets(activity Activity, add []string, remove []string) error {
-	return f.client.updateToTargets(f, activity, updateToTargetsWithAdd(add...), updateToTargetsWithRemove(remove...))
+// UpdateToTargets updates the "to" targets for the provided activity, with the options passed
+// as argument for replacing, adding, or removing to targets.
+func (f *feed) UpdateToTargets(activity Activity, opts ...UpdateToTargetsOption) error {
+	return f.client.updateToTargets(f, activity, opts...)
 }
 
 // Token returns a token that can be used client-side to listen in real-time to feed changes.

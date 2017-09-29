@@ -19,27 +19,27 @@ func TestGetNotificationActivities(t *testing.T) {
 			url: "https://api.getstream.io/api/v1.0/feed/notification/123/?api_key=key",
 		},
 		{
-			opts: []stream.GetActivitiesOption{stream.GetActivitiesWithLimit(42)},
+			opts: []stream.GetActivitiesOption{stream.WithActivitiesLimit(42)},
 			url:  "https://api.getstream.io/api/v1.0/feed/notification/123/?api_key=key&limit=42",
 		},
 		{
-			opts: []stream.GetActivitiesOption{stream.GetActivitiesWithLimit(42), stream.GetActivitiesWithOffset(11), stream.GetActivitiesWithIDGT("aabbcc")},
+			opts: []stream.GetActivitiesOption{stream.WithActivitiesLimit(42), stream.WithActivitiesOffset(11), stream.WithIDGT("aabbcc")},
 			url:  "https://api.getstream.io/api/v1.0/feed/notification/123/?api_key=key&limit=42&offset=11&id_gt=aabbcc",
 		},
 		{
-			opts: []stream.GetActivitiesOption{stream.GetNotificationWithMarkRead(false, "f1", "f2", "f3")},
+			opts: []stream.GetActivitiesOption{stream.WithMarkRead(false, "f1", "f2", "f3")},
 			url:  "https://api.getstream.io/api/v1.0/feed/notification/123/?api_key=key&mark_read=f1,f2,f3",
 		},
 		{
-			opts: []stream.GetActivitiesOption{stream.GetNotificationWithMarkRead(true, "f1", "f2", "f3")},
+			opts: []stream.GetActivitiesOption{stream.WithMarkRead(true, "f1", "f2", "f3")},
 			url:  "https://api.getstream.io/api/v1.0/feed/notification/123/?api_key=key&mark_read=true",
 		},
 		{
-			opts: []stream.GetActivitiesOption{stream.GetNotificationWithMarkSeen(false, "f1", "f2", "f3")},
+			opts: []stream.GetActivitiesOption{stream.WithMarkSeen(false, "f1", "f2", "f3")},
 			url:  "https://api.getstream.io/api/v1.0/feed/notification/123/?api_key=key&mark_seen=f1,f2,f3",
 		},
 		{
-			opts: []stream.GetActivitiesOption{stream.GetNotificationWithMarkSeen(true, "f1", "f2", "f3")},
+			opts: []stream.GetActivitiesOption{stream.WithMarkSeen(true, "f1", "f2", "f3")},
 			url:  "https://api.getstream.io/api/v1.0/feed/notification/123/?api_key=key&mark_seen=true",
 		},
 	}

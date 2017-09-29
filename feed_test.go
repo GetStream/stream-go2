@@ -88,7 +88,7 @@ func TestFollow(t *testing.T) {
 			expectedBody: `{"target":"flat:f2","activity_copy_limit":300}`,
 		},
 		{
-			opts:         []stream.FollowFeedOption{stream.FollowFeedWithActivityCopyLimit(123)},
+			opts:         []stream.FollowFeedOption{stream.WithFollowFeedActivityCopyLimit(123)},
 			expectedURL:  "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/?api_key=key",
 			expectedBody: `{"target":"flat:f2","activity_copy_limit":123}`,
 		},
@@ -113,7 +113,7 @@ func TestGetFollowing(t *testing.T) {
 			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/?api_key=key",
 		},
 		{
-			opts:     []stream.FollowingOption{stream.FollowingWithFilter("filter"), stream.FollowingWithLimit(42), stream.FollowingWithOffset(84)},
+			opts:     []stream.FollowingOption{stream.WithFollowingFilter("filter"), stream.WithFollowingLimit(42), stream.WithFollowingOffset(84)},
 			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/?api_key=key&filter=filter&limit=42&offset=84",
 		},
 	}
@@ -137,7 +137,7 @@ func TestGetFollowers(t *testing.T) {
 			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/followers/?api_key=key",
 		},
 		{
-			opts:     []stream.FollowersOption{stream.FollowersWithLimit(42), stream.FollowersWithOffset(84)},
+			opts:     []stream.FollowersOption{stream.WithFollowersLimit(42), stream.WithFollowersOffset(84)},
 			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/followers/?api_key=key&limit=42&offset=84",
 		},
 	}
@@ -161,11 +161,11 @@ func TestUnfollow(t *testing.T) {
 			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key",
 		},
 		{
-			opts:     []stream.UnfollowOption{stream.UnfollowWithKeepHistory(false)},
+			opts:     []stream.UnfollowOption{stream.WithKeepHistory(false)},
 			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key",
 		},
 		{
-			opts:     []stream.UnfollowOption{stream.UnfollowWithKeepHistory(true)},
+			opts:     []stream.UnfollowOption{stream.WithKeepHistory(true)},
 			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key&keep_history=1",
 		},
 	}
@@ -196,17 +196,17 @@ func TestUpdateToTargets(t *testing.T) {
 		now               = getTime(time.Now())
 		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}, Extra: map[string]interface{}{"popularity": 9000}}
 	)
-	err := flat.UpdateToTargets(activity, []string{f2.ID()}, []string{f1.ID()})
+	err := flat.UpdateToTargets(activity, stream.WithAddToTargets(f2.ID()), stream.WithRemoveToTargets(f1.ID()))
 	require.NoError(t, err)
 	body := fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","added_targets":["flat:f2"],"removed_targets":["flat:f1"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
-	err = flat.ReplaceToTargets(activity, []string{f3.ID()})
+	err = flat.UpdateToTargets(activity, stream.WithNewToTargets(f3.ID()))
 	require.NoError(t, err)
 	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
 
 	activity.Time = stream.Time{Time: time.Time{}}
-	err = flat.UpdateToTargets(activity, []string{f2.ID()}, nil)
+	err = flat.UpdateToTargets(activity, stream.WithAddToTargets(f2.ID()))
 	require.Error(t, err)
 }
 

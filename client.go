@@ -311,7 +311,7 @@ func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) erro
 	return err
 }
 
-func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...updateToTargetsOption) error {
+func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToTargetsOption) error {
 	if activity.Time.IsZero() {
 		return fmt.Errorf("activity time cannot be zero")
 	}

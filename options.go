@@ -41,47 +41,47 @@ type GetActivitiesOption struct {
 	requestOption
 }
 
-// GetActivitiesWithLimit adds the limit parameter to API calls which support it, limiting
+// WithActivitiesLimit adds the limit parameter to API calls which support it, limiting
 // the number of results in the response to the provided limit threshold.
 // Supported operations: retrieve activities, retrieve followers, retrieve
 // following.
-func GetActivitiesWithLimit(limit int) GetActivitiesOption {
+func WithActivitiesLimit(limit int) GetActivitiesOption {
 	return GetActivitiesOption{withLimit(limit)}
 }
 
-// GetActivitiesWithOffset adds the offset parameter to API calls which support it, getting
+// WithActivitiesOffset adds the offset parameter to API calls which support it, getting
 // results starting from the provided offset index.
 // Supported operations: retrieve activities, retrieve followers, retrieve
 // following.
-func GetActivitiesWithOffset(offset int) GetActivitiesOption {
+func WithActivitiesOffset(offset int) GetActivitiesOption {
 	return GetActivitiesOption{withOffset(offset)}
 }
 
-// GetActivitiesWithIDGTE adds the id_gte parameter to API calls, used when retrieving
+// WithIDGTE adds the id_gte parameter to API calls, used when retrieving
 // paginated activities from feeds, returning activities with ID greater or
 // equal than the provided id.
-func GetActivitiesWithIDGTE(id string) GetActivitiesOption {
+func WithIDGTE(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_gte", id)}
 }
 
-// GetActivitiesWithIDGT adds the id_gt parameter to API calls, used when retrieving
+// WithIDGT adds the id_gt parameter to API calls, used when retrieving
 // paginated activities from feeds, returning activities with ID greater than
 // the provided id.
-func GetActivitiesWithIDGT(id string) GetActivitiesOption {
+func WithIDGT(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_gt", id)}
 }
 
-// GetActivitiesWithIDLTE adds the id_lte parameter to API calls, used when retrieving
+// WithIDLTE adds the id_lte parameter to API calls, used when retrieving
 // paginated activities from feeds, returning activities with ID lesser or equal
 // than the provided id.
-func GetActivitiesWithIDLTE(id string) GetActivitiesOption {
+func WithIDLTE(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_lte", id)}
 }
 
-// GetActivitiesWithIDLT adds the id_lt parameter to API calls, used when retrieving
+// WithIDLT adds the id_lt parameter to API calls, used when retrieving
 // paginated activities from feeds, returning activities with ID lesser than the
 // provided id.
-func GetActivitiesWithIDLT(id string) GetActivitiesOption {
+func WithIDLT(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_lt", id)}
 }
 
@@ -89,18 +89,18 @@ func getActivitiesWithRanking(ranking string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking", ranking)}
 }
 
-// GetNotificationWithMarkSeen marks as seen the given activity ids in a notification
+// WithMarkSeen marks as seen the given activity ids in a notification
 // feed. If the all parameter is true, every activity in the feed is marked as seen.
-func GetNotificationWithMarkSeen(all bool, activityIDs ...string) GetActivitiesOption {
+func WithMarkSeen(all bool, activityIDs ...string) GetActivitiesOption {
 	if all {
 		return GetActivitiesOption{makeRequestOption("mark_seen", true)}
 	}
 	return GetActivitiesOption{makeRequestOption("mark_seen", strings.Join(activityIDs, ","))}
 }
 
-// GetNotificationWithMarkRead marks as read the given activity ids in a notification
+// WithMarkRead marks as read the given activity ids in a notification
 // feed. If the all parameter is true, every activity in the feed is marked as read.
-func GetNotificationWithMarkRead(all bool, activityIDs ...string) GetActivitiesOption {
+func WithMarkRead(all bool, activityIDs ...string) GetActivitiesOption {
 	if all {
 		return GetActivitiesOption{makeRequestOption("mark_read", true)}
 	}
@@ -112,19 +112,19 @@ type FollowingOption struct {
 	requestOption
 }
 
-// FollowingWithFilter adds the filter parameter to API calls, used when retrieving
+// WithFollowingFilter adds the filter parameter to API calls, used when retrieving
 // following feeds, allowing the check whether certain feeds are being followed.
-func FollowingWithFilter(ids ...string) FollowingOption {
+func WithFollowingFilter(ids ...string) FollowingOption {
 	return FollowingOption{makeRequestOption("filter", strings.Join(ids, ","))}
 }
 
-// FollowingWithLimit limits the number of followings in the response to the provided limit.
-func FollowingWithLimit(limit int) FollowingOption {
+// WithFollowingLimit limits the number of followings in the response to the provided limit.
+func WithFollowingLimit(limit int) FollowingOption {
 	return FollowingOption{withLimit(limit)}
 }
 
-// FollowingWithOffset returns followings starting from the given offset.
-func FollowingWithOffset(offset int) FollowingOption {
+// WithFollowingOffset returns followings starting from the given offset.
+func WithFollowingOffset(offset int) FollowingOption {
 	return FollowingOption{withOffset(offset)}
 }
 
@@ -133,13 +133,13 @@ type FollowersOption struct {
 	requestOption
 }
 
-// FollowersWithLimit limits the number of followers in the response to the provided limit.
-func FollowersWithLimit(limit int) FollowersOption {
+// WithFollowersLimit limits the number of followers in the response to the provided limit.
+func WithFollowersLimit(limit int) FollowersOption {
 	return FollowersOption{withLimit(limit)}
 }
 
-// FollowersWithOffset returns followers starting from the given offset.
-func FollowersWithOffset(offset int) FollowersOption {
+// WithFollowersOffset returns followers starting from the given offset.
+func WithFollowersOffset(offset int) FollowersOption {
 	return FollowersOption{withOffset(offset)}
 }
 
@@ -148,10 +148,10 @@ type UnfollowOption struct {
 	requestOption
 }
 
-// UnfollowWithKeepHistory adds the keep_history parameter to API calls, used to keep
+// WithKeepHistory adds the keep_history parameter to API calls, used to keep
 // history when unfollowing feeds, rather than purging it (default behavior).
 // If the keepHistory parameter is false, nothing happens.
-func UnfollowWithKeepHistory(keepHistory bool) UnfollowOption {
+func WithKeepHistory(keepHistory bool) UnfollowOption {
 	if !keepHistory {
 		return UnfollowOption{nop{}}
 	}
@@ -168,37 +168,41 @@ type FollowManyOption struct {
 	requestOption
 }
 
-// FollowManyWithActivityCopyLimit sets how many activities should be copied from the target feed.
-func FollowManyWithActivityCopyLimit(activityCopyLimit int) FollowManyOption {
+// WithFollowManyActivityCopyLimit sets how many activities should be copied from the target feed.
+func WithFollowManyActivityCopyLimit(activityCopyLimit int) FollowManyOption {
 	return FollowManyOption{makeRequestOption("activity_copy_limit", activityCopyLimit)}
 }
 
 // FollowFeedOption is a function used to customize FollowFeed API calls.
 type FollowFeedOption func(*followFeedOptions)
 
-// FollowFeedWithActivityCopyLimit sets the activity copy threshold for Follow Feed API
+// WithFollowFeedActivityCopyLimit sets the activity copy threshold for Follow Feed API
 // calls.
-func FollowFeedWithActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
+func WithFollowFeedActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 	return func(o *followFeedOptions) {
 		o.ActivityCopyLimit = activityCopyLimit
 	}
 }
 
-type updateToTargetsOption func(*updateToTargetsRequest)
+// UpdateToTargetsOption determines what operations perform during an UpdateToTargets API call.
+type UpdateToTargetsOption func(*updateToTargetsRequest)
 
-func updateToTargetsWithNew(targets ...string) updateToTargetsOption {
+// WithNewToTargets sets the new to targets, replacing all the existing ones. It cannot be used in combination with any other UpdateToTargetsOption.
+func WithNewToTargets(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.New = targets
 	}
 }
 
-func updateToTargetsWithAdd(targets ...string) updateToTargetsOption {
+// WithAddToTargets sets the add to targets, adding them to the activity's existing ones.
+func WithAddToTargets(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.Adds = targets
 	}
 }
 
-func updateToTargetsWithRemove(targets ...string) updateToTargetsOption {
+// WithRemoveToTargets sets the remove to targets, removing them from activity's the existing ones.
+func WithRemoveToTargets(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.Removes = targets
 	}
