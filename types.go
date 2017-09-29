@@ -53,34 +53,34 @@ func timeFromString(s string) (Time, error) {
 }
 
 // Response is the part of StreamAPI responses common throughout the API.
-type Response struct {
+type response struct {
 	Duration Duration `json:"duration,omitempty"`
 }
 
-// ReadResponse is the part of StreamAPI responses common for GetActivities API requests.
-type ReadResponse struct {
-	Response
+// readResponse is the part of StreamAPI responses common for GetActivities API requests.
+type readResponse struct {
+	response
 	Next string `json:"next,omitempty"`
 }
 
 // FlatFeedResponse is the API response obtained when retrieving activities from
 // a flat feed.
 type FlatFeedResponse struct {
-	ReadResponse
+	readResponse
 	Results []Activity `json:"results,omitempty"`
 }
 
 // AggregatedFeedResponse is the API response obtained when retrieving
 // activities from an aggregated feed.
 type AggregatedFeedResponse struct {
-	ReadResponse
+	readResponse
 	Results []ActivityGroup `json:"results,omitempty"`
 }
 
 // NotificationFeedResponse is the API response obtained when retrieving activities
 // from a notification feed.
 type NotificationFeedResponse struct {
-	ReadResponse
+	readResponse
 	Unseen  int                      `json:"unseen"`
 	Unread  int                      `json:"unread"`
 	Results []NotificationFeedResult `json:"results"`
@@ -102,14 +102,14 @@ type NotificationFeedResult struct {
 // AddActivityResponse is the API response obtained when adding a single activity
 // to a feed.
 type AddActivityResponse struct {
-	Response
+	response
 	Activity
 }
 
 // AddActivitiesResponse is the API response obtained when adding activities to
 // a feed.
 type AddActivitiesResponse struct {
-	Response
+	response
 	Activities []Activity `json:"activities,omitempty"`
 }
 
@@ -120,7 +120,7 @@ type Follower struct {
 }
 
 type followResponse struct {
-	Response
+	response
 	Results []Follower `json:"results,omitempty"`
 }
 
