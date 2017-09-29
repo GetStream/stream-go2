@@ -8,15 +8,15 @@ import (
 
 // Activity is a Stream activity entity.
 type Activity struct {
-	ID        string                 `json:"id,omitempty"`
+	ID        FeedID                 `json:"id,omitempty"`
 	Actor     string                 `json:"actor,omitempty"`
 	Verb      string                 `json:"verb,omitempty"`
 	Object    string                 `json:"object,omitempty"`
 	ForeignID string                 `json:"foreign_id,omitempty"`
 	Target    string                 `json:"target,omitempty"`
 	Time      Time                   `json:"time,omitempty"`
-	Origin    string                 `json:"origin,omitempty"`
-	To        []string               `json:"to,omitempty"`
+	Origin    FeedID                 `json:"origin,omitempty"`
+	To        []FeedID               `json:"to,omitempty"`
 	Score     float64                `json:"score,omitempty"`
 	Extra     map[string]interface{} `json:"-"`
 }

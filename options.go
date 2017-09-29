@@ -186,30 +186,21 @@ func FollowFeedWithActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 
 type updateToTargetsOption func(*updateToTargetsRequest)
 
-func updateToTargetsWithNew(targets ...Feed) updateToTargetsOption {
+func updateToTargetsWithNew(targets ...FeedID) updateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
-		r.New = make([]string, len(targets))
-		for i := range targets {
-			r.New[i] = targets[i].ID()
-		}
+		r.New = targets
 	}
 }
 
-func updateToTargetsWithAdd(targets ...Feed) updateToTargetsOption {
+func updateToTargetsWithAdd(targets ...FeedID) updateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
-		r.Adds = make([]string, len(targets))
-		for i := range targets {
-			r.Adds[i] = targets[i].ID()
-		}
+		r.Adds = targets
 	}
 }
 
-func updateToTargetsWithRemove(targets ...Feed) updateToTargetsOption {
+func updateToTargetsWithRemove(targets ...FeedID) updateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
-		r.Removes = make([]string, len(targets))
-		for i := range targets {
-			r.Removes[i] = targets[i].ID()
-		}
+		r.Removes = targets
 	}
 }
 

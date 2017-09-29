@@ -14,9 +14,9 @@ import (
 func TestFeedID(t *testing.T) {
 	client, _ := newClient(t)
 	flat := client.FlatFeed("flat", "123")
-	assert.Equal(t, "flat:123", flat.ID())
+	assert.Equal(t, stream.FeedID("flat:123"), flat.ID())
 	aggregated := client.AggregatedFeed("aggregated", "456")
-	assert.Equal(t, "aggregated:456", aggregated.ID())
+	assert.Equal(t, stream.FeedID("aggregated:456"), aggregated.ID())
 }
 
 func TestAddActivity(t *testing.T) {
@@ -194,19 +194,19 @@ func TestUpdateToTargets(t *testing.T) {
 		flat              = newFlatFeedWithUserID(client, "123")
 		f1, f2, f3        = newFlatFeedWithUserID(client, "f1"), newFlatFeedWithUserID(client, "f2"), newFlatFeedWithUserID(client, "f3")
 		now               = getTime(time.Now())
-		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}, Extra: map[string]interface{}{"popularity": 9000}}
+		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []stream.FeedID{f1.ID()}, Extra: map[string]interface{}{"popularity": 9000}}
 	)
-	err := flat.UpdateToTargets(activity, []stream.Feed{f2}, []stream.Feed{f1})
+	err := flat.UpdateToTargets(activity, []stream.FeedID{f2.ID()}, []stream.FeedID{f1.ID()})
 	require.NoError(t, err)
 	body := fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","added_targets":["flat:f2"],"removed_targets":["flat:f1"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
-	err = flat.ReplaceToTargets(activity, []stream.Feed{f3})
+	err = flat.ReplaceToTargets(activity, []stream.FeedID{f3.ID()})
 	require.NoError(t, err)
 	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
 
 	activity.Time = stream.Time{Time: time.Time{}}
-	err = flat.UpdateToTargets(activity, []stream.Feed{f2}, nil)
+	err = flat.UpdateToTargets(activity, []stream.FeedID{f2.ID()}, nil)
 	require.Error(t, err)
 }
 

@@ -5,7 +5,7 @@ import "fmt"
 // Feed is a generic Stream feed, exporting the generic functions common to any
 // Stream feed.
 type Feed interface {
-	ID() string
+	ID() FeedID
 	Slug() string
 	UserID() string
 	AddActivity(Activity) (*AddActivityResponse, error)
@@ -16,8 +16,8 @@ type Feed interface {
 	Follow(*FlatFeed, ...FollowFeedOption) error
 	GetFollowing(...FollowingOption) (*FollowingResponse, error)
 	Unfollow(Feed, ...UnfollowOption) error
-	ReplaceToTargets(Activity, []Feed) error
-	UpdateToTargets(Activity, []Feed, []Feed) error
+	ReplaceToTargets(Activity, []FeedID) error
+	UpdateToTargets(Activity, []FeedID, []FeedID) error
 	Token(bool) string
 }
 
@@ -28,8 +28,8 @@ type feed struct {
 }
 
 // ID returns the feed ID, as slug:user_id.
-func (f *feed) ID() string {
-	return fmt.Sprintf("%s:%s", f.slug, f.userID)
+func (f *feed) ID() FeedID {
+	return FeedID(fmt.Sprintf("%s:%s", f.slug, f.userID))
 }
 
 // Slug returns the feed's slug.
@@ -98,14 +98,14 @@ func (f *feed) Unfollow(target Feed, opts ...UnfollowOption) error {
 }
 
 // ReplaceToTargets removes all the existing "to" targets from the provided activity, replacing
-// them with the ones in the provided new []Feed slice.
-func (f *feed) ReplaceToTargets(activity Activity, new []Feed) error {
+// them with the ones in the provided new []FeedID slice.
+func (f *feed) ReplaceToTargets(activity Activity, new []FeedID) error {
 	return f.client.updateToTargets(f, activity, updateToTargetsWithNew(new...))
 }
 
 // UpdateToTargets updates the "to" targets for the provided activity, adding the feeds in the add []Feed slice
 // on top of the existing ones, and removing the ones in the remove []Feed slice.
-func (f *feed) UpdateToTargets(activity Activity, add []Feed, remove []Feed) error {
+func (f *feed) UpdateToTargets(activity Activity, add []FeedID, remove []FeedID) error {
 	return f.client.updateToTargets(f, activity, updateToTargetsWithAdd(add...), updateToTargetsWithRemove(remove...))
 }
 

@@ -104,7 +104,7 @@ func (c *Client) NotificationFeed(slug, userID string) *NotificationFeed {
 // AddToMany adds an activity to multiple feeds at once.
 func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 	endpoint := c.makeEndpoint("feed/add_to_many")
-	ids := make([]string, len(feeds))
+	ids := make([]FeedID, len(feeds))
 	for i := range feeds {
 		ids[i] = feeds[i].ID()
 	}
@@ -302,7 +302,7 @@ func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingRes
 	return &out, nil
 }
 
-func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) error {
+func (c *Client) unfollow(feed Feed, target FeedID, opts ...UnfollowOption) error {
 	endpoint := c.makeEndpoint("feed/%s/%s/follows/%s", feed.Slug(), feed.UserID(), target)
 	for _, opt := range opts {
 		endpoint += opt.String()
