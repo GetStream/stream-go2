@@ -115,8 +115,8 @@ type AddActivitiesResponse struct {
 
 // Follower is the representation of a feed following another feed.
 type Follower struct {
-	FeedID   FeedID `json:"feed_id,omitempty"`
-	TargetID FeedID `json:"target_id,omitempty"`
+	FeedID   string `json:"feed_id,omitempty"`
+	TargetID string `json:"target_id,omitempty"`
 }
 
 type followResponse struct {
@@ -140,14 +140,14 @@ type FollowingResponse struct {
 // feeds at once.
 type AddToManyRequest struct {
 	Activity Activity `json:"activity,omitempty"`
-	FeedIDs  []FeedID `json:"feeds,omitempty"`
+	FeedIDs  []string `json:"feeds,omitempty"`
 }
 
 // FollowRelationship represents a follow relationship between a source
 // ("follower") and a target ("following"), used for FollowMany requests.
 type FollowRelationship struct {
-	Source FeedID `json:"source,omitempty"`
-	Target FeedID `json:"target,omitempty"`
+	Source string `json:"source,omitempty"`
+	Target string `json:"target,omitempty"`
 }
 
 // NewFollowRelationship is a helper for creating a FollowRelationship from the
@@ -162,10 +162,7 @@ func NewFollowRelationship(source, target Feed) FollowRelationship {
 type updateToTargetsRequest struct {
 	ForeignID string   `json:"foreign_id,omitempty"`
 	Time      string   `json:"time,omitempty"`
-	New       []FeedID `json:"new_targets,omitempty"`
-	Adds      []FeedID `json:"added_targets,omitempty"`
-	Removes   []FeedID `json:"removed_targets,omitempty"`
+	New       []string `json:"new_targets,omitempty"`
+	Adds      []string `json:"added_targets,omitempty"`
+	Removes   []string `json:"removed_targets,omitempty"`
 }
-
-// FeedID is a string representing a feed's slug:userID id
-type FeedID string
