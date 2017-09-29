@@ -312,9 +312,6 @@ func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) erro
 }
 
 func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToTargetsOption) error {
-	if activity.Time.IsZero() {
-		return fmt.Errorf("activity time cannot be zero")
-	}
 	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets", feed.Slug(), feed.UserID())
 
 	req := &updateToTargetsRequest{
