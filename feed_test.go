@@ -204,10 +204,6 @@ func TestUpdateToTargets(t *testing.T) {
 	require.NoError(t, err)
 	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
-
-	activity.Time = stream.Time{Time: time.Time{}}
-	err = flat.UpdateToTargets(activity, stream.WithAddToTargets(f2.ID()))
-	require.Error(t, err)
 }
 
 func TestToken(t *testing.T) {
