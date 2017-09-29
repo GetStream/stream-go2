@@ -187,22 +187,22 @@ func WithFollowFeedActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 // UpdateToTargetsOption determines what operations perform during an UpdateToTargets API call.
 type UpdateToTargetsOption func(*updateToTargetsRequest)
 
-// WithUpdateNewToTargets sets the new to targets, replacing all the existing ones. It cannot be used in combination with any other UpdateToTargetsOption.
-func WithUpdateNewToTargets(targets ...string) UpdateToTargetsOption {
+// WithToTargetsNew sets the new to targets, replacing all the existing ones. It cannot be used in combination with any other UpdateToTargetsOption.
+func WithToTargetsNew(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.New = targets
 	}
 }
 
-// WithUpdateAddToTargets sets the add to targets, adding them to the activity's existing ones.
-func WithUpdateAddToTargets(targets ...string) UpdateToTargetsOption {
+// WithToTargetsAdd sets the add to targets, adding them to the activity's existing ones.
+func WithToTargetsAdd(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.Adds = targets
 	}
 }
 
-// WithUpdateRemoveToTargets sets the remove to targets, removing them from activity's the existing ones.
-func WithUpdateRemoveToTargets(targets ...string) UpdateToTargetsOption {
+// WithToTargetsRemove sets the remove to targets, removing them from activity's the existing ones.
+func WithToTargetsRemove(targets ...string) UpdateToTargetsOption {
 	return func(r *updateToTargetsRequest) {
 		r.Removes = targets
 	}

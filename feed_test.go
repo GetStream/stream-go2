@@ -196,11 +196,11 @@ func TestUpdateToTargets(t *testing.T) {
 		now               = getTime(time.Now())
 		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}, Extra: map[string]interface{}{"popularity": 9000}}
 	)
-	err := flat.UpdateToTargets(activity, stream.WithUpdateAddToTargets(f2.ID()), stream.WithUpdateRemoveToTargets(f1.ID()))
+	err := flat.UpdateToTargets(activity, stream.WithToTargetsAdd(f2.ID()), stream.WithToTargetsRemove(f1.ID()))
 	require.NoError(t, err)
 	body := fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","added_targets":["flat:f2"],"removed_targets":["flat:f1"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
-	err = flat.UpdateToTargets(activity, stream.WithUpdateNewToTargets(f3.ID()))
+	err = flat.UpdateToTargets(activity, stream.WithToTargetsNew(f3.ID()))
 	require.NoError(t, err)
 	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
