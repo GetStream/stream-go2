@@ -23,11 +23,11 @@ func TestAddActivity(t *testing.T) {
 	var (
 		client, requester = newClient(t)
 		flat              = newFlatFeedWithUserID(client, "123")
-		bobActivity       = stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream"}
+		bobActivity       = stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{"flat:456"}}
 	)
 	_, err := flat.AddActivity(bobActivity)
 	require.NoError(t, err)
-	body := `{"actor":"bob","object":"ice-cream","verb":"like"}`
+	body := `{"actor":"bob","object":"ice-cream","to":["flat:456 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiIqIiwiZmVlZF9pZCI6ImZsYXQ6NDU2IiwicmVzb3VyY2UiOiJmZWVkIn0.QlOpuo6pSQxJrHJlBQpgMReFWX6Knb28YjvcMPjJe2Q"],"verb":"like"}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key", body)
 
 	requester.resp = `{"duration": "something-broken"}`
@@ -44,11 +44,11 @@ func TestAddActivities(t *testing.T) {
 		client, requester = newClient(t)
 		flat              = newFlatFeedWithUserID(client, "123")
 		bobActivity       = stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream"}
-		aliceActivity     = stream.Activity{Actor: "alice", Verb: "dislike", Object: "ice-cream"}
+		aliceActivity     = stream.Activity{Actor: "alice", Verb: "dislike", Object: "ice-cream", To: []string{"flat:456"}}
 	)
 	_, err := flat.AddActivities(bobActivity, aliceActivity)
 	require.NoError(t, err)
-	body := `{"activities":[{"actor":"bob","object":"ice-cream","verb":"like"},{"actor":"alice","object":"ice-cream","verb":"dislike"}]}`
+	body := `{"activities":[{"actor":"bob","object":"ice-cream","verb":"like"},{"actor":"alice","object":"ice-cream","to":["flat:456 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiIqIiwiZmVlZF9pZCI6ImZsYXQ6NDU2IiwicmVzb3VyY2UiOiJmZWVkIn0.QlOpuo6pSQxJrHJlBQpgMReFWX6Knb28YjvcMPjJe2Q"],"verb":"dislike"}]}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key", body)
 }
 

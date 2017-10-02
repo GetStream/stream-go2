@@ -110,7 +110,8 @@ func (f *feed) Token(readonly bool) string {
 	} else {
 		action = actionWrite
 	}
-	token, err := f.client.authenticator.feedAuthToken(resFeed, action, f)
+	id := f.client.authenticator.feedID(f)
+	token, err := f.client.authenticator.feedAuthToken(resFeed, action, id)
 	if err != nil {
 		return ""
 	}

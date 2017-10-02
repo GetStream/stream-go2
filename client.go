@@ -193,9 +193,31 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 	return body, nil
 }
 
+func (c *Client) signActivity(activity Activity) Activity {
+	if len(activity.To) == 0 {
+		return activity
+	}
+	tos := make([]string, len(activity.To))
+	signed := activity
+	for i, id := range activity.To {
+		tos[i] = c.authenticator.feedSignature(id)
+	}
+	signed.To = tos
+	return signed
+}
+
+func (c *Client) signActivities(activities []Activity) []Activity {
+	signed := make([]Activity, len(activities))
+	for i := range activities {
+		signed[i] = c.signActivity(activities[i])
+	}
+	return signed
+}
+
 func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s", feed.Slug(), feed.UserID())
-	resp, err := c.post(endpoint, activity, c.authenticator.feedAuth(resFeed, feed))
+	signedActivity := c.signActivity(activity)
+	resp, err := c.post(endpoint, signedActivity, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
 		return nil, err
 	}
@@ -215,10 +237,11 @@ func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse
 }
 
 func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitiesResponse, error) {
+	signedActivities := c.signActivities(activities)
 	reqBody := struct {
 		Activities []Activity `json:"activities,omitempty"`
 	}{
-		Activities: activities,
+		Activities: signedActivities,
 	}
 	endpoint := c.makeEndpoint("feed/%s/%s", feed.Slug(), feed.UserID())
 	resp, err := c.post(endpoint, reqBody, c.authenticator.feedAuth(resFeed, feed))
@@ -233,10 +256,11 @@ func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitie
 }
 
 func (c *Client) updateActivities(activities ...Activity) error {
+	signedActivities := c.signActivities(activities)
 	req := struct {
 		Activities []Activity `json:"activities,omitempty"`
 	}{
-		Activities: activities,
+		Activities: signedActivities,
 	}
 	endpoint := c.makeEndpoint("activities")
 	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
