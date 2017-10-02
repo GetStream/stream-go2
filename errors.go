@@ -11,11 +11,12 @@ var (
 // APIError is an error returned by Stream API when the request cannot be
 // performed or errored server side.
 type APIError struct {
-	Code       int      `json:"code,omitempty"`
-	Detail     string   `json:"detail,omitempty"`
-	Duration   Duration `json:"duration,omitempty"`
-	Exception  string   `json:"exception,omitempty"`
-	StatusCode int      `json:"status_code,omitempty"`
+	Code            int                 `json:"code,omitempty"`
+	Detail          string              `json:"detail,omitempty"`
+	Duration        Duration            `json:"duration,omitempty"`
+	Exception       string              `json:"exception,omitempty"`
+	ExceptionFields map[string][]string `json:"exception_fields,omitempty"`
+	StatusCode      int                 `json:"status_code,omitempty"`
 }
 
 func (e APIError) Error() string {
