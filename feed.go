@@ -17,7 +17,7 @@ type Feed interface {
 	GetFollowing(...FollowingOption) (*FollowingResponse, error)
 	Unfollow(Feed, ...UnfollowOption) error
 	UpdateToTargets(Activity, ...UpdateToTargetsOption) error
-	Token(bool) string
+	RealtimeToken(bool) string
 }
 
 type feed struct {
@@ -102,8 +102,8 @@ func (f *feed) UpdateToTargets(activity Activity, opts ...UpdateToTargetsOption)
 	return f.client.updateToTargets(f, activity, opts...)
 }
 
-// Token returns a token that can be used client-side to listen in real-time to feed changes.
-func (f *feed) Token(readonly bool) string {
+// RealtimeToken returns a token that can be used client-side to listen in real-time to feed changes.
+func (f *feed) RealtimeToken(readonly bool) string {
 	var action action
 	if readonly {
 		action = actionRead

@@ -349,10 +349,10 @@ if err != nil {
 You can get a token suitable for client-side [real-time feed updates](https://getstream.io/docs/go/#realtime) as:
 ```go
 // Read+Write token
-token := feed.Token(false)
+token := feed.RealtimeToken(false)
 
 // Read-only token
-readonlyToken := feed.Token(true)
+readonlyToken := feed.RealtimeToken(true)
 ```
 
 ## License
