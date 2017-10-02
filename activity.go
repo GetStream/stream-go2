@@ -28,6 +28,20 @@ func (a *Activity) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &data); err != nil {
 		return err
 	}
+
+	if _, ok := data["to"]; ok {
+		tos := data["to"].([]interface{})
+		simpleTos := make([]string, len(tos))
+		for i := range tos {
+			if sliceTos, isString := tos[i].(string); isString {
+				simpleTos[i] = sliceTos
+			} else if sliceTos, isSlice := tos[i].([]string); isSlice {
+				simpleTos[i] = sliceTos[0]
+			}
+		}
+		data["to"] = simpleTos
+	}
+
 	if err := a.decode(data); err != nil {
 		return err
 	}

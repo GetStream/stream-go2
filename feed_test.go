@@ -27,7 +27,7 @@ func TestAddActivity(t *testing.T) {
 	)
 	_, err := flat.AddActivity(bobActivity)
 	require.NoError(t, err)
-	body := `{"actor":"bob","object":"ice-cream","to":["flat:456 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiIqIiwiZmVlZF9pZCI6ImZsYXQ6NDU2IiwicmVzb3VyY2UiOiJmZWVkIn0.QlOpuo6pSQxJrHJlBQpgMReFWX6Knb28YjvcMPjJe2Q"],"verb":"like"}`
+	body := `{"actor":"bob","object":"ice-cream","to":["flat:456 BpEkhYaXtVxbITXiIcpdYWVL9T8"],"verb":"like"}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key", body)
 
 	requester.resp = `{"duration": "something-broken"}`
@@ -48,7 +48,7 @@ func TestAddActivities(t *testing.T) {
 	)
 	_, err := flat.AddActivities(bobActivity, aliceActivity)
 	require.NoError(t, err)
-	body := `{"activities":[{"actor":"bob","object":"ice-cream","verb":"like"},{"actor":"alice","object":"ice-cream","to":["flat:456 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiIqIiwiZmVlZF9pZCI6ImZsYXQ6NDU2IiwicmVzb3VyY2UiOiJmZWVkIn0.QlOpuo6pSQxJrHJlBQpgMReFWX6Knb28YjvcMPjJe2Q"],"verb":"dislike"}]}`
+	body := `{"activities":[{"actor":"bob","object":"ice-cream","verb":"like"},{"actor":"alice","object":"ice-cream","to":["flat:456 BpEkhYaXtVxbITXiIcpdYWVL9T8"],"verb":"dislike"}]}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key", body)
 }
 
@@ -206,7 +206,7 @@ func TestUpdateToTargets(t *testing.T) {
 	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
 }
 
-func TestToken(t *testing.T) {
+func TestRealtimeToken(t *testing.T) {
 	client, err := stream.NewClient("key", "super secret")
 	require.NoError(t, err)
 	flat := newFlatFeedWithUserID(client, "sample")
@@ -224,7 +224,7 @@ func TestToken(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		token := flat.Token(tc.readOnly)
+		token := flat.RealtimeToken(tc.readOnly)
 		assert.Equal(t, tc.expected, token)
 	}
 }

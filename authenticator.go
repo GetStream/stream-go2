@@ -1,8 +1,12 @@
 package stream
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strings"
 
 	httpsig "gopkg.in/LeisureLink/httpsig.v1"
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
@@ -52,11 +56,24 @@ func (a authenticator) feedAuthToken(resource resource, action action, feedID st
 }
 
 func (a authenticator) feedSignature(feedID string) string {
-	token, err := a.feedAuthToken(resFeed, "*", feedID)
-	if err != nil {
-		return feedID
-	}
-	return fmt.Sprintf("%s %s", feedID, token)
+	return fmt.Sprintf("%s %s", feedID, a.feedToken(feedID))
+}
+
+func (a authenticator) feedToken(feedID string) string {
+	id := strings.Replace(feedID, ":", "", -1)
+	hash := sha1.New()
+	hash.Write([]byte(a.secret))
+	mac := hmac.New(sha1.New, hash.Sum(nil))
+	mac.Write([]byte(id))
+	digest := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+	return a.urlSafe(digest)
+}
+
+func (a authenticator) urlSafe(src string) string {
+	src = strings.Replace(src, "+", "-", -1)
+	src = strings.Replace(src, "/", "_", -1)
+	src = strings.Trim(src, "=")
+	return src
 }
 
 func (a authenticator) feedID(feed Feed) string {

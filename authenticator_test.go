@@ -32,3 +32,9 @@ func TestApplicationAuth(t *testing.T) {
 	expectedAuthRe := regexp.MustCompile(`Signature keyId="my key",algorithm="hmac-sha256",headers="date",signature="[0-9a-zA-Z/+]{43}="`)
 	assert.Regexp(t, expectedAuthRe, req.Header.Get("authorization"))
 }
+
+func TestFeedToken(t *testing.T) {
+	a := authenticator{secret: "test"}
+	token := a.feedSignature("flat:123")
+	assert.Equal(t, "flat:123 u1jO3CcR8PeAD22yGNtVobcHrxI", token)
+}
