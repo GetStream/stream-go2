@@ -56,8 +56,8 @@ func TestConfig(t *testing.T) {
 }
 
 func Test_makeEndpoint(t *testing.T) {
-	prev := os.Getenv("STREAM_API_URL")
-	defer os.Setenv("STREAM_API_URL", prev)
+	prev := os.Getenv("STREAM_URL")
+	defer os.Setenv("STREAM_URL", prev)
 
 	testCases := []struct {
 		url      *apiURL
@@ -82,7 +82,7 @@ func Test_makeEndpoint(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		os.Setenv("STREAM_API_URL", tc.env)
+		os.Setenv("STREAM_URL", tc.env)
 		c := &Client{url: tc.url, key: "test"}
 		assert.Equal(t, tc.expected, c.makeEndpoint(tc.format, tc.args...))
 	}

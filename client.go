@@ -140,7 +140,7 @@ func (c *Client) makeStreamError(body io.ReadCloser) error {
 
 func (c *Client) makeEndpoint(f string, a ...interface{}) string {
 	var host string
-	if envHost := os.Getenv("STREAM_API_URL"); envHost != "" {
+	if envHost := os.Getenv("STREAM_URL"); envHost != "" {
 		host = envHost
 	} else {
 		host = c.url.String()
