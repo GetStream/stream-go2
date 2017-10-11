@@ -45,8 +45,8 @@ You can pass additional options when creating a client using the available `Clie
 
 ```go
 client, err := stream.NewClient(key, secret, 
-    WithAPIRegion("us-east"),
-    WithAPIVersion("1.0"),
+    stream.WithAPIRegion("us-east"),
+    stream.WithAPIVersion("1.0"),
     ...,
 )
 ```
