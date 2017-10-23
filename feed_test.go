@@ -28,7 +28,7 @@ func TestAddActivity(t *testing.T) {
 	_, err := flat.AddActivity(bobActivity)
 	require.NoError(t, err)
 	body := `{"actor":"bob","object":"ice-cream","to":["flat:456 BpEkhYaXtVxbITXiIcpdYWVL9T8"],"verb":"like"}`
-	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key", body)
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key", body)
 
 	requester.resp = `{"duration": "something-broken"}`
 	_, err = flat.AddActivity(bobActivity)
@@ -49,7 +49,7 @@ func TestAddActivities(t *testing.T) {
 	_, err := flat.AddActivities(bobActivity, aliceActivity)
 	require.NoError(t, err)
 	body := `{"activities":[{"actor":"bob","object":"ice-cream","verb":"like"},{"actor":"alice","object":"ice-cream","to":["flat:456 BpEkhYaXtVxbITXiIcpdYWVL9T8"],"verb":"dislike"}]}`
-	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed/flat/123/?api_key=key", body)
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key", body)
 }
 
 func TestUpdateActivities(t *testing.T) {
@@ -70,7 +70,7 @@ func TestUpdateActivities(t *testing.T) {
 	require.NoError(t, err)
 
 	body := fmt.Sprintf(`{"activities":[{"actor":"bob","foreign_id":"bob:123","influence":42,"object":"ice-cream","time":"%s","verb":"like"}]}`, now.Format(stream.TimeLayout))
-	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/activities/?api_key=key", body)
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activities/?api_key=key", body)
 }
 
 func TestFollow(t *testing.T) {
@@ -84,12 +84,12 @@ func TestFollow(t *testing.T) {
 		expectedBody string
 	}{
 		{
-			expectedURL:  "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/?api_key=key",
+			expectedURL:  "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/follows/?api_key=key",
 			expectedBody: `{"target":"flat:f2","activity_copy_limit":300}`,
 		},
 		{
 			opts:         []stream.FollowFeedOption{stream.WithFollowFeedActivityCopyLimit(123)},
-			expectedURL:  "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/?api_key=key",
+			expectedURL:  "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/follows/?api_key=key",
 			expectedBody: `{"target":"flat:f2","activity_copy_limit":123}`,
 		},
 	}
@@ -110,11 +110,11 @@ func TestGetFollowing(t *testing.T) {
 		expected string
 	}{
 		{
-			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/?api_key=key",
+			expected: "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/follows/?api_key=key",
 		},
 		{
 			opts:     []stream.FollowingOption{stream.WithFollowingFilter("filter"), stream.WithFollowingLimit(42), stream.WithFollowingOffset(84)},
-			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/?api_key=key&filter=filter&limit=42&offset=84",
+			expected: "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/follows/?api_key=key&filter=filter&limit=42&offset=84",
 		},
 	}
 	for _, tc := range testCases {
@@ -134,11 +134,11 @@ func TestGetFollowers(t *testing.T) {
 		expected string
 	}{
 		{
-			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/followers/?api_key=key",
+			expected: "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/followers/?api_key=key",
 		},
 		{
 			opts:     []stream.FollowersOption{stream.WithFollowersLimit(42), stream.WithFollowersOffset(84)},
-			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/followers/?api_key=key&limit=42&offset=84",
+			expected: "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/followers/?api_key=key&limit=42&offset=84",
 		},
 	}
 	for _, tc := range testCases {
@@ -158,15 +158,15 @@ func TestUnfollow(t *testing.T) {
 		expected string
 	}{
 		{
-			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key",
+			expected: "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key",
 		},
 		{
 			opts:     []stream.UnfollowOption{stream.WithUnfollowKeepHistory(false)},
-			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key",
+			expected: "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key",
 		},
 		{
 			opts:     []stream.UnfollowOption{stream.WithUnfollowKeepHistory(true)},
-			expected: "https://api.getstream.io/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key&keep_history=1",
+			expected: "https://api.stream-io-api.com/api/v1.0/feed/flat/f1/follows/flat:f2/?api_key=key&keep_history=1",
 		},
 	}
 
@@ -182,10 +182,10 @@ func TestRemoveActivities(t *testing.T) {
 	flat := newFlatFeedWithUserID(client, "123")
 	err := flat.RemoveActivityByID("id-to-remove")
 	require.NoError(t, err)
-	testRequest(t, requester.req, http.MethodDelete, "https://api.getstream.io/api/v1.0/feed/flat/123/id-to-remove/?api_key=key", "")
+	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/id-to-remove/?api_key=key", "")
 	err = flat.RemoveActivityByForeignID("bob:123")
 	require.NoError(t, err)
-	testRequest(t, requester.req, http.MethodDelete, "https://api.getstream.io/api/v1.0/feed/flat/123/bob:123/?api_key=key&foreign_id=1", "")
+	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/bob:123/?api_key=key&foreign_id=1", "")
 }
 
 func TestUpdateToTargets(t *testing.T) {
@@ -199,11 +199,11 @@ func TestUpdateToTargets(t *testing.T) {
 	err := flat.UpdateToTargets(activity, stream.WithToTargetsAdd(f2.ID()), stream.WithToTargetsRemove(f1.ID()))
 	require.NoError(t, err)
 	body := fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","added_targets":["flat:f2"],"removed_targets":["flat:f1"]}`, now.Format(stream.TimeLayout))
-	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
 	err = flat.UpdateToTargets(activity, stream.WithToTargetsNew(f3.ID()))
 	require.NoError(t, err)
 	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
-	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
 }
 
 func TestRealtimeToken(t *testing.T) {

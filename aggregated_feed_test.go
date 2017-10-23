@@ -17,15 +17,15 @@ func TestAggregatedFeedGetActivities(t *testing.T) {
 		url  string
 	}{
 		{
-			url: "https://api.getstream.io/api/v1.0/feed/aggregated/123/?api_key=key",
+			url: "https://api.stream-io-api.com/api/v1.0/feed/aggregated/123/?api_key=key",
 		},
 		{
 			opts: []stream.GetActivitiesOption{stream.WithActivitiesLimit(42)},
-			url:  "https://api.getstream.io/api/v1.0/feed/aggregated/123/?api_key=key&limit=42",
+			url:  "https://api.stream-io-api.com/api/v1.0/feed/aggregated/123/?api_key=key&limit=42",
 		},
 		{
 			opts: []stream.GetActivitiesOption{stream.WithActivitiesLimit(42), stream.WithActivitiesOffset(11), stream.WithActivitiesIDGT("aabbcc")},
-			url:  "https://api.getstream.io/api/v1.0/feed/aggregated/123/?api_key=key&limit=42&offset=11&id_gt=aabbcc",
+			url:  "https://api.stream-io-api.com/api/v1.0/feed/aggregated/123/?api_key=key&limit=42&offset=11&id_gt=aabbcc",
 		},
 	}
 

@@ -20,7 +20,7 @@ func TestAddToMany(t *testing.T) {
 	err := client.AddToMany(activity, flat, aggregated)
 	require.NoError(t, err)
 	body := `{"activity":{"actor":"bob","object":"cake","verb":"like"},"feeds":["flat:123","aggregated:123"]}`
-	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/feed/add_to_many/?api_key=key", body)
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed/add_to_many/?api_key=key", body)
 }
 
 func TestFollowMany(t *testing.T) {
@@ -38,5 +38,5 @@ func TestFollowMany(t *testing.T) {
 	err := client.FollowMany(relationships)
 	require.NoError(t, err)
 	body := `[{"source":"aggregated:0","target":"flat:123"},{"source":"aggregated:1","target":"flat:123"},{"source":"aggregated:2","target":"flat:123"}]`
-	testRequest(t, requester.req, http.MethodPost, "https://api.getstream.io/api/v1.0/follow_many/?api_key=key", body)
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/follow_many/?api_key=key", body)
 }

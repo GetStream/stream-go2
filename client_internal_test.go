@@ -70,7 +70,7 @@ func Test_makeEndpoint(t *testing.T) {
 			url:      &apiURL{},
 			format:   "test-%d-%s",
 			args:     []interface{}{42, "asd"},
-			expected: "https://api.getstream.io/api/v1.0/test-42-asd/?api_key=test",
+			expected: "https://api.stream-io-api.com/api/v1.0/test-42-asd/?api_key=test",
 		},
 		{
 			url:      &apiURL{},

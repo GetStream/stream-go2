@@ -7,8 +7,10 @@ type apiURL struct {
 	version string
 }
 
+const domain = "stream-io-api.com"
+
 func (u *apiURL) String() string {
-	return fmt.Sprintf("https://%s.getstream.io/api/v%s/", u.makeRegion(), u.makeVersion())
+	return fmt.Sprintf("https://%s.%s/api/v%s/", u.makeRegion(), domain, u.makeVersion())
 }
 
 func (u *apiURL) makeVersion() string {

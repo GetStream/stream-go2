@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,11 +14,11 @@ func Test_URLString(t *testing.T) {
 	}{
 		{
 			url:      &apiURL{},
-			expected: "https://api.getstream.io/api/v1.0/",
+			expected: fmt.Sprintf("https://api.%s/api/v1.0/", domain),
 		},
 		{
 			url:      &apiURL{region: "eu-central", version: "2.0"},
-			expected: "https://eu-central-api.getstream.io/api/v2.0/",
+			expected: fmt.Sprintf("https://eu-central-api.%s/api/v2.0/", domain),
 		},
 	}
 
