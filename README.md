@@ -14,7 +14,7 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
 Get the client:
 
 ```
-$ go get github.com/GetStream/stream-go2
+$ go get gopkg.in/GetStream/stream-go2.v1
 ```
 
 stream-go2 uses [dep](https://github.com/golang/dep) for managing dependencies (see `Gopkg.toml` and `Gopkg.lock`).
