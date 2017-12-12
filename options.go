@@ -107,6 +107,11 @@ func WithNotificationsMarkRead(all bool, activityIDs ...string) GetActivitiesOpt
 	return GetActivitiesOption{makeRequestOption("mark_read", strings.Join(activityIDs, ","))}
 }
 
+// WithCustomParam adds a custom parameter to the read request.
+func WithCustomParam(name, value string) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption(name, value)}
+}
+
 // FollowingOption is an option usable by following feed methods.
 type FollowingOption struct {
 	requestOption

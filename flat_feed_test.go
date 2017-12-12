@@ -34,6 +34,12 @@ func TestFlatFeedGetActivities(t *testing.T) {
 			},
 			url: "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&limit=42&offset=11&id_gt=aabbcc&id_gte=ccddee&id_lt=ffgghh&id_lte=iijjkk",
 		},
+		{
+			opts: []stream.GetActivitiesOption{
+				stream.WithCustomParam("aaa", "bbb"),
+			},
+			url: "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&aaa=bbb",
+		},
 	}
 
 	for _, tc := range testCases {
