@@ -28,7 +28,7 @@ func TestGetNotificationActivities(t *testing.T) {
 		},
 		{
 			opts: []stream.GetActivitiesOption{stream.WithNotificationsMarkRead(false, "f1", "f2", "f3")},
-			url:  "https://api.stream-io-api.com/api/v1.0/feed/notification/123/?api_key=key&mark_read=f1,f2,f3",
+			url:  "https://api.stream-io-api.com/api/v1.0/feed/notification/123/?api_key=key&mark_read=f1%2Cf2%2Cf3",
 		},
 		{
 			opts: []stream.GetActivitiesOption{stream.WithNotificationsMarkRead(true, "f1", "f2", "f3")},
@@ -36,7 +36,7 @@ func TestGetNotificationActivities(t *testing.T) {
 		},
 		{
 			opts: []stream.GetActivitiesOption{stream.WithNotificationsMarkSeen(false, "f1", "f2", "f3")},
-			url:  "https://api.stream-io-api.com/api/v1.0/feed/notification/123/?api_key=key&mark_seen=f1,f2,f3",
+			url:  "https://api.stream-io-api.com/api/v1.0/feed/notification/123/?api_key=key&mark_seen=f1%2Cf2%2Cf3",
 		},
 		{
 			opts: []stream.GetActivitiesOption{stream.WithNotificationsMarkSeen(true, "f1", "f2", "f3")},

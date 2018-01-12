@@ -2,6 +2,7 @@ package stream
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -25,7 +26,8 @@ func makeRequestOption(key string, value interface{}) requestOption {
 }
 
 func (o baseRequestOption) String() string {
-	return fmt.Sprintf("&%s=%v", o.key, o.value)
+	val := url.QueryEscape(fmt.Sprintf("%v", o.value))
+	return fmt.Sprintf("&%s=%s", o.key, val)
 }
 
 func withLimit(limit int) requestOption {
