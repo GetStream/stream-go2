@@ -42,10 +42,7 @@ func (a *Activity) UnmarshalJSON(b []byte) error {
 		data["to"] = simpleTos
 	}
 
-	if err := a.decode(data); err != nil {
-		return err
-	}
-	return nil
+	return a.decode(data)
 }
 
 // MarshalJSON encodes the Activity to a valid JSON bytes slice. It's required because of
