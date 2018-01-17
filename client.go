@@ -302,7 +302,7 @@ func (c *Client) removeActivityByID(feed Feed, activityID string) error {
 
 func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) error {
 	endpoint := c.makeEndpoint("feed/%s/%s/%s/", feed.Slug(), feed.UserID(), foreignID)
-	endpoint.query.Set("foreign_id", "1")
+	endpoint.addQueryParam(makeRequestOption("foreign_id", 1))
 	_, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
 	return err
 }
