@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 )
 
@@ -103,7 +104,7 @@ func (c *Client) NotificationFeed(slug, userID string) *NotificationFeed {
 
 // AddToMany adds an activity to multiple feeds at once.
 func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
-	endpoint := c.makeEndpoint("feed/add_to_many")
+	endpoint := c.makeEndpoint("feed/add_to_many/")
 	ids := make([]string, len(feeds))
 	for i := range feeds {
 		ids[i] = feeds[i].ID()
@@ -118,9 +119,9 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 
 // FollowMany creates multiple follows at once.
 func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowManyOption) error {
-	endpoint := c.makeEndpoint("follow_many")
+	endpoint := c.makeEndpoint("follow_many/")
 	for _, opt := range opts {
-		endpoint += opt.String()
+		endpoint.addQueryParam(opt)
 	}
 	_, err := c.post(endpoint, relationships, c.authenticator.applicationAuth(c.key))
 	return err
@@ -138,30 +139,56 @@ func (c *Client) makeStreamError(body io.ReadCloser) error {
 	return streamErr
 }
 
-func (c *Client) makeEndpoint(f string, a ...interface{}) string {
+type endpoint struct {
+	url   *url.URL
+	query url.Values
+}
+
+func (e endpoint) String() string {
+	e.url.RawQuery = e.query.Encode()
+	return e.url.String()
+}
+
+func (e *endpoint) addQueryParam(v valuer) {
+	if !v.valid() {
+		return
+	}
+	e.query.Add(v.values())
+}
+
+func (c *Client) makeEndpoint(format string, a ...interface{}) endpoint {
 	var host string
 	if envHost := os.Getenv("STREAM_URL"); envHost != "" {
 		host = envHost
 	} else {
 		host = c.url.String()
 	}
-	format := fmt.Sprintf("%s%s/?api_key=%s", host, f, c.key)
-	return fmt.Sprintf(format, a...)
+
+	path := fmt.Sprintf(format, a...)
+	u, _ := url.Parse(host + path)
+
+	query := make(url.Values)
+	query.Set("api_key", c.key)
+
+	return endpoint{
+		url:   u,
+		query: query,
+	}
 }
 
-func (c *Client) post(endpoint string, data interface{}, authFn authFunc) ([]byte, error) {
-	return c.request(http.MethodPost, endpoint, data, authFn)
-}
-
-func (c *Client) get(endpoint string, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) get(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
 	return c.request(http.MethodGet, endpoint, data, authFn)
 }
 
-func (c *Client) delete(endpoint string, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) post(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+	return c.request(http.MethodPost, endpoint, data, authFn)
+}
+
+func (c *Client) delete(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
 	return c.request(http.MethodDelete, endpoint, data, authFn)
 }
 
-func (c *Client) request(method, endpoint string, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) request(method string, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
 	var reader io.Reader
 	if data != nil {
 		payload, err := json.Marshal(data)
@@ -171,7 +198,7 @@ func (c *Client) request(method, endpoint string, data interface{}, authFn authF
 		reader = bytes.NewReader(payload)
 	}
 
-	req, err := http.NewRequest(method, endpoint, reader)
+	req, err := http.NewRequest(method, endpoint.String(), reader)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create request: %s", err)
 	}
@@ -215,7 +242,7 @@ func (c *Client) signActivities(activities []Activity) []Activity {
 }
 
 func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse, error) {
-	endpoint := c.makeEndpoint("feed/%s/%s", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
 	signedActivity := c.signActivity(activity)
 	resp, err := c.post(endpoint, signedActivity, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
@@ -243,7 +270,7 @@ func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitie
 	}{
 		Activities: signedActivities,
 	}
-	endpoint := c.makeEndpoint("feed/%s/%s", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
 	resp, err := c.post(endpoint, reqBody, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
 		return nil, err
@@ -262,43 +289,44 @@ func (c *Client) updateActivities(activities ...Activity) error {
 	}{
 		Activities: signedActivities,
 	}
-	endpoint := c.makeEndpoint("activities")
+	endpoint := c.makeEndpoint("activities/")
 	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
 	return err
 }
 
 func (c *Client) removeActivityByID(feed Feed, activityID string) error {
-	endpoint := c.makeEndpoint("feed/%s/%s/%s", feed.Slug(), feed.UserID(), activityID)
+	endpoint := c.makeEndpoint("feed/%s/%s/%s/", feed.Slug(), feed.UserID(), activityID)
 	_, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
 	return err
 }
 
 func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) error {
-	endpoint := c.makeEndpoint("feed/%s/%s/%s", feed.Slug(), feed.UserID(), foreignID)
-	endpoint += "&foreign_id=1"
+	endpoint := c.makeEndpoint("feed/%s/%s/%s/", feed.Slug(), feed.UserID(), foreignID)
+	endpoint.query.Set("foreign_id", "1")
 	_, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
 	return err
 }
 
 func (c *Client) getActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
-	endpoint := c.makeEndpoint("feed/%s/%s", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
-		endpoint += opt.String()
+		endpoint.addQueryParam(opt)
 	}
 	return c.get(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
 }
 
 func (c *Client) follow(feed Feed, opts *followFeedOptions) error {
-	endpoint := c.makeEndpoint("feed/%s/%s/follows", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/follows/", feed.Slug(), feed.UserID())
 	_, err := c.post(endpoint, opts, c.authenticator.feedAuth(resFollower, feed))
 	return err
 }
 
 func (c *Client) getFollowers(feed Feed, opts ...FollowersOption) (*FollowersResponse, error) {
-	endpoint := c.makeEndpoint("feed/%s/%s/followers", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/followers/", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
-		endpoint += opt.String()
+		endpoint.addQueryParam(opt)
 	}
+
 	resp, err := c.get(endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
 	if err != nil {
 		return nil, err
@@ -311,10 +339,11 @@ func (c *Client) getFollowers(feed Feed, opts ...FollowersOption) (*FollowersRes
 }
 
 func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingResponse, error) {
-	endpoint := c.makeEndpoint("feed/%s/%s/follows", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed/%s/%s/follows/", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
-		endpoint += opt.String()
+		endpoint.addQueryParam(opt)
 	}
+
 	resp, err := c.get(endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
 	if err != nil {
 		return nil, err
@@ -327,16 +356,17 @@ func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingRes
 }
 
 func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) error {
-	endpoint := c.makeEndpoint("feed/%s/%s/follows/%s", feed.Slug(), feed.UserID(), target)
+	endpoint := c.makeEndpoint("feed/%s/%s/follows/%s/", feed.Slug(), feed.UserID(), target)
 	for _, opt := range opts {
-		endpoint += opt.String()
+		endpoint.addQueryParam(opt)
 	}
+
 	_, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
 	return err
 }
 
 func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToTargetsOption) error {
-	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets", feed.Slug(), feed.UserID())
+	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets/", feed.Slug(), feed.UserID())
 
 	req := &updateToTargetsRequest{
 		ForeignID: activity.ForeignID,

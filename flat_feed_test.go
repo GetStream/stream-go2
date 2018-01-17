@@ -32,13 +32,13 @@ func TestFlatFeedGetActivities(t *testing.T) {
 				stream.WithActivitiesIDLT("ffgghh"),
 				stream.WithActivitiesIDLTE("iijjkk"),
 			},
-			url: "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&limit=42&offset=11&id_gt=aabbcc&id_gte=ccddee&id_lt=ffgghh&id_lte=iijjkk",
+			url: "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&id_gt=aabbcc&id_gte=ccddee&id_lt=ffgghh&id_lte=iijjkk&limit=42&offset=11",
 		},
 		{
 			opts: []stream.GetActivitiesOption{
 				stream.WithCustomParam("aaa", "bbb"),
 			},
-			url: "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&aaa=bbb",
+			url: "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?aaa=bbb&api_key=key",
 		},
 	}
 
