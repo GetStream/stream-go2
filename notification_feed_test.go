@@ -24,7 +24,7 @@ func TestGetNotificationActivities(t *testing.T) {
 		},
 		{
 			opts: []stream.GetActivitiesOption{stream.WithActivitiesLimit(42), stream.WithActivitiesOffset(11), stream.WithActivitiesIDGT("aabbcc")},
-			url:  "https://api.stream-io-api.com/api/v1.0/feed/notification/123/?api_key=key&limit=42&offset=11&id_gt=aabbcc",
+			url:  "https://api.stream-io-api.com/api/v1.0/feed/notification/123/?api_key=key&id_gt=aabbcc&limit=42&offset=11",
 		},
 		{
 			opts: []stream.GetActivitiesOption{stream.WithNotificationsMarkRead(false, "f1", "f2", "f3")},

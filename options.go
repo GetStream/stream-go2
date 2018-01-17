@@ -2,7 +2,6 @@ package stream
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 )
 
@@ -10,10 +9,15 @@ const (
 	defaultActivityCopyLimit = 300
 )
 
-// RequestOption is an interface representing API request optional filters and
+// requestOption is an interface representing API request optional filters and
 // parameters.
 type requestOption interface {
-	String() string
+	valuer
+}
+
+type valuer interface {
+	values() (string, string)
+	valid() bool
 }
 
 type baseRequestOption struct {
@@ -25,9 +29,12 @@ func makeRequestOption(key string, value interface{}) requestOption {
 	return baseRequestOption{key: key, value: value}
 }
 
-func (o baseRequestOption) String() string {
-	val := url.QueryEscape(fmt.Sprintf("%v", o.value))
-	return fmt.Sprintf("&%s=%s", o.key, val)
+func (o baseRequestOption) values() (string, string) {
+	return o.key, fmt.Sprintf("%v", o.value)
+}
+
+func (o baseRequestOption) valid() bool {
+	return true
 }
 
 func withLimit(limit int) requestOption {
@@ -217,6 +224,10 @@ func WithToTargetsRemove(targets ...string) UpdateToTargetsOption {
 
 type nop struct{}
 
-func (nop) String() string {
-	return ""
+func (nop) values() (string, string) {
+	return "", ""
+}
+
+func (nop) valid() bool {
+	return false
 }

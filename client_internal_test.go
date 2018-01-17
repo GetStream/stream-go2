@@ -70,20 +70,20 @@ func Test_makeEndpoint(t *testing.T) {
 			url:      &apiURL{},
 			format:   "test-%d-%s",
 			args:     []interface{}{42, "asd"},
-			expected: "https://api.stream-io-api.com/api/v1.0/test-42-asd/?api_key=test",
+			expected: "https://api.stream-io-api.com/api/v1.0/test-42-asd?api_key=test",
 		},
 		{
 			url:      &apiURL{},
 			env:      "http://localhost:8000/api/v1.0/",
 			format:   "test-%d-%s",
 			args:     []interface{}{42, "asd"},
-			expected: "http://localhost:8000/api/v1.0/test-42-asd/?api_key=test",
+			expected: "http://localhost:8000/api/v1.0/test-42-asd?api_key=test",
 		},
 	}
 
 	for _, tc := range testCases {
 		os.Setenv("STREAM_URL", tc.env)
 		c := &Client{url: tc.url, key: "test"}
-		assert.Equal(t, tc.expected, c.makeEndpoint(tc.format, tc.args...))
+		assert.Equal(t, tc.expected, c.makeEndpoint(tc.format, tc.args...).String())
 	}
 }
