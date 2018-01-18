@@ -20,3 +20,13 @@ func (f *NotificationFeed) GetActivities(opts ...GetActivitiesOption) (*Notifica
 	}
 	return &resp, nil
 }
+
+// GetNextPageActivities returns the activities for the given NotificationFeed at the "next" page
+// of a previous *NotificationFeedResponse response, if any.
+func (f *NotificationFeed) GetNextPageActivities(resp *NotificationFeedResponse) (*NotificationFeedResponse, error) {
+	opts, err := resp.parseNext()
+	if err != nil {
+		return nil, err
+	}
+	return f.GetActivities(opts...)
+}

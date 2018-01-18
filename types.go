@@ -2,6 +2,8 @@ package stream
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -61,6 +63,48 @@ type response struct {
 type readResponse struct {
 	response
 	Next string `json:"next,omitempty"`
+}
+
+// ErrMissingNextPage is returned when trying to read the next page of a response
+// which has an empty "next" field.
+var ErrMissingNextPage = fmt.Errorf("request missing next page")
+
+func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
+	if r.Next == "" {
+		return nil, ErrMissingNextPage
+	}
+	values, err := url.ParseQuery(strings.Split(r.Next, "?")[1])
+	if err != nil {
+		return nil, err
+	}
+
+	var opts []GetActivitiesOption
+
+	limit, ok, err := parseIntValue(values, "limit")
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		opts = append(opts, WithActivitiesLimit(limit))
+	}
+
+	offset, ok, err := parseIntValue(values, "offset")
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		opts = append(opts, WithActivitiesOffset(offset))
+	}
+
+	if idLT := values.Get("id_lt"); idLT != "" {
+		opts = append(opts, WithActivitiesIDLT(idLT))
+	}
+
+	if ranking := values.Get("ranking"); ranking != "" {
+		opts = append(opts, withActivitiesRanking(ranking))
+	}
+
+	return opts, nil
 }
 
 // FlatFeedResponse is the API response obtained when retrieving activities from

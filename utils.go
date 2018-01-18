@@ -1,7 +1,9 @@
 package stream
 
 import (
+	"net/url"
 	"reflect"
+	"strconv"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -34,4 +36,16 @@ func decodeData(data map[string]interface{}, target interface{}) (*mapstructure.
 		return nil, err
 	}
 	return cfg.Metadata, nil
+}
+
+func parseIntValue(values url.Values, key string) (int, bool, error) {
+	v := values.Get(key)
+	if v == "" {
+		return 0, false, nil
+	}
+	i, err := strconv.Atoi(v)
+	if err != nil {
+		return 0, false, err
+	}
+	return i, true, nil
 }

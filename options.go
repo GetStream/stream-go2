@@ -22,19 +22,22 @@ type valuer interface {
 
 type baseRequestOption struct {
 	key   string
-	value interface{}
+	value string
 }
 
 func makeRequestOption(key string, value interface{}) requestOption {
-	return baseRequestOption{key: key, value: value}
+	return baseRequestOption{
+		key:   key,
+		value: fmt.Sprintf("%v", value),
+	}
 }
 
 func (o baseRequestOption) values() (string, string) {
-	return o.key, fmt.Sprintf("%v", o.value)
+	return o.key, o.value
 }
 
 func (o baseRequestOption) valid() bool {
-	return true
+	return o.value != ""
 }
 
 func withLimit(limit int) requestOption {
@@ -94,7 +97,7 @@ func WithActivitiesIDLT(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_lt", id)}
 }
 
-func getActivitiesWithRanking(ranking string) GetActivitiesOption {
+func withActivitiesRanking(ranking string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking", ranking)}
 }
 

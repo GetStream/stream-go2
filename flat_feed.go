@@ -21,10 +21,20 @@ func (f *FlatFeed) GetActivities(opts ...GetActivitiesOption) (*FlatFeedResponse
 	return &resp, nil
 }
 
+// GetNextPageActivities returns the activities for the given FlatFeed at the "next" page
+// of a previous *FlatFeedResponse response, if any.
+func (f *FlatFeed) GetNextPageActivities(resp *FlatFeedResponse) (*FlatFeedResponse, error) {
+	opts, err := resp.parseNext()
+	if err != nil {
+		return nil, err
+	}
+	return f.GetActivities(opts...)
+}
+
 // GetActivitiesWithRanking returns the activities (filtered) for the given FlatFeed,
 // using the provided ranking method.
 func (f *FlatFeed) GetActivitiesWithRanking(ranking string, opts ...GetActivitiesOption) (*FlatFeedResponse, error) {
-	return f.GetActivities(append(opts, getActivitiesWithRanking(ranking))...)
+	return f.GetActivities(append(opts, withActivitiesRanking(ranking))...)
 }
 
 // GetFollowers returns the feeds following the given FlatFeed.

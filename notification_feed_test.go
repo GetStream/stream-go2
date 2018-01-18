@@ -6,6 +6,7 @@ import (
 
 	stream "github.com/GetStream/stream-go2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetNotificationActivities(t *testing.T) {
@@ -49,4 +50,15 @@ func TestGetNotificationActivities(t *testing.T) {
 		testRequest(t, requester.req, http.MethodGet, tc.url, "")
 		assert.NoError(t, err)
 	}
+}
+
+func TestNotificationFeedGetNextPageActivities(t *testing.T) {
+	client, requester := newClient(t)
+	notification := newNotificationFeedWithUserID(client, "123")
+	requester.resp = `{"next":"/api/v1.0/feed/notification/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
+	resp, err := notification.GetActivities()
+	require.NoError(t, err)
+	_, err = notification.GetNextPageActivities(resp)
+	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/feed/notification/123/?api_key=key&id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25", "")
+	require.NoError(t, err)
 }
