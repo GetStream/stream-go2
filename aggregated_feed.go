@@ -23,3 +23,13 @@ func (f *AggregatedFeed) GetActivities(opts ...GetActivitiesOption) (*Aggregated
 	}
 	return &resp, nil
 }
+
+// GetNextPageActivities returns the activities for the given AggregatedFeed at the "next" page
+// of a previous *AggregatedFeedResponse response, if any.
+func (f *AggregatedFeed) GetNextPageActivities(resp *AggregatedFeedResponse) (*AggregatedFeedResponse, error) {
+	opts, err := resp.parseNext()
+	if err != nil {
+		return nil, err
+	}
+	return f.GetActivities(opts...)
+}
