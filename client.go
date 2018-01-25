@@ -127,7 +127,10 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	return err
 }
 
-func (c *Client) makeStreamError(body io.ReadCloser) error {
+func (c *Client) makeStreamError(body io.Reader) error {
+	if body == nil {
+		return fmt.Errorf("invalid body")
+	}
 	errBody, err := ioutil.ReadAll(body)
 	if err != nil {
 		return err
