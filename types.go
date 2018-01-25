@@ -73,7 +73,11 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 	if r.Next == "" {
 		return nil, ErrMissingNextPage
 	}
-	values, err := url.ParseQuery(strings.Split(r.Next, "?")[1])
+	urlParts := strings.Split(r.Next, "?")
+	if len(urlParts) != 2 {
+		return nil, fmt.Errorf("invalid format for Next field")
+	}
+	values, err := url.ParseQuery(urlParts[1])
 	if err != nil {
 		return nil, err
 	}
