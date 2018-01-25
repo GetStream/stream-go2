@@ -3,6 +3,9 @@ package stream
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -170,5 +173,69 @@ func Test_makeStreamError(t *testing.T) {
 		if tc.apiErr.Code != 0 {
 			assert.Equal(t, tc.apiErr, err)
 		}
+	}
+}
+
+type requester struct {
+	code int
+	body io.ReadCloser
+	err  error
+}
+
+func (r requester) Do(*http.Request) (*http.Response, error) {
+	resp := &http.Response{
+		StatusCode: r.code,
+		Body:       r.body,
+	}
+	return resp, r.err
+}
+
+func Test_requestErrors(t *testing.T) {
+	testCases := []struct {
+		data      interface{}
+		method    string
+		authFn    authFunc
+		expected  error
+		requester Requester
+	}{
+		{
+			data:     make(chan int),
+			expected: fmt.Errorf("cannot marshal request: json: unsupported type: chan int"),
+		},
+		{
+			data:     42,
+			authFn:   func(*http.Request) error { return fmt.Errorf("boom") },
+			expected: fmt.Errorf("boom"),
+		},
+		{
+			data:     42,
+			method:   "Ω",
+			expected: fmt.Errorf(`cannot create request: net/http: invalid method "Ω"`),
+		},
+		{
+			data:      42,
+			authFn:    func(*http.Request) error { return nil },
+			requester: &requester{err: fmt.Errorf("boom")},
+			expected:  fmt.Errorf("cannot perform request: boom"),
+		},
+		{
+			data:      42,
+			authFn:    func(*http.Request) error { return nil },
+			requester: &requester{code: 400, body: ioutil.NopCloser(strings.NewReader(`{"detail":"boom"}`))},
+			expected:  fmt.Errorf("boom"),
+		},
+		{
+			data:      42,
+			authFn:    func(*http.Request) error { return nil },
+			requester: &requester{code: 200, body: ioutil.NopCloser(badReader{})},
+			expected:  fmt.Errorf("cannot read response: boom"),
+		},
+	}
+
+	for _, tc := range testCases {
+		c := &Client{requester: tc.requester}
+		_, err := c.request(tc.method, endpoint{url: &url.URL{}, query: url.Values{}}, tc.data, tc.authFn)
+		require.Error(t, err)
+		assert.Equal(t, tc.expected.Error(), err.Error())
 	}
 }
