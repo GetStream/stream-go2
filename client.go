@@ -38,10 +38,7 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		url:           &apiURL{},
 	}
 	for _, opt := range opts {
-		err := opt(c)
-		if err != nil {
-			return nil, err
-		}
+		opt(c)
 	}
 	return c, nil
 }
@@ -59,29 +56,26 @@ func NewClientFromEnv() (*Client, error) {
 
 // ClientOption is a function used for adding specific configuration options to
 // a Stream client.
-type ClientOption func(*Client) error
+type ClientOption func(*Client)
 
 // WithAPIRegion sets the region for a given Client.
 func WithAPIRegion(region string) ClientOption {
-	return func(c *Client) error {
+	return func(c *Client) {
 		c.url.region = region
-		return nil
 	}
 }
 
 // WithAPIVersion sets the version for a given Client.
 func WithAPIVersion(version string) ClientOption {
-	return func(c *Client) error {
+	return func(c *Client) {
 		c.url.version = version
-		return nil
 	}
 }
 
 // WithHTTPRequester sets the HTTP requester for a given client, used mostly for testing.
 func WithHTTPRequester(requester Requester) ClientOption {
-	return func(c *Client) error {
+	return func(c *Client) {
 		c.requester = requester
-		return nil
 	}
 }
 
