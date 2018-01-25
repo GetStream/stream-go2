@@ -2,6 +2,7 @@ package stream
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/fatih/structs"
 )
@@ -35,8 +36,12 @@ func (a *Activity) UnmarshalJSON(b []byte) error {
 		for i := range tos {
 			if sliceTos, isString := tos[i].(string); isString {
 				simpleTos[i] = sliceTos
-			} else if sliceTos, isSlice := tos[i].([]string); isSlice {
-				simpleTos[i] = sliceTos[0]
+			} else if sliceTos, isSlice := tos[i].([]interface{}); isSlice {
+				tos, ok := sliceTos[0].(string)
+				if !ok {
+					return fmt.Errorf("invalid format for to targets")
+				}
+				simpleTos[i] = tos
 			}
 		}
 		data["to"] = simpleTos
