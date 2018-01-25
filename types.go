@@ -65,21 +65,27 @@ type readResponse struct {
 	Next string `json:"next,omitempty"`
 }
 
-// ErrMissingNextPage is returned when trying to read the next page of a response
-// which has an empty "next" field.
-var ErrMissingNextPage = fmt.Errorf("request missing next page")
+var (
+	// ErrMissingNextPage is returned when trying to read the next page of a response
+	// which has an empty "next" field.
+	ErrMissingNextPage = fmt.Errorf("request missing next page")
+	// ErrInvalidNextPage is returned when trying to read the next page of a response
+	// which has an invalid "next" field.
+	ErrInvalidNextPage = fmt.Errorf("invalid format for Next field")
+)
 
 func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 	if r.Next == "" {
 		return nil, ErrMissingNextPage
 	}
+
 	urlParts := strings.Split(r.Next, "?")
 	if len(urlParts) != 2 {
-		return nil, fmt.Errorf("invalid format for Next field")
+		return nil, ErrInvalidNextPage
 	}
 	values, err := url.ParseQuery(urlParts[1])
 	if err != nil {
-		return nil, err
+		return nil, ErrInvalidNextPage
 	}
 
 	var opts []GetActivitiesOption
