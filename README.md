@@ -231,10 +231,10 @@ err := feed.Follow(anotherFeed,
 ```
 
 ### Retrieving followers and followings
-#### Followings
+#### Following
 Get the feeds that a feed is following:
 ```go
-resp, err := feed.GetFollowings()
+resp, err := feed.GetFollowing()
 if err != nil {
     // ...
 }
@@ -245,7 +245,7 @@ for _, followed := range resp.Results {
 }
 ```
 
-You can pass options to `GetFollowings`:
+You can pass options to `GetFollowing`:
 ```go
 resp, err := feed.GetFollowing(
     stream.WithFollowingLimit(5),
