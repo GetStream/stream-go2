@@ -200,16 +200,31 @@ type AddToManyRequest struct {
 // FollowRelationship represents a follow relationship between a source
 // ("follower") and a target ("following"), used for FollowMany requests.
 type FollowRelationship struct {
-	Source string `json:"source,omitempty"`
-	Target string `json:"target,omitempty"`
+	Source            string `json:"source,omitempty"`
+	Target            string `json:"target,omitempty"`
+	ActivityCopyLimit *int   `json:"activity_copy_limit,omitempty"`
 }
 
 // NewFollowRelationship is a helper for creating a FollowRelationship from the
 // source ("follower") and target ("following") feeds.
-func NewFollowRelationship(source, target Feed) FollowRelationship {
-	return FollowRelationship{
+func NewFollowRelationship(source, target Feed, opts ...FollowRelationshipOption) FollowRelationship {
+	r := FollowRelationship{
 		Source: source.ID(),
 		Target: target.ID(),
+	}
+	for _, opt := range opts {
+		opt(&r)
+	}
+	return r
+}
+
+// FollowRelationshipOption customizes a FollowRelationship.
+type FollowRelationshipOption func(r *FollowRelationship)
+
+// WithFollowRelationshipActivityCopyLimit sets the ActivityCopyLimit field for a given FollowRelationship.
+func WithFollowRelationshipActivityCopyLimit(activityCopyLimit int) FollowRelationshipOption {
+	return func(r *FollowRelationship) {
+		r.ActivityCopyLimit = &activityCopyLimit
 	}
 }
 

@@ -45,3 +45,26 @@ func TestFollowMany(t *testing.T) {
 	body = `[{"source":"aggregated:0","target":"flat:123"},{"source":"aggregated:1","target":"flat:123"},{"source":"aggregated:2","target":"flat:123"}]`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/follow_many/?activity_copy_limit=500&api_key=key", body)
 }
+
+func TestFollowManyActivityCopyLimit(t *testing.T) {
+	var (
+		client, requester = newClient(t)
+		relationships     = make([]stream.FollowRelationship, 3)
+		flat              = newFlatFeedWithUserID(client, "123")
+	)
+
+	for i := range relationships {
+		other := newAggregatedFeedWithUserID(client, strconv.Itoa(i))
+		relationships[i] = stream.NewFollowRelationship(other, flat, stream.WithFollowRelationshipActivityCopyLimit(i))
+	}
+
+	err := client.FollowMany(relationships)
+	require.NoError(t, err)
+	body := `[{"source":"aggregated:0","target":"flat:123","activity_copy_limit":0},{"source":"aggregated:1","target":"flat:123","activity_copy_limit":1},{"source":"aggregated:2","target":"flat:123","activity_copy_limit":2}]`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/follow_many/?api_key=key", body)
+
+	err = client.FollowMany(relationships, stream.WithFollowManyActivityCopyLimit(123))
+	require.NoError(t, err)
+	body = `[{"source":"aggregated:0","target":"flat:123","activity_copy_limit":0},{"source":"aggregated:1","target":"flat:123","activity_copy_limit":1},{"source":"aggregated:2","target":"flat:123","activity_copy_limit":2}]`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/follow_many/?activity_copy_limit=123&api_key=key", body)
+}
