@@ -121,7 +121,7 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	return err
 }
 
-func (c *Client) makeStreamError(body io.Reader) error {
+func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
 	if body == nil {
 		return fmt.Errorf("invalid body")
 	}
@@ -131,7 +131,7 @@ func (c *Client) makeStreamError(body io.Reader) error {
 	}
 	var streamErr APIError
 	if err := json.Unmarshal(errBody, &streamErr); err != nil {
-		return err
+		return fmt.Errorf("unexpected error (status code %d)", statusCode)
 	}
 	return streamErr
 }
@@ -208,7 +208,7 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 		return nil, fmt.Errorf("cannot perform request: %s", err)
 	}
 	if resp.StatusCode/100 != 2 {
-		return nil, c.makeStreamError(resp.Body)
+		return nil, c.makeStreamError(resp.StatusCode, resp.Body)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
