@@ -146,11 +146,11 @@ func Test_makeStreamError(t *testing.T) {
 		},
 		{
 			body:     strings.NewReader(`{{`),
-			expected: fmt.Errorf("invalid character '{' looking for beginning of object key string"),
+			expected: fmt.Errorf("unexpected error (status code 123)"),
 		},
 		{
 			body:     strings.NewReader(`{"code":"A"}`),
-			expected: fmt.Errorf("json: cannot unmarshal string into Go struct field APIError.code of type int"),
+			expected: fmt.Errorf("unexpected error (status code 123)"),
 		},
 		{
 			body:     strings.NewReader(`{"code":123, "detail":"test", "duration": "1m2s", "exception": "boom", "status_code": 456, "exception_fields": {"foo":["bar"]}}`),
@@ -168,7 +168,7 @@ func Test_makeStreamError(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		err := (&Client{}).makeStreamError(tc.body)
+		err := (&Client{}).makeStreamError(123, tc.body)
 		assert.Equal(t, tc.expected.Error(), err.Error())
 		if tc.apiErr.Code != 0 {
 			assert.Equal(t, tc.apiErr, err)
