@@ -20,9 +20,19 @@ func (u *apiURL) makeVersion() string {
 	return "1.0"
 }
 
+// handy rewrites for regions
+var regionOverrides = map[string]string{
+	"us-east":   "us-east-api",
+	"eu-west":   "eu-west-api",
+	"singapore": "singapore-api",
+}
+
 func (u *apiURL) makeRegion() string {
 	if u.region != "" {
-		return fmt.Sprintf("%s-api", u.region)
+		if override, ok := regionOverrides[u.region]; ok {
+			return override
+		}
+		return u.region
 	}
 	return "api"
 }
