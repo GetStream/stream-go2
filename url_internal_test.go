@@ -17,8 +17,16 @@ func Test_URLString(t *testing.T) {
 			expected: fmt.Sprintf("https://api.%s/api/v1.0/", domain),
 		},
 		{
-			url:      &apiURL{region: "eu-central", version: "2.0"},
-			expected: fmt.Sprintf("https://eu-central-api.%s/api/v2.0/", domain),
+			url:      &apiURL{region: "us-east", version: "2.0"},
+			expected: fmt.Sprintf("https://us-east-api.%s/api/v2.0/", domain),
+		},
+		{
+			url:      &apiURL{region: "eu-west", version: "2.0"},
+			expected: fmt.Sprintf("https://eu-west-api.%s/api/v2.0/", domain),
+		},
+		{
+			url:      &apiURL{region: "singapore", version: "2.0"},
+			expected: fmt.Sprintf("https://singapore-api.%s/api/v2.0/", domain),
 		},
 	}
 
