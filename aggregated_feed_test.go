@@ -49,7 +49,7 @@ func TestAggregatedFeedGetNextPageActivities(t *testing.T) {
 	require.NoError(t, err)
 
 	requester.resp = `{"next":123}`
-	resp, err = aggregated.GetActivities()
+	_, err = aggregated.GetActivities()
 	require.Error(t, err)
 
 	requester.resp = `{"next":"123"}`
