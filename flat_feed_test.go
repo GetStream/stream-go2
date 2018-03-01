@@ -67,7 +67,7 @@ func TestFlatFeedGetNextPageActivities(t *testing.T) {
 	require.NoError(t, err)
 
 	requester.resp = `{"next":123}`
-	_, err = flat.GetActivities()
+	resp, err = flat.GetActivities()
 	require.Error(t, err)
 
 	requester.resp = `{"next":"123"}`
