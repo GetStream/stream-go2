@@ -185,6 +185,11 @@ func (c *Client) delete(endpoint endpoint, data interface{}, authFn authFunc) ([
 	return c.request(http.MethodDelete, endpoint, data, authFn)
 }
 
+func (c *Client) setBaseHeaders(r *http.Request) {
+	r.Header.Set("Content-type", "application/json")
+	r.Header.Set("X-Stream-Client", fmt.Sprintf("stream-go2-client-%s", Version))
+}
+
 func (c *Client) request(method string, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
 	var reader io.Reader
 	if data != nil {
@@ -199,10 +204,12 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 	if err != nil {
 		return nil, fmt.Errorf("cannot create request: %s", err)
 	}
+	c.setBaseHeaders(req)
+
 	if err := authFn(req); err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-type", "application/json")
+
 	resp, err := c.requester.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot perform request: %s", err)

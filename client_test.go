@@ -6,8 +6,17 @@ import (
 	"testing"
 
 	stream "github.com/GetStream/stream-go2"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestHeaders(t *testing.T) {
+	client, requester := newClient(t)
+	_, err := client.FlatFeed("user", "123").GetActivities()
+	require.NoError(t, err)
+	assert.Equal(t, "application/json", requester.req.Header.Get("content-type"))
+	assert.Regexp(t, "^stream-go2-client-v[0-9\\.]+$", requester.req.Header.Get("x-stream-client"))
+}
 
 func TestAddToMany(t *testing.T) {
 	var (
