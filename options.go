@@ -177,7 +177,7 @@ func WithUnfollowKeepHistory(keepHistory bool) UnfollowOption {
 
 type followFeedOptions struct {
 	Target            string `json:"target,omitempty"`
-	ActivityCopyLimit int    `json:"activity_copy_limit,omitempty"`
+	ActivityCopyLimit int    `json:"activity_copy_limit"`
 }
 
 // FollowManyOption is an option to customize behavior of Follow Many calls.
