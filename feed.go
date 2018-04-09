@@ -111,7 +111,8 @@ func (f *feed) RealtimeToken(readonly bool) string {
 		action = actionWrite
 	}
 	id := f.client.authenticator.feedID(f)
-	token, err := f.client.authenticator.feedAuthToken(resFeed, action, id)
+	claims := f.client.authenticator.jwtFeedClaims(resFeed, action, id)
+	token, err := f.client.authenticator.jwtSignatureFromClaims(claims)
 	if err != nil {
 		return ""
 	}
