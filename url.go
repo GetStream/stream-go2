@@ -19,9 +19,8 @@ var regionOverrides = map[string]string{
 }
 
 type regionalURLBuilder struct {
-	subdomain string
-	region    string
-	version   string
+	region  string
+	version string
 }
 
 func newRegionalURLBuilder(region, version string) regionalURLBuilder {
