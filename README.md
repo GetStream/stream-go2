@@ -8,6 +8,28 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
 [![godoc](https://godoc.org/github.com/GetStream/stream-go2?status.svg)](https://godoc.org/github.com/GetStream/stream-go2)
 [![codecov](https://codecov.io/gh/GetStream/stream-go2/branch/master/graph/badge.svg)](https://codecov.io/gh/GetStream/stream-go2)
 
+## Contents
+
+* [Getting started](#usage)
+* [Creating a Client](#creating-a-client)
+* [Creating a Feed](#creating-a-feed)
+* [Retrieving Activities](#retrieving-activities)
+  * [Flat feeds](#flat-feeds)
+  * [Aggregated feeds](#aggregated-feeds)
+  * [Notification feeds](#notification-feeds)
+  * [Options](#options)
+* [Adding activities](#adding-activities)
+* [Updating activities](#updating-activities)
+* [Removing activities](#removing-activities)
+* [Retrieving follows](#retrieving-followers-and-followings)
+  * [Following](#following)
+  * [Followers](#followers)
+* [Unfollow](#unfollowing-a-feed)
+* [Update `to` targets](#updating-an-activitys-to-targets)
+* [Batch activities](#batch-adding-activities)
+* [Batch follows](#batch-creating-follows)
+* [Realtime tokens](#realtime-tokens)
+* [License](#license)
 
 ## Usage
 
