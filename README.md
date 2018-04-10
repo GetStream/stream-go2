@@ -29,6 +29,10 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
 * [Batch activities](#batch-adding-activities)
 * [Batch follows](#batch-creating-follows)
 * [Realtime tokens](#realtime-tokens)
+* [Analytics](#analytics)
+  * [Tracking engagement](#tracking-engagement)
+  * [Tracking impressions](#tracking-impressions)
+  * [Email tracking](#email-tracking)
 * [License](#license)
 
 ## Usage
@@ -375,6 +379,96 @@ token := feed.RealtimeToken(false)
 
 // Read-only token
 readonlyToken := feed.RealtimeToken(true)
+```
+
+## Analytics
+
+If your app is enabled for analytics collection you can use the Go client to track events. The main documentation for the analytics features is available [in our Docs page](https://getstream.io/docs/#analytics_setup).
+
+### Obtaining an Analytics client
+
+You can obtain a specialized Analytics client (`*stream.AnalyticsClient`) from a regular client, which you can use to track events:
+
+```go
+// Create the client
+analytics := client.Analytics()
+```
+
+### Tracking engagement
+
+Engagement events can be tracked with the `TrackEngagement` method of `AnalyticsClient`. It accepts any number of `EngagementEvent`s.
+
+Events' syntax is not checked by the client, so be sure to follow our [documentation](https://getstream.io/docs/#analytics_engagements) about it.
+
+Events are simple maps, but the `stream` package offers handy helpers to populate such events easily.
+
+```go
+// Create the event
+event := stream.EngagementEvent{}.
+    WithLabel("click").
+    WithForeignID("event:1234").
+    WithUserData(stream.NewUserData().String("john")).
+    WithFeatures(
+        stream.NewEventFeature("color", "blue"),
+        stream.NewEventFeature("shape", "rectangle"),
+    ).
+    WithLocation("homepage")
+
+// Track the event(s)
+err := analytics.TrackEngagement(event)
+if err != nil {
+    // ...
+}
+```
+
+### Tracking impressions
+
+Impression events can be tracked with the `TrackImpression` method of `AnalyticsClient` ([syntax docs](https://getstream.io/docs/#analytics_impressions)):
+
+```go
+// Create the impression events
+imp := stream.ImpressionEventData{}.
+    WithForeignIDs("product:1", "product:2", "product:3").
+    WithUserData(stream.NewUserData().String("john")).
+    WithLocation("storepage")
+
+// Track the events
+err := analytics.TrackImpression(imp)
+if err != nil {
+    // ...
+}
+```
+
+### Email tracking
+
+You can generate URLs to track events and redirect to a specific URL with the `RedirectAndTrack` method of `AnalyticsClient` ([syntax docs](https://getstream.io/docs/#analytics_email)). It accepts any number of engagement and impression events:
+
+```go
+// Create the events
+engagement := stream.EngagementEvent{}.
+    WithLabel("click").
+    WithForeignID("event:1234").
+    WithUserData(stream.NewUserData().String("john")).
+    WithFeatures(
+        stream.NewEventFeature("color", "blue"),
+        stream.NewEventFeature("shape", "rectangle"),
+    ).
+    WithLocation("homepage")
+
+impressions := stream.ImpressionEventData{}.
+    WithForeignIDs("product:1", "product:2", "product:3").
+    WithUserData(stream.NewUserData().String("john")).
+    WithLocation("storepage")
+
+// Generate the tracking and redirect URL, which once followed
+// will redirect the user to the targetURL.
+targetURL := "https://google.com"
+url, err := analytics.RedirectAndTrack(targetURL, engagement, impression)
+if err != nil {
+    // ...
+}
+
+// Display the obtained url where needed.
 ```
 
 ## License
