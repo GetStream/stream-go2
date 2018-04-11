@@ -17,7 +17,9 @@ type Client struct {
 	key           string
 	requester     Requester
 	authenticator authenticator
-	url           *apiURL
+	urlBuilder    urlBuilder
+	region        string
+	version       string
 }
 
 // Requester performs HTTP requests.
@@ -35,11 +37,11 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		key:           key,
 		requester:     &http.Client{},
 		authenticator: authenticator{secret: secret},
-		url:           &apiURL{},
 	}
 	for _, opt := range opts {
 		opt(c)
 	}
+	c.urlBuilder = newAPIURLBuilder(c.region, c.version)
 	return c, nil
 }
 
@@ -61,14 +63,14 @@ type ClientOption func(*Client)
 // WithAPIRegion sets the region for a given Client.
 func WithAPIRegion(region string) ClientOption {
 	return func(c *Client) {
-		c.url.region = region
+		c.region = region
 	}
 }
 
 // WithAPIVersion sets the version for a given Client.
 func WithAPIVersion(version string) ClientOption {
 	return func(c *Client) {
-		c.url.version = version
+		c.version = version
 	}
 }
 
@@ -121,6 +123,18 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	return err
 }
 
+// Analytics returns a new AnalyticsClient sharing the base configuration of the original Client.
+func (c *Client) Analytics() *AnalyticsClient {
+	return &AnalyticsClient{
+		client: &Client{
+			key:           c.key,
+			requester:     c.requester,
+			authenticator: c.authenticator,
+			urlBuilder:    newAnalyticsURLBuilder(c.region, c.version),
+		},
+	}
+}
+
 func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
 	if body == nil {
 		return fmt.Errorf("invalid body")
@@ -154,12 +168,7 @@ func (e *endpoint) addQueryParam(v valuer) {
 }
 
 func (c *Client) makeEndpoint(format string, a ...interface{}) endpoint {
-	var host string
-	if envHost := os.Getenv("STREAM_URL"); envHost != "" {
-		host = envHost
-	} else {
-		host = c.url.String()
-	}
+	host := c.urlBuilder.url()
 
 	path := fmt.Sprintf(format, a...)
 	u, _ := url.Parse(host + path)
@@ -206,8 +215,10 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 	}
 	c.setBaseHeaders(req)
 
-	if err := authFn(req); err != nil {
-		return nil, err
+	if authFn != nil {
+		if err := authFn(req); err != nil {
+			return nil, err
+		}
 	}
 
 	resp, err := c.requester.Do(req)
