@@ -16,8 +16,19 @@ type Duration struct {
 
 // UnmarshalJSON for Duration is required because of the incoming duration string.
 func (d *Duration) UnmarshalJSON(b []byte) error {
-	var err error
-	*d, err = durationFromString(strings.Replace(string(b), `"`, "", -1))
+	var tmp interface{}
+	err := json.Unmarshal(b, &tmp)
+	if err != nil {
+		return err
+	}
+	switch v := tmp.(type) {
+	case string:
+		*d, err = durationFromString(v)
+	case float64:
+		*d, err = durationFromString(fmt.Sprintf("%fs", v))
+	default:
+		err = fmt.Errorf("invalid duration")
+	}
 	return err
 }
 
@@ -234,4 +245,85 @@ type updateToTargetsRequest struct {
 	New       []string `json:"new_targets,omitempty"`
 	Adds      []string `json:"added_targets,omitempty"`
 	Removes   []string `json:"removed_targets,omitempty"`
+}
+
+// CollectionObject is a collection's object.
+type CollectionObject struct {
+	ID   string
+	Name string
+	Data map[string]interface{}
+}
+
+// MarshalJSON marshals the CollectionObject to a flat JSON object.
+func (o CollectionObject) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
+		"id":   o.ID,
+		"name": o.Name,
+	}
+	for k, v := range o.Data {
+		m[k] = v
+	}
+	return json.Marshal(m)
+}
+
+type selectCollectionResponse struct {
+	Response selectCollectionResponseData `json:"response"`
+}
+
+type selectCollectionResponseData struct {
+	Data []selectCollectionResponseObject `json:"data"`
+}
+
+type selectCollectionResponseObject struct {
+	ForeignID string                 `json:"foreign_id"`
+	Data      map[string]interface{} `json:"data"`
+}
+
+func (o selectCollectionResponseObject) toCollectionObject() CollectionObject {
+	parts := strings.SplitN(o.ForeignID, ":", 2)
+	id, name := parts[0], parts[1]
+	return CollectionObject{
+		ID:   id,
+		Name: name,
+		Data: o.Data,
+	}
+}
+
+// PersonalizationResponse is a generic response from the personalization endpoints
+// obtained after a PersonalizationClient.Get call.
+// Common JSON fields are directly available as struct fields, while non-standard
+// JSON fields can be retrieved using the Extra() method.
+type PersonalizationResponse struct {
+	AppID    int                      `json:"app_id"`
+	Duration Duration                 `json:"duration"`
+	Limit    int                      `json:"limit"`
+	Offset   int                      `json:"offset"`
+	Version  string                   `json:"version"`
+	Results  []map[string]interface{} `json:"results"`
+	extra    map[string]interface{}
+}
+
+// Extra returns the non-common response fields as a map[string]interface{}.
+func (r *PersonalizationResponse) Extra() map[string]interface{} {
+	return r.extra
+}
+
+// UnmarshalJSON for PersonalizationResponse is required because of the incoming duration string, and
+// for storing non-standard fields without losing their values, so they can be retrieved
+// later on with the Extra() function.
+func (r *PersonalizationResponse) UnmarshalJSON(data []byte) error {
+	var m map[string]interface{}
+	err := json.Unmarshal(data, &m)
+	if err != nil {
+		return err
+	}
+	meta, err := decodeData(m, r)
+	if err != nil {
+		return err
+	}
+	r.extra = make(map[string]interface{})
+	for _, k := range meta.Unused {
+		r.extra[k] = m[k]
+	}
+	return nil
 }

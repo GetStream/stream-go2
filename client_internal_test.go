@@ -58,8 +58,8 @@ func TestConfig(t *testing.T) {
 			continue
 		}
 		assert.NoError(t, err)
-		assert.Equal(t, tc.expectedRegion, c.url.region)
-		assert.Equal(t, tc.expectedVersion, c.url.version)
+		assert.Equal(t, tc.expectedRegion, c.urlBuilder.(apiURLBuilder).region)
+		assert.Equal(t, tc.expectedVersion, c.urlBuilder.(apiURLBuilder).version)
 	}
 }
 
@@ -68,30 +68,30 @@ func Test_makeEndpoint(t *testing.T) {
 	defer os.Setenv("STREAM_URL", prev)
 
 	testCases := []struct {
-		url      *apiURL
-		format   string
-		env      string
-		args     []interface{}
-		expected string
+		urlBuilder apiURLBuilder
+		format     string
+		env        string
+		args       []interface{}
+		expected   string
 	}{
 		{
-			url:      &apiURL{},
-			format:   "test-%d-%s",
-			args:     []interface{}{42, "asd"},
-			expected: "https://api.stream-io-api.com/api/v1.0/test-42-asd?api_key=test",
+			urlBuilder: apiURLBuilder{},
+			format:     "test-%d-%s",
+			args:       []interface{}{42, "asd"},
+			expected:   "https://api.stream-io-api.com/api/v1.0/test-42-asd?api_key=test",
 		},
 		{
-			url:      &apiURL{},
-			env:      "http://localhost:8000/api/v1.0/",
-			format:   "test-%d-%s",
-			args:     []interface{}{42, "asd"},
-			expected: "http://localhost:8000/api/v1.0/test-42-asd?api_key=test",
+			urlBuilder: apiURLBuilder{},
+			env:        "http://localhost:8000",
+			format:     "test-%d-%s",
+			args:       []interface{}{42, "asd"},
+			expected:   "http://localhost:8000/api/v1.0/test-42-asd?api_key=test",
 		},
 	}
 
 	for _, tc := range testCases {
 		os.Setenv("STREAM_URL", tc.env)
-		c := &Client{url: tc.url, key: "test"}
+		c := &Client{urlBuilder: tc.urlBuilder, key: "test"}
 		assert.Equal(t, tc.expected, c.makeEndpoint(tc.format, tc.args...).String())
 	}
 }
@@ -118,12 +118,12 @@ func TestNewClientFromEnv(t *testing.T) {
 	os.Setenv("STREAM_API_REGION", "baz")
 	client, err = NewClientFromEnv()
 	require.NoError(t, err)
-	assert.Equal(t, "baz", client.url.region)
+	assert.Equal(t, "baz", client.urlBuilder.(apiURLBuilder).region)
 
 	os.Setenv("STREAM_API_VERSION", "qux")
 	client, err = NewClientFromEnv()
 	require.NoError(t, err)
-	assert.Equal(t, "qux", client.url.version)
+	assert.Equal(t, "qux", client.urlBuilder.(apiURLBuilder).version)
 }
 
 type badReader struct{}

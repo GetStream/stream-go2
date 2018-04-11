@@ -17,10 +17,12 @@ type authFunc func(*http.Request) error
 type resource string
 
 const (
-	resFollower    resource = "follower"
-	resActivities  resource = "activities"
-	resFeed        resource = "feed"
-	resFeedTargets resource = "feed_targets"
+	resFollower        resource = "follower"
+	resActivities      resource = "activities"
+	resFeed            resource = "feed"
+	resFeedTargets     resource = "feed_targets"
+	resCollections     resource = "collections"
+	resPersonalization resource = "personalization"
 )
 
 type action string
@@ -45,16 +47,6 @@ type authenticator struct {
 	secret string
 }
 
-func (a authenticator) feedAuthToken(resource resource, action action, feedID string) (string, error) {
-	claims := jwt.MapClaims{
-		"resource": resource,
-		"action":   action,
-		"feed_id":  feedID,
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(a.secret))
-}
-
 func (a authenticator) feedSignature(feedID string) string {
 	return fmt.Sprintf("%s %s", feedID, a.feedToken(feedID))
 }
@@ -69,13 +61,6 @@ func (a authenticator) feedToken(feedID string) string {
 	return a.urlSafe(digest)
 }
 
-func (a authenticator) urlSafe(src string) string {
-	src = strings.Replace(src, "+", "-", -1)
-	src = strings.Replace(src, "/", "_", -1)
-	src = strings.Trim(src, "=")
-	return src
-}
-
 func (a authenticator) feedID(feed Feed) string {
 	if feed == nil {
 		return "*"
@@ -85,14 +70,28 @@ func (a authenticator) feedID(feed Feed) string {
 
 func (a authenticator) feedAuth(resource resource, feed Feed) authFunc {
 	return func(req *http.Request) error {
-		auth, err := a.feedAuthToken(resource, actions[req.Method], a.feedID(feed))
-		if err != nil {
-			return fmt.Errorf("cannot make auth: %s", err)
-		}
-		req.Header.Add("Stream-Auth-Type", "jwt")
-		req.Header.Add("Authorization", auth)
-		return nil
+		return a.jwtSignRequest(req, a.jwtFeedClaims(resource, actions[req.Method], a.feedID(feed)))
 	}
+}
+
+func (a authenticator) collectionsAuth(req *http.Request) error {
+	claims := jwt.MapClaims{
+		"action":   "*",
+		"user_id":  "*",
+		"feed_id":  "*",
+		"resource": resCollections,
+	}
+	return a.jwtSignRequest(req, claims)
+}
+
+func (a authenticator) personalizationAuth(req *http.Request) error {
+	claims := jwt.MapClaims{
+		"action":   "*",
+		"user_id":  "*",
+		"feed_id":  "*",
+		"resource": resPersonalization,
+	}
+	return a.jwtSignRequest(req, claims)
 }
 
 func (a authenticator) applicationAuth(key string) authFunc {
@@ -104,4 +103,34 @@ func (a authenticator) applicationAuth(key string) authFunc {
 		}
 		return signer.SignRequest(req, []string{}, nil)
 	}
+}
+
+func (a authenticator) jwtSignatureFromClaims(claims jwt.MapClaims) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(a.secret))
+}
+
+func (a authenticator) jwtFeedClaims(resource resource, action action, feedID string) jwt.MapClaims {
+	return jwt.MapClaims{
+		"resource": resource,
+		"action":   action,
+		"feed_id":  feedID,
+	}
+}
+
+func (a authenticator) jwtSignRequest(req *http.Request, claims jwt.MapClaims) error {
+	auth, err := a.jwtSignatureFromClaims(claims)
+	if err != nil {
+		return fmt.Errorf("cannot make auth: %s", err)
+	}
+	req.Header.Add("Stream-Auth-Type", "jwt")
+	req.Header.Add("Authorization", auth)
+	return nil
+}
+
+func (a authenticator) urlSafe(src string) string {
+	src = strings.Replace(src, "+", "-", -1)
+	src = strings.Replace(src, "/", "_", -1)
+	src = strings.Trim(src, "=")
+	return src
 }

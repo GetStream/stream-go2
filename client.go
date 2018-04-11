@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 // Client is a Stream API client used for retrieving feeds and performing API
@@ -17,7 +18,9 @@ type Client struct {
 	key           string
 	requester     Requester
 	authenticator authenticator
-	url           *apiURL
+	urlBuilder    urlBuilder
+	region        string
+	version       string
 }
 
 // Requester performs HTTP requests.
@@ -35,11 +38,11 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		key:           key,
 		requester:     &http.Client{},
 		authenticator: authenticator{secret: secret},
-		url:           &apiURL{},
 	}
 	for _, opt := range opts {
 		opt(c)
 	}
+	c.urlBuilder = newAPIURLBuilder(c.region, c.version)
 	return c, nil
 }
 
@@ -61,14 +64,14 @@ type ClientOption func(*Client)
 // WithAPIRegion sets the region for a given Client.
 func WithAPIRegion(region string) ClientOption {
 	return func(c *Client) {
-		c.url.region = region
+		c.region = region
 	}
 }
 
 // WithAPIVersion sets the version for a given Client.
 func WithAPIVersion(version string) ClientOption {
 	return func(c *Client) {
-		c.url.version = version
+		c.version = version
 	}
 }
 
@@ -121,6 +124,75 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	return err
 }
 
+// UpsertCollectionObjects creates new or updates existing objects for the given collection's name.
+func (c *Client) UpsertCollectionObjects(collection string, objects ...CollectionObject) error {
+	if collection == "" {
+		return fmt.Errorf("collection name required")
+	}
+	endpoint := c.makeEndpoint("meta/")
+	data := map[string]interface{}{
+		"data": map[string][]CollectionObject{
+			collection: objects,
+		},
+	}
+	_, err := c.post(endpoint, data, c.authenticator.collectionsAuth)
+	return err
+}
+
+// GetCollectionObjects returns a list of CollectionObjects for the given collection name
+// having the given IDs.
+func (c *Client) GetCollectionObjects(collection string, ids ...string) ([]CollectionObject, error) {
+	if collection == "" {
+		return nil, fmt.Errorf("collection name required")
+	}
+	foreignIDs := make([]string, len(ids))
+	for i := range ids {
+		foreignIDs[i] = fmt.Sprintf("%s:%s", collection, ids[i])
+	}
+	endpoint := c.makeEndpoint("meta/")
+	endpoint.addQueryParam(makeRequestOption("foreign_ids", strings.Join(foreignIDs, ",")))
+	resp, err := c.get(endpoint, nil, c.authenticator.collectionsAuth)
+	if err != nil {
+		return nil, err
+	}
+	var selectResp selectCollectionResponse
+	err = json.Unmarshal(resp, &selectResp)
+	if err != nil {
+		return nil, err
+	}
+	objects := make([]CollectionObject, len(selectResp.Response.Data))
+	for i, obj := range selectResp.Response.Data {
+		objects[i] = obj.toCollectionObject()
+	}
+	return objects, nil
+}
+
+// DeleteCollectionObjects removes from a collection the objects having the given IDs.
+func (c *Client) DeleteCollectionObjects(collection string, ids ...string) error {
+	if collection == "" {
+		return fmt.Errorf("collection name required")
+	}
+	endpoint := c.makeEndpoint("meta/")
+	data := map[string]interface{}{
+		"collection_name": collection,
+		"ids":             ids,
+	}
+	_, err := c.delete(endpoint, data, c.authenticator.collectionsAuth)
+	return err
+}
+
+// Personalization returns a new PersonalizationClient.
+func (c *Client) Personalization() *PersonalizationClient {
+	return &PersonalizationClient{
+		client: &Client{
+			key:           c.key,
+			requester:     c.requester,
+			authenticator: c.authenticator,
+			urlBuilder:    newPersonalizationURLBuilder(),
+		},
+	}
+}
+
 func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
 	if body == nil {
 		return fmt.Errorf("invalid body")
@@ -154,12 +226,7 @@ func (e *endpoint) addQueryParam(v valuer) {
 }
 
 func (c *Client) makeEndpoint(format string, a ...interface{}) endpoint {
-	var host string
-	if envHost := os.Getenv("STREAM_URL"); envHost != "" {
-		host = envHost
-	} else {
-		host = c.url.String()
-	}
+	host := c.urlBuilder.url()
 
 	path := fmt.Sprintf(format, a...)
 	u, _ := url.Parse(host + path)
