@@ -78,3 +78,15 @@ func (b personalizationURLBuilder) url() string {
 	}
 	return "https://personalization.stream-io-api.com/personalization/v1.0/"
 }
+
+type analyticsURLBuilder struct {
+	regionalURLBuilder
+}
+
+func newAnalyticsURLBuilder(region, version string) analyticsURLBuilder {
+	return analyticsURLBuilder{newRegionalURLBuilder(region, version)}
+}
+
+func (u analyticsURLBuilder) url() string {
+	return fmt.Sprintf("%s/analytics/v%s/", u.makeHost("analytics"), u.makeVersion())
+}

@@ -181,6 +181,18 @@ func (c *Client) DeleteCollectionObjects(collection string, ids ...string) error
 	return err
 }
 
+// Analytics returns a new AnalyticsClient sharing the base configuration of the original Client.
+func (c *Client) Analytics() *AnalyticsClient {
+	return &AnalyticsClient{
+		client: &Client{
+			key:           c.key,
+			requester:     c.requester,
+			authenticator: c.authenticator,
+			urlBuilder:    newAnalyticsURLBuilder(c.region, c.version),
+		},
+	}
+}
+
 // Personalization returns a new PersonalizationClient.
 func (c *Client) Personalization() *PersonalizationClient {
 	return &PersonalizationClient{
@@ -273,8 +285,10 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 	}
 	c.setBaseHeaders(req)
 
-	if err := authFn(req); err != nil {
-		return nil, err
+	if authFn != nil {
+		if err := authFn(req); err != nil {
+			return nil, err
+		}
 	}
 
 	resp, err := c.requester.Do(req)

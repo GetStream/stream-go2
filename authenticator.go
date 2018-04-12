@@ -17,12 +17,14 @@ type authFunc func(*http.Request) error
 type resource string
 
 const (
-	resFollower        resource = "follower"
-	resActivities      resource = "activities"
-	resFeed            resource = "feed"
-	resFeedTargets     resource = "feed_targets"
-	resCollections     resource = "collections"
-	resPersonalization resource = "personalization"
+	resFollower          resource = "follower"
+	resActivities        resource = "activities"
+	resFeed              resource = "feed"
+	resFeedTargets       resource = "feed_targets"
+	resCollections       resource = "collections"
+	resPersonalization   resource = "personalization"
+	resAnalytics         resource = "analytics"
+	resAnalyticsRedirect resource = "redirect_and_track"
 )
 
 type action string
@@ -94,6 +96,29 @@ func (a authenticator) personalizationAuth(req *http.Request) error {
 	return a.jwtSignRequest(req, claims)
 }
 
+func (a authenticator) analyticsAuth(req *http.Request) error {
+	claims := jwt.MapClaims{
+		"action":   "*",
+		"user_id":  "*",
+		"resource": resAnalytics,
+	}
+	return a.jwtSignRequest(req, claims)
+}
+
+func (a authenticator) signAnalyticsRedirectEndpoint(endpoint *endpoint) error {
+	claims := jwt.MapClaims{
+		"action":   "*",
+		"user_id":  "*",
+		"resource": resAnalyticsRedirect,
+	}
+	signature, err := a.jwtSignatureFromClaims(claims)
+	if err != nil {
+		return err
+	}
+	endpoint.addQueryParam(makeRequestOption("stream-auth-type", "jwt"))
+	endpoint.addQueryParam(makeRequestOption("authorization", signature))
+	return nil
+}
 func (a authenticator) applicationAuth(key string) authFunc {
 	return func(req *http.Request) error {
 		req.Header.Set("X-API-Key", key)
