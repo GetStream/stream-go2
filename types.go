@@ -61,8 +61,15 @@ func (t Time) MarshalJSON() ([]byte, error) {
 }
 
 func timeFromString(s string) (Time, error) {
-	tt, err := time.Parse(TimeLayout, s)
-	return Time{tt}, err
+	var err error
+	for _, layout := range timeLayouts {
+		var tt time.Time
+		tt, err = time.Parse(layout, s)
+		if err == nil {
+			return Time{tt}, nil
+		}
+	}
+	return Time{}, err
 }
 
 // Response is the part of StreamAPI responses common throughout the API.
