@@ -33,6 +33,8 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
   * [Tracking engagement](#tracking-engagement)
   * [Tracking impressions](#tracking-impressions)
   * [Email tracking](#email-tracking)
+* [Personalization](#personalization)
+* [Collections](#collections)
 * [License](#license)
 
 ## Usage
@@ -470,6 +472,73 @@ if err != nil {
 
 // Display the obtained url where needed.
 ```
+
+## Personalization
+
+[Personalization endpoints](https://getstream.io/personalization) for enabled apps can be reached using a `PersonalizationClient`, a specialized client obtained with the `Personalization()` function of a regular `Client`.
+
+```go
+personalization := client.Personalization()
+```
+
+The `PersonalizationClient` exposes three functions that you can use to retrieve and manipulate data: `Get`, `Post`, and `Delete`.
+
+For example, to retrieve follow recommendations:
+
+```go
+// Get follow recommendations
+data := map[string]interface{}{
+    "user_id":          123,
+    "source_feed_slug": "timeline",
+    "target_feed_slug": "user",
+}
+resp, err = personalization.Get("follow_recommendations", data)
+if err != nil {
+    // ...
+}
+fmt.Println(resp)
+```
+
+See the complete [docs and examples](https://getstream.io/docs/#personalization_introduction) about personalization features on Stream's documentation pages.
+
+## Collections
+
+[Collections](https://getstream.io/docs/#collections) endpoints for enabled apps can be reached using a specialized `CollectionsClient` which, like `PersonalizationClient`, can be obtained from a regular `Client`:
+
+```go
+collections := client.Collections()
+```
+
+`CollectionsClient` exposes three functions, `Upsert`, `Get`, and `Delete`:
+
+```go
+// Upsert the "user" collection
+object := stream.CollectionObject{
+    ID:   "123",
+    Name: "johndoe",
+    Data: map[string]interface{}{
+        "favorite_color": "blue",
+    },
+}
+err = collections.Upsert("user", object)
+if err != nil {
+    // ...
+}
+
+// Get the data from the "user" collection for ID "123" and "456"
+objects, err := collections.Get("user", "123", "456")
+if err != nil {
+    // ...
+}
+
+// Delete the data from the "user" collection for user with ID "123"
+err = collections.Delete("user", "123")
+if err != nil {
+    // ...
+}
+```
+
+See the complete [docs and examples](https://getstream.io/docs/#collections) about collections on Stream's documentation pages.
 
 ## License
 stream-go2 is licensed under the [GNU General Public License v3.0](LICENSE).

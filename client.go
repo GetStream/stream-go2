@@ -123,16 +123,30 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	return err
 }
 
+func (c *Client) cloneWithURLBuilder(builder urlBuilder) *Client {
+	return &Client{
+		key:           c.key,
+		requester:     c.requester,
+		authenticator: c.authenticator,
+		urlBuilder:    builder,
+	}
+}
+
 // Analytics returns a new AnalyticsClient sharing the base configuration of the original Client.
 func (c *Client) Analytics() *AnalyticsClient {
-	return &AnalyticsClient{
-		client: &Client{
-			key:           c.key,
-			requester:     c.requester,
-			authenticator: c.authenticator,
-			urlBuilder:    newAnalyticsURLBuilder(c.region, c.version),
-		},
-	}
+	b := newAnalyticsURLBuilder(c.region, c.version)
+	return &AnalyticsClient{client: c.cloneWithURLBuilder(b)}
+}
+
+func (c *Client) Collections() *CollectionsClient {
+	b := newAPIURLBuilder(c.region, c.version)
+	return &CollectionsClient{client: c.cloneWithURLBuilder(b)}
+}
+
+// Personalization returns a new PersonalizationClient.
+func (c *Client) Personalization() *PersonalizationClient {
+	b := newPersonalizationURLBuilder()
+	return &PersonalizationClient{client: c.cloneWithURLBuilder(b)}
 }
 
 func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
