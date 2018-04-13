@@ -173,11 +173,9 @@ func (c *Client) DeleteCollectionObjects(collection string, ids ...string) error
 		return fmt.Errorf("collection name required")
 	}
 	endpoint := c.makeEndpoint("meta/")
-	data := map[string]interface{}{
-		"collection_name": collection,
-		"ids":             ids,
-	}
-	_, err := c.delete(endpoint, data, c.authenticator.collectionsAuth)
+	endpoint.addQueryParam(makeRequestOption("collection_name", collection))
+	endpoint.addQueryParam(makeRequestOption("ids", strings.Join(ids, ",")))
+	_, err := c.delete(endpoint, nil, c.authenticator.collectionsAuth)
 	return err
 }
 

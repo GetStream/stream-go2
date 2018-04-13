@@ -89,27 +89,24 @@ func TestGetCollectionObjects(t *testing.T) {
 func TestDeleteCollectionObjects(t *testing.T) {
 	client, requester := newClient(t)
 	testCases := []struct {
-		ids          []string
-		collection   string
-		expectedURL  string
-		expectedBody string
+		ids         []string
+		collection  string
+		expectedURL string
 	}{
 		{
-			collection:   "test-single",
-			ids:          []string{"one"},
-			expectedURL:  "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key",
-			expectedBody: `{"collection_name":"test-single","ids":["one"]}`,
+			collection:  "test-single",
+			ids:         []string{"one"},
+			expectedURL: "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key&collection_name=test-single&ids=one",
 		},
 		{
-			collection:   "test-many",
-			ids:          []string{"one", "two", "three"},
-			expectedURL:  "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key",
-			expectedBody: `{"collection_name":"test-single","ids":["one","two","three"]}`,
+			collection:  "test-many",
+			ids:         []string{"one", "two", "three"},
+			expectedURL: "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key&collection_name=test-many&ids=one%2Ctwo%2Cthree",
 		},
 	}
 	for _, tc := range testCases {
 		err := client.DeleteCollectionObjects(tc.collection, tc.ids...)
 		require.NoError(t, err)
-		testRequest(t, requester.req, http.MethodDelete, tc.expectedURL, tc.expectedBody)
+		testRequest(t, requester.req, http.MethodDelete, tc.expectedURL, "")
 	}
 }
