@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 )
 
 // Client is a Stream API client used for retrieving feeds and performing API
@@ -124,83 +123,30 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	return err
 }
 
-// UpsertCollectionObjects creates new or updates existing objects for the given collection's name.
-func (c *Client) UpsertCollectionObjects(collection string, objects ...CollectionObject) error {
-	if collection == "" {
-		return fmt.Errorf("collection name required")
+func (c *Client) cloneWithURLBuilder(builder urlBuilder) *Client {
+	return &Client{
+		key:           c.key,
+		requester:     c.requester,
+		authenticator: c.authenticator,
+		urlBuilder:    builder,
 	}
-	endpoint := c.makeEndpoint("meta/")
-	data := map[string]interface{}{
-		"data": map[string][]CollectionObject{
-			collection: objects,
-		},
-	}
-	_, err := c.post(endpoint, data, c.authenticator.collectionsAuth)
-	return err
-}
-
-// GetCollectionObjects returns a list of CollectionObjects for the given collection name
-// having the given IDs.
-func (c *Client) GetCollectionObjects(collection string, ids ...string) ([]CollectionObject, error) {
-	if collection == "" {
-		return nil, fmt.Errorf("collection name required")
-	}
-	foreignIDs := make([]string, len(ids))
-	for i := range ids {
-		foreignIDs[i] = fmt.Sprintf("%s:%s", collection, ids[i])
-	}
-	endpoint := c.makeEndpoint("meta/")
-	endpoint.addQueryParam(makeRequestOption("foreign_ids", strings.Join(foreignIDs, ",")))
-	resp, err := c.get(endpoint, nil, c.authenticator.collectionsAuth)
-	if err != nil {
-		return nil, err
-	}
-	var selectResp selectCollectionResponse
-	err = json.Unmarshal(resp, &selectResp)
-	if err != nil {
-		return nil, err
-	}
-	objects := make([]CollectionObject, len(selectResp.Response.Data))
-	for i, obj := range selectResp.Response.Data {
-		objects[i] = obj.toCollectionObject()
-	}
-	return objects, nil
-}
-
-// DeleteCollectionObjects removes from a collection the objects having the given IDs.
-func (c *Client) DeleteCollectionObjects(collection string, ids ...string) error {
-	if collection == "" {
-		return fmt.Errorf("collection name required")
-	}
-	endpoint := c.makeEndpoint("meta/")
-	endpoint.addQueryParam(makeRequestOption("collection_name", collection))
-	endpoint.addQueryParam(makeRequestOption("ids", strings.Join(ids, ",")))
-	_, err := c.delete(endpoint, nil, c.authenticator.collectionsAuth)
-	return err
 }
 
 // Analytics returns a new AnalyticsClient sharing the base configuration of the original Client.
 func (c *Client) Analytics() *AnalyticsClient {
-	return &AnalyticsClient{
-		client: &Client{
-			key:           c.key,
-			requester:     c.requester,
-			authenticator: c.authenticator,
-			urlBuilder:    newAnalyticsURLBuilder(c.region, c.version),
-		},
-	}
+	b := newAnalyticsURLBuilder(c.region, c.version)
+	return &AnalyticsClient{client: c.cloneWithURLBuilder(b)}
+}
+
+func (c *Client) Collections() *CollectionsClient {
+	b := newAPIURLBuilder(c.region, c.version)
+	return &CollectionsClient{client: c.cloneWithURLBuilder(b)}
 }
 
 // Personalization returns a new PersonalizationClient.
 func (c *Client) Personalization() *PersonalizationClient {
-	return &PersonalizationClient{
-		client: &Client{
-			key:           c.key,
-			requester:     c.requester,
-			authenticator: c.authenticator,
-			urlBuilder:    newPersonalizationURLBuilder(),
-		},
-	}
+	b := newPersonalizationURLBuilder()
+	return &PersonalizationClient{client: c.cloneWithURLBuilder(b)}
 }
 
 func (c *Client) makeStreamError(statusCode int, body io.Reader) error {

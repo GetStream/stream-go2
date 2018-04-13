@@ -54,7 +54,7 @@ func TestUpsertCollectionObjects(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		err := client.UpsertCollectionObjects(tc.collection, tc.objects...)
+		err := client.Collections().Upsert(tc.collection, tc.objects...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
 	}
@@ -80,7 +80,7 @@ func TestGetCollectionObjects(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := client.GetCollectionObjects(tc.collection, tc.ids...)
+		_, err := client.Collections().Get(tc.collection, tc.ids...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.expectedURL, tc.expectedBody)
 	}
@@ -105,7 +105,7 @@ func TestDeleteCollectionObjects(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		err := client.DeleteCollectionObjects(tc.collection, tc.ids...)
+		err := client.Collections().Delete(tc.collection, tc.ids...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodDelete, tc.expectedURL, "")
 	}
