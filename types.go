@@ -235,3 +235,11 @@ type updateToTargetsRequest struct {
 	Adds      []string `json:"added_targets,omitempty"`
 	Removes   []string `json:"removed_targets,omitempty"`
 }
+
+// UnfollowRelationship represents a single follow relationship to remove, used for
+// UnfollowMany requests.
+type UnfollowRelationship struct {
+	Source      string `json:"source"`
+	Target      string `json:"target"`
+	KeepHistory bool   `json:"keep_history"`
+}

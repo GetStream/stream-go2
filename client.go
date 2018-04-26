@@ -123,6 +123,13 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	return err
 }
 
+// UnfollowMany removes multiple follow relationships at once.
+func (c *Client) UnfollowMany(relationships []UnfollowRelationship) error {
+	endpoint := c.makeEndpoint("unfollow_many/")
+	_, err := c.post(endpoint, relationships, c.authenticator.applicationAuth(c.key))
+	return err
+}
+
 // Analytics returns a new AnalyticsClient sharing the base configuration of the original Client.
 func (c *Client) Analytics() *AnalyticsClient {
 	return &AnalyticsClient{
