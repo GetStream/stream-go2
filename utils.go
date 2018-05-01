@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"fmt"
 	"net/url"
 	"reflect"
 	"strconv"
@@ -9,14 +10,18 @@ import (
 )
 
 func decodeJSONStringTimes(f reflect.Type, typ reflect.Type, data interface{}) (interface{}, error) {
-	if f.Kind() != reflect.String {
-		return data, nil
-	}
 	switch typ {
 	case reflect.TypeOf(Time{}):
 		return timeFromString(data.(string))
 	case reflect.TypeOf(Duration{}):
-		return durationFromString(data.(string))
+		switch v := data.(type) {
+		case string:
+			return durationFromString(v)
+		case float64:
+			return durationFromString(fmt.Sprintf("%fs", v))
+		default:
+			return nil, fmt.Errorf("invalid duration")
+		}
 	}
 	return data, nil
 }

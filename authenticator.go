@@ -21,6 +21,8 @@ const (
 	resActivities        resource = "activities"
 	resFeed              resource = "feed"
 	resFeedTargets       resource = "feed_targets"
+	resCollections       resource = "collections"
+	resPersonalization   resource = "personalization"
 	resAnalytics         resource = "analytics"
 	resAnalyticsRedirect resource = "redirect_and_track"
 )
@@ -72,6 +74,26 @@ func (a authenticator) feedAuth(resource resource, feed Feed) authFunc {
 	return func(req *http.Request) error {
 		return a.jwtSignRequest(req, a.jwtFeedClaims(resource, actions[req.Method], a.feedID(feed)))
 	}
+}
+
+func (a authenticator) collectionsAuth(req *http.Request) error {
+	claims := jwt.MapClaims{
+		"action":   "*",
+		"user_id":  "*",
+		"feed_id":  "*",
+		"resource": resCollections,
+	}
+	return a.jwtSignRequest(req, claims)
+}
+
+func (a authenticator) personalizationAuth(req *http.Request) error {
+	claims := jwt.MapClaims{
+		"action":   "*",
+		"user_id":  "*",
+		"feed_id":  "*",
+		"resource": resPersonalization,
+	}
+	return a.jwtSignRequest(req, claims)
 }
 
 func (a authenticator) analyticsAuth(req *http.Request) error {

@@ -48,6 +48,19 @@ func Test_decodeJSONStringTimes(t *testing.T) {
 			data:        "test",
 			shouldError: true,
 		},
+		{
+			f:           reflect.TypeOf(float64(0)),
+			typ:         reflect.TypeOf(Duration{}),
+			data:        float64(42),
+			shouldError: false,
+			expected:    Duration{time.Second * 42},
+		},
+		{
+			f:           reflect.TypeOf(float64(0)),
+			typ:         reflect.TypeOf(Duration{}),
+			data:        struct{}{},
+			shouldError: true,
+		},
 	}
 	for _, tc := range testCases {
 		out, err := decodeJSONStringTimes(tc.f, tc.typ, tc.data)

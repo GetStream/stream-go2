@@ -66,6 +66,19 @@ func (u apiURLBuilder) url() string {
 	return fmt.Sprintf("%s/api/v%s/", u.makeHost("api"), u.makeVersion())
 }
 
+type personalizationURLBuilder struct{}
+
+func newPersonalizationURLBuilder() personalizationURLBuilder {
+	return personalizationURLBuilder{}
+}
+
+func (b personalizationURLBuilder) url() string {
+	if envHost := os.Getenv("STREAM_URL"); envHost != "" {
+		return envHost
+	}
+	return "https://personalization.stream-io-api.com/personalization/v1.0/"
+}
+
 type analyticsURLBuilder struct {
 	regionalURLBuilder
 }
