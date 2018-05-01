@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"testing"
@@ -76,4 +77,22 @@ func TestFollowManyActivityCopyLimit(t *testing.T) {
 	require.NoError(t, err)
 	body = `[{"source":"aggregated:0","target":"flat:123","activity_copy_limit":0},{"source":"aggregated:1","target":"flat:123","activity_copy_limit":1},{"source":"aggregated:2","target":"flat:123","activity_copy_limit":2}]`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/follow_many/?activity_copy_limit=123&api_key=key", body)
+}
+
+func TestUnfollowMany(t *testing.T) {
+	var (
+		client, requester = newClient(t)
+		relationships     = make([]stream.UnfollowRelationship, 3)
+	)
+	for i := range relationships {
+		relationships[i] = stream.UnfollowRelationship{
+			Source:      fmt.Sprintf("src:%d", i),
+			Target:      fmt.Sprintf("tgt:%d", i),
+			KeepHistory: i%2 == 0,
+		}
+	}
+	err := client.UnfollowMany(relationships)
+	require.NoError(t, err)
+	body := `[{"source":"src:0","target":"tgt:0","keep_history":true},{"source":"src:1","target":"tgt:1","keep_history":false},{"source":"src:2","target":"tgt:2","keep_history":true}]`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/unfollow_many/?api_key=key", body)
 }
