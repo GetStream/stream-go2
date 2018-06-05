@@ -251,10 +251,13 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 	if resp.StatusCode/100 != 2 {
 		return nil, c.makeStreamError(resp.StatusCode, resp.Body)
 	}
+	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read response: %s", err)
 	}
+
 	return body, nil
 }
 
