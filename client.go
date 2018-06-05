@@ -34,8 +34,10 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		return nil, errMissingCredentials
 	}
 	c := &Client{
-		key:           key,
-		requester:     &http.Client{},
+		key: key,
+		requester: &http.Client{
+			Transport: &http.Transport{},
+		},
 		authenticator: authenticator{secret: secret},
 	}
 	for _, opt := range opts {
