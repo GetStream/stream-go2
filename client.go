@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 // Client is a Stream API client used for retrieving feeds and performing API
@@ -156,6 +157,42 @@ func (c *Client) Collections() *CollectionsClient {
 func (c *Client) Personalization() *PersonalizationClient {
 	b := newPersonalizationURLBuilder()
 	return &PersonalizationClient{client: c.cloneWithURLBuilder(b)}
+}
+
+// GetActivitiesByID returns activities for the current app having the given IDs.
+func (c *Client) GetActivitiesByID(ids ...string) (*GetActivitiesResponse, error) {
+	return c.getAppActivities(makeRequestOption("ids", strings.Join(ids, ",")))
+}
+
+// GetActivitiesByForeignID returns activities for the current app having the given foreign IDs and timestamps.
+func (c *Client) GetActivitiesByForeignID(values ...ForeignIDTimePair) (*GetActivitiesResponse, error) {
+	foreignIDs := make([]string, len(values))
+	timestamps := make([]string, len(values))
+	for i, v := range values {
+		foreignIDs[i] = v.ForeignID
+		timestamps[i] = v.Timestamp.Format(TimeLayout)
+	}
+	return c.getAppActivities(
+		makeRequestOption("foreign_ids", strings.Join(foreignIDs, ",")),
+		makeRequestOption("timestamps", strings.Join(timestamps, ",")),
+	)
+}
+
+func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, error) {
+	endpoint := c.makeEndpoint("activities/")
+	for _, v := range values {
+		endpoint.addQueryParam(v)
+	}
+	data, err := c.get(endpoint, nil, c.authenticator.feedAuth(resActivities, nil))
+	if err != nil {
+		return nil, err
+	}
+	var resp GetActivitiesResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func (c *Client) makeStreamError(statusCode int, body io.Reader) error {

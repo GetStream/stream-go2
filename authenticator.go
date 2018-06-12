@@ -72,7 +72,13 @@ func (a authenticator) feedID(feed Feed) string {
 
 func (a authenticator) feedAuth(resource resource, feed Feed) authFunc {
 	return func(req *http.Request) error {
-		return a.jwtSignRequest(req, a.jwtFeedClaims(resource, actions[req.Method], a.feedID(feed)))
+		var feedID string
+		if feed != nil {
+			feedID = a.feedID(feed)
+		} else {
+			feedID = "*"
+		}
+		return a.jwtSignRequest(req, a.jwtFeedClaims(resource, actions[req.Method], feedID))
 	}
 }
 

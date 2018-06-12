@@ -342,3 +342,24 @@ func (r *PersonalizationResponse) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
+
+// GetActivitiesResponse contains a slice of Activity returned by GetActivitiesByID
+// and GetActivitiesByForeignID requests.
+type GetActivitiesResponse struct {
+	response
+	Results []Activity `json:"results"`
+}
+
+// ForeignIDTimePair couples an activity's foreignID and timestamp.
+type ForeignIDTimePair struct {
+	ForeignID string
+	Timestamp Time
+}
+
+// NewForeignIDTimePair creates a new ForeignIDTimePair with the given foreign ID and timestamp.
+func NewForeignIDTimePair(foreignID string, timestamp Time) ForeignIDTimePair {
+	return ForeignIDTimePair{
+		ForeignID: foreignID,
+		Timestamp: timestamp,
+	}
+}
