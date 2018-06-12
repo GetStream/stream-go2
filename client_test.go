@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 
 	stream "github.com/GetStream/stream-go2"
 	"github.com/stretchr/testify/assert"
@@ -95,4 +96,16 @@ func TestUnfollowMany(t *testing.T) {
 	require.NoError(t, err)
 	body := `[{"source":"src:0","target":"tgt:0","keep_history":true},{"source":"src:1","target":"tgt:1","keep_history":false},{"source":"src:2","target":"tgt:2","keep_history":true}]`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/unfollow_many/?api_key=key", body)
+}
+
+func TestGetActivities(t *testing.T) {
+	client, requester := newClient(t)
+	_, err := client.GetActivitiesByID("foo", "bar", "baz")
+	require.NoError(t, err)
+	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/activities/?api_key=key&ids=foo%2Cbar%2Cbaz", "")
+	_, err = client.GetActivitiesByForeignID(
+		stream.NewForeignIDTimePair("foo", stream.Time{}),
+		stream.NewForeignIDTimePair("bar", stream.Time{Time: time.Time{}.Add(time.Second)}),
+	)
+	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/activities/?api_key=key&foreign_ids=foo%2Cbar&timestamps=0001-01-01T00%3A00%3A00%2C0001-01-01T00%3A00%3A01", "")
 }
