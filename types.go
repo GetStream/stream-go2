@@ -363,7 +363,7 @@ func NewForeignIDTimePair(foreignID string, timestamp Time) ForeignIDTimePair {
 	}
 }
 
-type UpdateActivityRequest struct {
+type updateActivityRequest struct {
 	ID        *string                `json:"id,omitempty"`
 	ForeignID *string                `json:"foreign_id,omitempty"`
 	Time      *Time                  `json:"time,omitempty"`
@@ -371,6 +371,8 @@ type UpdateActivityRequest struct {
 	Unset     []string               `json:"unset,omitempty"`
 }
 
+// UpdateActivityResponse is the response returned by the UpdateActivityByID and
+// UpdateActivityByForeignID methods.
 type UpdateActivityResponse struct {
 	Activity
 }
