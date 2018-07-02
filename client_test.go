@@ -109,3 +109,43 @@ func TestGetActivities(t *testing.T) {
 	)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/activities/?api_key=key&foreign_ids=foo%2Cbar&timestamps=0001-01-01T00%3A00%3A00%2C0001-01-01T00%3A00%3A01", "")
 }
+
+func TestUpdateActivityByID(t *testing.T) {
+	client, requester := newClient(t)
+
+	_, err := client.UpdateActivityByID("abcdef", map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, []string{"a", "b", "c"})
+	require.NoError(t, err)
+	body := `{"id":"abcdef","set":{"color":{"hex":"FF0000","rgb":"255,0,0"},"foo.bar":"baz","popularity":42},"unset":["a","b","c"]}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+
+	_, err = client.UpdateActivityByID("abcdef", map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, nil)
+	require.NoError(t, err)
+	body = `{"id":"abcdef","set":{"color":{"hex":"FF0000","rgb":"255,0,0"},"foo.bar":"baz","popularity":42}}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+
+	_, err = client.UpdateActivityByID("abcdef", nil, []string{"a", "b", "c"})
+	require.NoError(t, err)
+	body = `{"id":"abcdef","unset":["a","b","c"]}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+}
+
+func TestUpdateActivityByForeignID(t *testing.T) {
+	client, requester := newClient(t)
+
+	tt := stream.Time{Time: time.Date(2018, 06, 24, 11, 28, 0, 0, time.UTC)}
+
+	_, err := client.UpdateActivityByForeignID("fid:123", tt, map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, []string{"a", "b", "c"})
+	require.NoError(t, err)
+	body := `{"foreign_id":"fid:123","time":"2018-06-24T11:28:00","set":{"color":{"hex":"FF0000","rgb":"255,0,0"},"foo.bar":"baz","popularity":42},"unset":["a","b","c"]}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+
+	_, err = client.UpdateActivityByForeignID("fid:123", tt, map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, nil)
+	require.NoError(t, err)
+	body = `{"foreign_id":"fid:123","time":"2018-06-24T11:28:00","set":{"color":{"hex":"FF0000","rgb":"255,0,0"},"foo.bar":"baz","popularity":42}}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+
+	_, err = client.UpdateActivityByForeignID("fid:123", tt, nil, []string{"a", "b", "c"})
+	require.NoError(t, err)
+	body = `{"foreign_id":"fid:123","time":"2018-06-24T11:28:00","unset":["a","b","c"]}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+}
