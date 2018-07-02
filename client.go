@@ -195,6 +195,45 @@ func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, err
 	return &resp, nil
 }
 
+// UpdateActivityByID performs a partial activity update with the given set and unset operations, returning the
+// affected activity, on the activity with the given ID.
+func (c *Client) UpdateActivityByID(id string, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
+	return c.updateActivity(updateActivityRequest{
+		ID:    &id,
+		Set:   set,
+		Unset: unset,
+	})
+}
+
+// UpdateActivityByForeignID performs a partial activity update with the given set and unset operations, returning the
+// affected activity, on the activity with the given foreign ID and timestamp.
+func (c *Client) UpdateActivityByForeignID(foreignID string, timestamp Time, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
+	return c.updateActivity(updateActivityRequest{
+		ForeignID: &foreignID,
+		Time:      &timestamp,
+		Set:       set,
+		Unset:     unset,
+	})
+}
+
+func (c *Client) updateActivity(req updateActivityRequest) (*UpdateActivityResponse, error) {
+	endpoint := c.makeEndpoint("activity/")
+	data, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
+	if err != nil {
+		return nil, err
+	}
+	var resp UpdateActivityResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return nil, err
+	}
+	_, ok := resp.Extra["duration"].(string)
+	if ok {
+		delete(resp.Extra, "duration")
+	}
+	return &resp, nil
+}
+
 func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
 	if body == nil {
 		return fmt.Errorf("invalid body")
@@ -330,13 +369,9 @@ func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse
 	if err := json.Unmarshal(resp, &out); err != nil {
 		return nil, err
 	}
-	dur, ok := out.Extra["duration"].(string)
+	_, ok := out.Extra["duration"].(string)
 	if ok {
 		delete(out.Extra, "duration")
-		out.Duration, err = durationFromString(dur)
-		if err != nil {
-			return nil, err
-		}
 	}
 	return &out, nil
 }

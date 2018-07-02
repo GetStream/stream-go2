@@ -174,7 +174,6 @@ type NotificationFeedResult struct {
 // AddActivityResponse is the API response obtained when adding a single activity
 // to a feed.
 type AddActivityResponse struct {
-	response
 	Activity
 }
 
@@ -362,4 +361,18 @@ func NewForeignIDTimePair(foreignID string, timestamp Time) ForeignIDTimePair {
 		ForeignID: foreignID,
 		Timestamp: timestamp,
 	}
+}
+
+type updateActivityRequest struct {
+	ID        *string                `json:"id,omitempty"`
+	ForeignID *string                `json:"foreign_id,omitempty"`
+	Time      *Time                  `json:"time,omitempty"`
+	Set       map[string]interface{} `json:"set,omitempty"`
+	Unset     []string               `json:"unset,omitempty"`
+}
+
+// UpdateActivityResponse is the response returned by the UpdateActivityByID and
+// UpdateActivityByForeignID methods.
+type UpdateActivityResponse struct {
+	Activity
 }
