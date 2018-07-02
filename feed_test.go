@@ -30,10 +30,6 @@ func TestAddActivity(t *testing.T) {
 	body := `{"actor":"bob","object":"ice-cream","to":["flat:456 BpEkhYaXtVxbITXiIcpdYWVL9T8"],"verb":"like"}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key", body)
 
-	requester.resp = `{"duration": "something-broken"}`
-	_, err = flat.AddActivity(bobActivity)
-	require.Error(t, err)
-
 	requester.resp = `{"duration": "1ms"}`
 	_, err = flat.AddActivity(bobActivity)
 	require.NoError(t, err)
