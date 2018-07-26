@@ -295,7 +295,7 @@ type selectCollectionResponseObject struct {
 
 func (o selectCollectionResponseObject) toCollectionObject() CollectionObject {
 	parts := strings.SplitN(o.ForeignID, ":", 2)
-	id, name := parts[0], parts[1]
+	name, id := parts[0], parts[1]
 	return CollectionObject{
 		ID:   id,
 		Name: name,
