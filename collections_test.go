@@ -21,9 +21,9 @@ func TestUpsertCollectionObjects(t *testing.T) {
 			collection: "test-single",
 			objects: []stream.CollectionObject{
 				stream.CollectionObject{
-					ID:   "1",
-					Name: "Juniper",
+					ID: "1",
 					Data: map[string]interface{}{
+						"name":    "Juniper",
 						"hobbies": []string{"playing", "sleeping", "eating"},
 					},
 				},
@@ -35,16 +35,16 @@ func TestUpsertCollectionObjects(t *testing.T) {
 			collection: "test-many",
 			objects: []stream.CollectionObject{
 				stream.CollectionObject{
-					ID:   "1",
-					Name: "Juniper",
+					ID: "1",
 					Data: map[string]interface{}{
+						"name":    "Juniper",
 						"hobbies": []string{"playing", "sleeping", "eating"},
 					},
 				},
 				stream.CollectionObject{
-					ID:   "2",
-					Name: "Ruby",
+					ID: "2",
 					Data: map[string]interface{}{
+						"name":      "Ruby",
 						"interests": []string{"sunbeams", "surprise attacks"},
 					},
 				},

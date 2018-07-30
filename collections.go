@@ -27,7 +27,7 @@ func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObjec
 
 // Get returns a list of CollectionObjects for the given collection name
 // having the given IDs.
-func (c *CollectionsClient) Get(collection string, ids ...string) ([]CollectionObject, error) {
+func (c *CollectionsClient) Get(collection string, ids ...string) ([]SelectCollectionResponseObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
 	}
@@ -41,16 +41,12 @@ func (c *CollectionsClient) Get(collection string, ids ...string) ([]CollectionO
 	if err != nil {
 		return nil, err
 	}
-	var selectResp selectCollectionResponse
+	var selectResp selectCollectionResponseWrap
 	err = json.Unmarshal(resp, &selectResp)
 	if err != nil {
 		return nil, err
 	}
-	objects := make([]CollectionObject, len(selectResp.Response.Data))
-	for i, obj := range selectResp.Response.Data {
-		objects[i] = obj.toCollectionObject()
-	}
-	return objects, nil
+	return selectResp.Response.Data, nil
 }
 
 // Delete removes from a collection the objects having the given IDs.

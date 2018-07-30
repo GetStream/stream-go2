@@ -264,15 +264,13 @@ type UnfollowRelationship struct {
 // CollectionObject is a collection's object.
 type CollectionObject struct {
 	ID   string
-	Name string
 	Data map[string]interface{}
 }
 
 // MarshalJSON marshals the CollectionObject to a flat JSON object.
 func (o CollectionObject) MarshalJSON() ([]byte, error) {
 	m := map[string]interface{}{
-		"id":   o.ID,
-		"name": o.Name,
+		"id": o.ID,
 	}
 	for k, v := range o.Data {
 		m[k] = v
@@ -280,27 +278,19 @@ func (o CollectionObject) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
+type selectCollectionResponseWrap struct {
+	Response selectCollectionResponse `json:"response"`
+}
+
 type selectCollectionResponse struct {
-	Response selectCollectionResponseData `json:"response"`
+	Data []SelectCollectionResponseObject `json:"data"`
 }
 
-type selectCollectionResponseData struct {
-	Data []selectCollectionResponseObject `json:"data"`
-}
-
-type selectCollectionResponseObject struct {
+// SelectCollectionResponseObject represent a single response coming from a Collection
+// Get request after a CollectionsClient.Get call.
+type SelectCollectionResponseObject struct {
 	ForeignID string                 `json:"foreign_id"`
 	Data      map[string]interface{} `json:"data"`
-}
-
-func (o selectCollectionResponseObject) toCollectionObject() CollectionObject {
-	parts := strings.SplitN(o.ForeignID, ":", 2)
-	name, id := parts[0], parts[1]
-	return CollectionObject{
-		ID:   id,
-		Name: name,
-		Data: o.Data,
-	}
 }
 
 // PersonalizationResponse is a generic response from the personalization endpoints
