@@ -27,7 +27,7 @@ func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObjec
 
 // Get returns a list of CollectionObjects for the given collection name
 // having the given IDs.
-func (c *CollectionsClient) Get(collection string, ids ...string) ([]SelectCollectionResponseObject, error) {
+func (c *CollectionsClient) Get(collection string, ids ...string) ([]GetCollectionResponseObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
 	}
@@ -41,7 +41,7 @@ func (c *CollectionsClient) Get(collection string, ids ...string) ([]SelectColle
 	if err != nil {
 		return nil, err
 	}
-	var selectResp selectCollectionResponseWrap
+	var selectResp getCollectionResponseWrap
 	err = json.Unmarshal(resp, &selectResp)
 	if err != nil {
 		return nil, err

@@ -278,17 +278,17 @@ func (o CollectionObject) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
-type selectCollectionResponseWrap struct {
-	Response selectCollectionResponse `json:"response"`
+type getCollectionResponseWrap struct {
+	Response getCollectionResponse `json:"response"`
 }
 
-type selectCollectionResponse struct {
-	Data []SelectCollectionResponseObject `json:"data"`
+type getCollectionResponse struct {
+	Data []GetCollectionResponseObject `json:"data"`
 }
 
-// SelectCollectionResponseObject represent a single response coming from a Collection
+// GetCollectionResponseObject represent a single response coming from a Collection
 // Get request after a CollectionsClient.Get call.
-type SelectCollectionResponseObject struct {
+type GetCollectionResponseObject struct {
 	ForeignID string                 `json:"foreign_id"`
 	Data      map[string]interface{} `json:"data"`
 }
