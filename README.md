@@ -26,6 +26,7 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
   * [Followers](#followers)
 * [Unfollow](#unfollowing-a-feed)
 * [Update `to` targets](#updating-an-activitys-to-targets)
+* [Updating parts of an activity](#updating-parts-of-an-activity)
 * [Batch activities](#batch-adding-activities)
 * [Batch follows](#batch-creating-follows)
 * [Realtime tokens](#realtime-tokens)
@@ -347,6 +348,37 @@ if err != nil {
 
 Note: you can't mix `stream.WithToTargetsNew` with `stream.WithToTargetsAdd` or `stream.WithToTargetsRemove`.
 
+### Updating parts of an activity
+It's possible to update some parts of an activity, referencing it either via ID or the combination of foreign ID and time,
+ providing the *partial update* changes with the `set` map and `unset` list of operations.
+
+```go
+// prepare the set operations
+set := map[string]interface{}{
+    "product.price": 19.99,
+    "shares": map[string]interface{}{
+        "facebook": "...",
+        "twitter": "...",
+    },
+}
+// prepare the unset operations
+unset := []string{"daily_likes", "popularity"}
+
+// update by ID
+id := "54a60c1e-4ee3-494b-a1e3-50c06acb5ed4"
+resp, err := client.UpdateActivityByID(id, set, unset)
+if err != nil {
+    // ...
+}
+
+// update by combination of foreign ID and time
+foreignID := "product:123"
+timestamp := stream.Time{/*...*/}
+resp, err := client.UpdateActivityByForeignID(foreignID, timestamp, set, unset)
+if err != nil {
+    // ...
+}
+```
 
 ### Batch adding activities
 You can add the same activities to multiple feeds at once with the `(*Client).AddToMany` method ([docs](https://getstream.io/docs_rest/#add_to_many)):
