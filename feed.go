@@ -10,7 +10,6 @@ type Feed interface {
 	UserID() string
 	AddActivity(Activity) (*AddActivityResponse, error)
 	AddActivities(...Activity) (*AddActivitiesResponse, error)
-	UpdateActivities(...Activity) error
 	RemoveActivityByID(string) error
 	RemoveActivityByForeignID(string) error
 	Follow(*FlatFeed, ...FollowFeedOption) error
@@ -53,11 +52,6 @@ func (f *feed) AddActivity(activity Activity) (*AddActivityResponse, error) {
 // AddActivities adds multiple activities to the feed.
 func (f *feed) AddActivities(activities ...Activity) (*AddActivitiesResponse, error) {
 	return f.client.addActivities(f, activities...)
-}
-
-// UpdateActivities updates existing activities in the feed.
-func (f *feed) UpdateActivities(activities ...Activity) error {
-	return f.client.updateActivities(activities...)
 }
 
 // RemoveActivityByID removes an activity from the feed (if present), using the provided

@@ -51,7 +51,6 @@ func TestAddActivities(t *testing.T) {
 func TestUpdateActivities(t *testing.T) {
 	var (
 		client, requester = newClient(t)
-		flat              = newFlatFeedWithUserID(client, "123")
 		now               = getTime(time.Now())
 		bobActivity       = stream.Activity{
 			Actor:     "bob",
@@ -62,7 +61,7 @@ func TestUpdateActivities(t *testing.T) {
 			Extra:     map[string]interface{}{"influence": 42},
 		}
 	)
-	err := flat.UpdateActivities(bobActivity)
+	err := client.UpdateActivities(bobActivity)
 	require.NoError(t, err)
 
 	body := fmt.Sprintf(`{"activities":[{"actor":"bob","foreign_id":"bob:123","influence":42,"object":"ice-cream","time":"%s","verb":"like"}]}`, now.Format(stream.TimeLayout))
