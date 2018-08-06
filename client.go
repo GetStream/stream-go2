@@ -195,6 +195,19 @@ func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, err
 	return &resp, nil
 }
 
+// UpdateActivities updates existing activities.
+func (c *Client) UpdateActivities(activities ...Activity) error {
+	signedActivities := c.signActivities(activities)
+	req := struct {
+		Activities []Activity `json:"activities,omitempty"`
+	}{
+		Activities: signedActivities,
+	}
+	endpoint := c.makeEndpoint("activities/")
+	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
+	return err
+}
+
 // UpdateActivityByID performs a partial activity update with the given set and unset operations, returning the
 // affected activity, on the activity with the given ID.
 func (c *Client) UpdateActivityByID(id string, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
@@ -393,18 +406,6 @@ func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitie
 		return nil, fmt.Errorf("cannot unmarshal response: %s", err)
 	}
 	return &out, nil
-}
-
-func (c *Client) updateActivities(activities ...Activity) error {
-	signedActivities := c.signActivities(activities)
-	req := struct {
-		Activities []Activity `json:"activities,omitempty"`
-	}{
-		Activities: signedActivities,
-	}
-	endpoint := c.makeEndpoint("activities/")
-	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
-	return err
 }
 
 func (c *Client) removeActivityByID(feed Feed, activityID string) error {
