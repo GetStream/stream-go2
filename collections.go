@@ -62,10 +62,12 @@ func (c *CollectionsClient) Delete(collection string, ids ...string) error {
 	return err
 }
 
+// CreateReference returns a new reference string in the form SO:<collection>:<id>.
 func (c *CollectionsClient) CreateReference(collection, id string) string {
 	return fmt.Sprintf("SO:%s:%s", collection, id)
 }
 
+// CreateUserReference is a shorthand for CreateReference, returning a new reference string in the form SO:user:<id>.
 func (c *CollectionsClient) CreateUserReference(id string) string {
 	return c.CreateReference("user", id)
 }
