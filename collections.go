@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// CollectionsClient is a specialized client used to interact with the Collection endpoints.
 type CollectionsClient struct {
 	client *Client
 }

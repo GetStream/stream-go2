@@ -148,6 +148,7 @@ func (c *Client) Analytics() *AnalyticsClient {
 	return &AnalyticsClient{client: c.cloneWithURLBuilder(b)}
 }
 
+// Collections returns a new CollectionsClient.
 func (c *Client) Collections() *CollectionsClient {
 	b := newAPIURLBuilder(c.region, c.version)
 	return &CollectionsClient{client: c.cloneWithURLBuilder(b)}

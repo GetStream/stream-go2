@@ -162,7 +162,7 @@ func Test_makeStreamError(t *testing.T) {
 				Exception:  "boom",
 				StatusCode: 456,
 				ExceptionFields: map[string][]interface{}{
-					"foo": []interface{}{"bar"},
+					"foo": {"bar"},
 				},
 			},
 		},
