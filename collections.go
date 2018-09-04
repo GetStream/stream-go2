@@ -60,3 +60,11 @@ func (c *CollectionsClient) Delete(collection string, ids ...string) error {
 	_, err := c.client.delete(endpoint, nil, c.client.authenticator.collectionsAuth)
 	return err
 }
+
+func (c *CollectionsClient) CreateReference(collection, id string) string {
+	return fmt.Sprintf("SO:%s:%s", collection, id)
+}
+
+func (c *CollectionsClient) CreateUserReference(id string) string {
+	return c.CreateReference("user", id)
+}
