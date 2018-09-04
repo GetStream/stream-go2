@@ -6,8 +6,17 @@ import (
 	"testing"
 
 	stream "github.com/GetStream/stream-go2"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestRefHelpers(t *testing.T) {
+	client, _ := newClient(t)
+	ref := client.Collections().CreateReference("foo", "bar")
+	assert.Equal(t, "SO:foo:bar", ref)
+	userRef := client.Collections().CreateUserReference("baz")
+	assert.Equal(t, "SO:user:baz", userRef)
+}
 
 func TestUpsertCollectionObjects(t *testing.T) {
 	client, requester := newClient(t)
