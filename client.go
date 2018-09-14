@@ -112,7 +112,7 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 		Activity: activity,
 		FeedIDs:  ids,
 	}
-	_, err := c.post(endpoint, req, c.authenticator.applicationAuth(c.key))
+	_, err := c.post(endpoint, req, c.authenticator.jwtAuth(resFeed, "*"))
 	return err
 }
 
@@ -122,14 +122,14 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
-	_, err := c.post(endpoint, relationships, c.authenticator.applicationAuth(c.key))
+	_, err := c.post(endpoint, relationships, c.authenticator.jwtAuth(resFollower, "*"))
 	return err
 }
 
 // UnfollowMany removes multiple follow relationships at once.
 func (c *Client) UnfollowMany(relationships []UnfollowRelationship) error {
 	endpoint := c.makeEndpoint("unfollow_many/")
-	_, err := c.post(endpoint, relationships, c.authenticator.applicationAuth(c.key))
+	_, err := c.post(endpoint, relationships, c.authenticator.jwtAuth(resFollower, "*"))
 	return err
 }
 
@@ -184,7 +184,7 @@ func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, err
 	for _, v := range values {
 		endpoint.addQueryParam(v)
 	}
-	data, err := c.get(endpoint, nil, c.authenticator.feedAuth(resActivities, nil))
+	data, err := c.get(endpoint, nil, c.authenticator.jwtAuth(resActivities, "*"))
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (c *Client) UpdateActivities(activities ...Activity) error {
 		Activities: signedActivities,
 	}
 	endpoint := c.makeEndpoint("activities/")
-	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
+	_, err := c.post(endpoint, req, c.authenticator.jwtAuth(resActivities, "*"))
 	return err
 }
 
@@ -232,7 +232,7 @@ func (c *Client) UpdateActivityByForeignID(foreignID string, timestamp Time, set
 
 func (c *Client) updateActivity(req updateActivityRequest) (*UpdateActivityResponse, error) {
 	endpoint := c.makeEndpoint("activity/")
-	data, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
+	data, err := c.post(endpoint, req, c.authenticator.jwtAuth(resActivities, "*"))
 	if err != nil {
 		return nil, err
 	}
@@ -375,7 +375,7 @@ func (c *Client) signActivities(activities []Activity) []Activity {
 func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
 	signedActivity := c.signActivity(activity)
-	resp, err := c.post(endpoint, signedActivity, c.authenticator.feedAuth(resFeed, feed))
+	resp, err := c.post(endpoint, signedActivity, c.authenticator.jwtAuth(resFeed, c.authenticator.feedID(feed)))
 	if err != nil {
 		return nil, err
 	}
@@ -398,7 +398,7 @@ func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitie
 		Activities: signedActivities,
 	}
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
-	resp, err := c.post(endpoint, reqBody, c.authenticator.feedAuth(resFeed, feed))
+	resp, err := c.post(endpoint, reqBody, c.authenticator.jwtAuth(resFeed, c.authenticator.feedID(feed)))
 	if err != nil {
 		return nil, err
 	}
@@ -411,14 +411,14 @@ func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitie
 
 func (c *Client) removeActivityByID(feed Feed, activityID string) error {
 	endpoint := c.makeEndpoint("feed/%s/%s/%s/", feed.Slug(), feed.UserID(), activityID)
-	_, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
+	_, err := c.delete(endpoint, nil, c.authenticator.jwtAuth(resFeed, c.authenticator.feedID(feed)))
 	return err
 }
 
 func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) error {
 	endpoint := c.makeEndpoint("feed/%s/%s/%s/", feed.Slug(), feed.UserID(), foreignID)
 	endpoint.addQueryParam(makeRequestOption("foreign_id", 1))
-	_, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
+	_, err := c.delete(endpoint, nil, c.authenticator.jwtAuth(resFeed, c.authenticator.feedID(feed)))
 	return err
 }
 
@@ -427,12 +427,12 @@ func (c *Client) getActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, 
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
-	return c.get(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
+	return c.get(endpoint, nil, c.authenticator.jwtAuth(resFeed, c.authenticator.feedID(feed)))
 }
 
 func (c *Client) follow(feed Feed, opts *followFeedOptions) error {
 	endpoint := c.makeEndpoint("feed/%s/%s/follows/", feed.Slug(), feed.UserID())
-	_, err := c.post(endpoint, opts, c.authenticator.feedAuth(resFollower, feed))
+	_, err := c.post(endpoint, opts, c.authenticator.jwtAuth(resFollower, c.authenticator.feedID(feed)))
 	return err
 }
 
@@ -442,7 +442,7 @@ func (c *Client) getFollowers(feed Feed, opts ...FollowersOption) (*FollowersRes
 		endpoint.addQueryParam(opt)
 	}
 
-	resp, err := c.get(endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
+	resp, err := c.get(endpoint, nil, c.authenticator.jwtAuth(resFollower, c.authenticator.feedID(feed)))
 	if err != nil {
 		return nil, err
 	}
@@ -459,7 +459,7 @@ func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingRes
 		endpoint.addQueryParam(opt)
 	}
 
-	resp, err := c.get(endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
+	resp, err := c.get(endpoint, nil, c.authenticator.jwtAuth(resFollower, "*"))
 	if err != nil {
 		return nil, err
 	}
@@ -476,7 +476,7 @@ func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) erro
 		endpoint.addQueryParam(opt)
 	}
 
-	_, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
+	_, err := c.delete(endpoint, nil, c.authenticator.jwtAuth(resFollower, "*"))
 	return err
 }
 
@@ -491,6 +491,6 @@ func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToT
 		opt(req)
 	}
 
-	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resFeedTargets, feed))
+	_, err := c.post(endpoint, req, c.authenticator.jwtAuth(resFeedTargets, c.authenticator.feedID(feed)))
 	return err
 }

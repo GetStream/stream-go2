@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	httpsig "gopkg.in/LeisureLink/httpsig.v1"
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 )
 
@@ -70,15 +69,9 @@ func (a authenticator) feedID(feed Feed) string {
 	return fmt.Sprintf("%s%s", feed.Slug(), feed.UserID())
 }
 
-func (a authenticator) feedAuth(resource resource, feed Feed) authFunc {
+func (a authenticator) jwtAuth(res resource, v string) authFunc {
 	return func(req *http.Request) error {
-		var feedID string
-		if feed != nil {
-			feedID = a.feedID(feed)
-		} else {
-			feedID = "*"
-		}
-		return a.jwtSignRequest(req, a.jwtFeedClaims(resource, actions[req.Method], feedID))
+		return a.jwtSignRequest(req, a.jwtFeedClaims(res, actions[req.Method], v))
 	}
 }
 
@@ -124,16 +117,6 @@ func (a authenticator) signAnalyticsRedirectEndpoint(endpoint *endpoint) error {
 	endpoint.addQueryParam(makeRequestOption("stream-auth-type", "jwt"))
 	endpoint.addQueryParam(makeRequestOption("authorization", signature))
 	return nil
-}
-func (a authenticator) applicationAuth(key string) authFunc {
-	return func(req *http.Request) error {
-		req.Header.Set("X-API-Key", key)
-		signer, err := httpsig.NewRequestSigner(key, a.secret, "hmac-sha256")
-		if err != nil {
-			return fmt.Errorf("cannot sign request: %s", err)
-		}
-		return signer.SignRequest(req, []string{}, nil)
-	}
 }
 
 func (a authenticator) jwtSignatureFromClaims(claims jwt.MapClaims) (string, error) {
