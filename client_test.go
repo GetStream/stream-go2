@@ -10,6 +10,7 @@ import (
 	stream "github.com/GetStream/stream-go2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 )
 
 func TestHeaders(t *testing.T) {
@@ -149,4 +150,24 @@ func TestUpdateActivityByForeignID(t *testing.T) {
 	require.NoError(t, err)
 	body = `{"foreign_id":"fid:123","time":"2018-06-24T11:28:00","unset":["a","b","c"]}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+}
+
+func TestUserSessionToken(t *testing.T) {
+	client, _ := newClient(t)
+	tokenString, err := client.GetUserSessionToken("user")
+	require.NoError(t, err)
+	assert.Equal(t, tokenString, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidXNlciJ9.0Kiui6HUywyU-C-00E68n1iq_3o7Eh0aE5VGSOc3pU4")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {return []byte("secret"), nil})
+	assert.Equal(t, true, token.Valid)
+	assert.Equal(t, token.Claims, jwt.MapClaims{"user_id": "user"})
+}
+
+func TestUserSessionTokenWithClaims(t *testing.T) {
+ 	client, _ := newClient(t)
+	tokenString, err := client.GetUserSessionTokenWithClaims("user", map[string]interface{}{"client": "go",})
+	require.NoError(t, err)
+	assert.Equal(t, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJnbyIsInVzZXJfaWQiOiJ1c2VyIn0.Us6UIuH83dJe1cXQIiudseFz9-1kVMr6-SL6-idzIB0", tokenString)
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {return []byte("secret"), nil})
+	assert.Equal(t, true, token.Valid)
+	assert.Equal(t, token.Claims, jwt.MapClaims{"user_id": "user", "client": "go"})
 }
