@@ -500,7 +500,6 @@ func (c *Client) GetUserSessionToken(userID string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 	}
-	fmt.Printf("CLAIMS: %v\n", claims)
 	return c.authenticator.jwtSignatureFromClaims(claims)
 }
 

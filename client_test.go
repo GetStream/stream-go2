@@ -163,7 +163,7 @@ func TestUserSessionToken(t *testing.T) {
 }
 
 func TestUserSessionTokenWithClaims(t *testing.T) {
- 	client, _ := newClient(t)
+	client, _ := newClient(t)
 	tokenString, err := client.GetUserSessionTokenWithClaims("user", map[string]interface{}{"client": "go",})
 	require.NoError(t, err)
 	assert.Equal(t, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJnbyIsInVzZXJfaWQiOiJ1c2VyIn0.Us6UIuH83dJe1cXQIiudseFz9-1kVMr6-SL6-idzIB0", tokenString)
