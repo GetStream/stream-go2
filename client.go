@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 )
 
 // Client is a Stream API client used for retrieving feeds and performing API
@@ -493,4 +494,20 @@ func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToT
 
 	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resFeedTargets, feed))
 	return err
+}
+
+func (c *Client) GetUserSessionToken(userID string) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": userID,
+	}
+	return c.authenticator.jwtSignatureFromClaims(claims)
+}
+
+func (c *Client) GetUserSessionTokenWithClaims(userID string, claims map[string]interface{}) (string, error) {
+	claims["user_id"] = userID
+	jwtclaims := jwt.MapClaims{}
+	for k, v := range claims {
+		jwtclaims[k] = v
+	}
+	return c.authenticator.jwtSignatureFromClaims(jwtclaims)
 }
