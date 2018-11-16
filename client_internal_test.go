@@ -153,14 +153,14 @@ func Test_makeStreamError(t *testing.T) {
 			expected: fmt.Errorf("unexpected error (status code 123)"),
 		},
 		{
-			body:     strings.NewReader(`{"code":123, "detail":"test", "duration": "1m2s", "exception": "boom", "status_code": 456, "exception_fields": {"foo":["bar"]}}`),
+			body:     strings.NewReader(`{"code":1, "detail":"test", "duration": "1m2s", "exception": "boom", "status_code": 456, "exception_fields": {"foo":["bar"]}}`),
 			expected: fmt.Errorf("test"),
 			apiErr: APIError{
-				Code:       123,
+				Code:       1,
 				Detail:     "test",
 				Duration:   Duration{time.Minute + time.Second*2},
 				Exception:  "boom",
-				StatusCode: 456,
+				StatusCode: 123,
 				ExceptionFields: map[string][]interface{}{
 					"foo": {"bar"},
 				},
