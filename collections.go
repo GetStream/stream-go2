@@ -28,7 +28,7 @@ func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObjec
 
 // Get returns a list of CollectionObjects for the given collection name
 // having the given IDs.
-func (c *CollectionsClient) Get(collection string, ids ...string) ([]GetCollectionResponseObject, error) {
+func (c *CollectionsClient) Select(collection string, ids ...string) ([]GetCollectionResponseObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
 	}
@@ -51,7 +51,7 @@ func (c *CollectionsClient) Get(collection string, ids ...string) ([]GetCollecti
 }
 
 // Delete removes from a collection the objects having the given IDs.
-func (c *CollectionsClient) Delete(collection string, ids ...string) error {
+func (c *CollectionsClient) DeleteMany(collection string, ids ...string) error {
 	if collection == "" {
 		return fmt.Errorf("collection name required")
 	}
@@ -91,7 +91,7 @@ func (c *CollectionsClient) Add(collection string, object CollectionObject, opts
 }
 
 //GetOne retrives a collection obejct having the given ID.
-func (c *CollectionsClient) GetOne(collection string, id string) (*CollectionObject, error) {
+func (c *CollectionsClient) Get(collection string, id string) (*CollectionObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
 	}
@@ -132,7 +132,7 @@ func (c *CollectionsClient) Update(collection string, id string, data map[string
 }
 
 // DeleteOne removes from a collection the object having the given ID.
-func (c *CollectionsClient) DeleteOne(collection string, id string) error {
+func (c *CollectionsClient) Delete(collection string, id string) error {
 	if collection == "" {
 		return fmt.Errorf("collection name required")
 	}
@@ -145,10 +145,4 @@ func (c *CollectionsClient) DeleteOne(collection string, id string) error {
 // CreateReference returns a new reference string in the form SO:<collection>:<id>.
 func (c *CollectionsClient) CreateReference(collection, id string) string {
 	return fmt.Sprintf("SO:%s:%s", collection, id)
-}
-
-// CreateUserReference is a shorthand for CreateReference, returning a new reference string in the form SO:user:<id>.
-//TODO: redirect this to users
-func (c *CollectionsClient) CreateUserReference(id string) string {
-	return ""
 }
