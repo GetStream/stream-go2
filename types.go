@@ -310,7 +310,8 @@ type GetCollectionResponseObject struct {
 	Data      map[string]interface{} `json:"data"`
 }
 
-type UserObject struct {
+//User represents a user
+type User struct {
 	ID   string                 `json:"id"`
 	Data map[string]interface{} `json:"data,omitempty"`
 }

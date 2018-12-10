@@ -11,7 +11,7 @@ type UsersClient struct {
 }
 
 // Add adds a new user with the specified id and optional extra data.
-func (c *UsersClient) Add(user UserObject, getOrCreate bool) (*UserObject, error) {
+func (c *UsersClient) Add(user User, getOrCreate bool) (*User, error) {
 	endpoint := c.client.makeEndpoint("user/")
 	endpoint.addQueryParam(makeRequestOption("get_or_create", getOrCreate))
 
@@ -20,7 +20,7 @@ func (c *UsersClient) Add(user UserObject, getOrCreate bool) (*UserObject, error
 		return nil, err
 	}
 
-	result := &UserObject{}
+	result := &User{}
 	err = json.Unmarshal(resp, result)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (c *UsersClient) Add(user UserObject, getOrCreate bool) (*UserObject, error
 }
 
 // Update updates the user's data.
-func (c *UsersClient) Update(id string, data map[string]interface{}) (*UserObject, error) {
+func (c *UsersClient) Update(id string, data map[string]interface{}) (*User, error) {
 	endpoint := c.client.makeEndpoint("user/%s/", id)
 
 	reqData := map[string]interface{}{
@@ -40,7 +40,7 @@ func (c *UsersClient) Update(id string, data map[string]interface{}) (*UserObjec
 		return nil, err
 	}
 
-	result := &UserObject{}
+	result := &User{}
 	err = json.Unmarshal(resp, result)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (c *UsersClient) Update(id string, data map[string]interface{}) (*UserObjec
 }
 
 //Get retrieves a user having the given id.
-func (c *UsersClient) Get(id string) (*UserObject, error) {
+func (c *UsersClient) Get(id string) (*User, error) {
 	endpoint := c.client.makeEndpoint("user/%s/", id)
 
 	resp, err := c.client.get(endpoint, nil, c.client.authenticator.usersAuth)
@@ -57,7 +57,7 @@ func (c *UsersClient) Get(id string) (*UserObject, error) {
 		return nil, err
 	}
 
-	result := &UserObject{}
+	result := &User{}
 	err = json.Unmarshal(resp, result)
 	if err != nil {
 		return nil, err

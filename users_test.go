@@ -15,7 +15,7 @@ func TestUserRefHelpers(t *testing.T) {
 	assert.Equal(t, "SU:bar", ref)
 }
 
-func TestGetUserObject(t *testing.T) {
+func TestGetUser(t *testing.T) {
 	client, requester := newClient(t)
 
 	_, err := client.Users().Get("id1")
@@ -23,7 +23,7 @@ func TestGetUserObject(t *testing.T) {
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/user/id1/?api_key=key", "")
 }
 
-func TestDeleteUserObject(t *testing.T) {
+func TestDeleteUser(t *testing.T) {
 	client, requester := newClient(t)
 
 	err := client.Users().Delete("id1")
@@ -31,16 +31,16 @@ func TestDeleteUserObject(t *testing.T) {
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/user/id1/?api_key=key", "")
 }
 
-func TestAddUserObject(t *testing.T) {
+func TestAddUser(t *testing.T) {
 	client, requester := newClient(t)
 	testCases := []struct {
-		object       stream.UserObject
+		object       stream.User
 		getOrCreate  bool
 		expectedURL  string
 		expectedBody string
 	}{
 		{
-			object: stream.UserObject{
+			object: stream.User{
 				ID: "user-test",
 				Data: map[string]interface{}{
 					"is_admin": true,
@@ -51,7 +51,7 @@ func TestAddUserObject(t *testing.T) {
 			expectedBody: `{"id":"user-test","data":{"is_admin":true,"name":"Johnny"}}`,
 		},
 		{
-			object: stream.UserObject{
+			object: stream.User{
 				ID: "user-test",
 				Data: map[string]interface{}{
 					"is_admin": true,
@@ -71,7 +71,7 @@ func TestAddUserObject(t *testing.T) {
 	}
 }
 
-func TestUpdateUserObject(t *testing.T) {
+func TestUpdateUser(t *testing.T) {
 	client, requester := newClient(t)
 
 	data := map[string]interface{}{
