@@ -90,7 +90,7 @@ func (c *CollectionsClient) Add(collection string, object CollectionObject, opts
 	return result, nil
 }
 
-//GetOne retrives a collection obejct having the given ID.
+//Get retrives a collection obejct having the given ID.
 func (c *CollectionsClient) Get(collection string, id string) (*CollectionObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
@@ -131,7 +131,7 @@ func (c *CollectionsClient) Update(collection string, id string, data map[string
 	return result, nil
 }
 
-// DeleteOne removes from a collection the object having the given ID.
+// Delete removes from a collection the object having the given ID.
 func (c *CollectionsClient) Delete(collection string, id string) error {
 	if collection == "" {
 		return fmt.Errorf("collection name required")
