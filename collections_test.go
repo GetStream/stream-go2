@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRefHelpers(t *testing.T) {
+func TestCollectionRefHelpers(t *testing.T) {
 	client, _ := newClient(t)
 	ref := client.Collections().CreateReference("foo", "bar")
 	assert.Equal(t, "SO:foo:bar", ref)

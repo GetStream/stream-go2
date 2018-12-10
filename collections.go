@@ -90,7 +90,7 @@ func (c *CollectionsClient) Add(collection string, object CollectionObject, opts
 	return result, nil
 }
 
-//Get retrives a collection obejct having the given ID.
+//Get retrives a collection object having the given ID.
 func (c *CollectionsClient) Get(collection string, id string) (*CollectionObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
@@ -109,7 +109,7 @@ func (c *CollectionsClient) Get(collection string, id string) (*CollectionObject
 	return result, nil
 }
 
-//Update updates the given user's data.
+//Update updates the given collection object's data.
 func (c *CollectionsClient) Update(collection string, id string, data map[string]interface{}) (*CollectionObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")

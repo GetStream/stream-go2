@@ -310,6 +310,11 @@ type GetCollectionResponseObject struct {
 	Data      map[string]interface{} `json:"data"`
 }
 
+type UserObject struct {
+	ID   string                 `json:"id"`
+	Data map[string]interface{} `json:"data,omitempty"`
+}
+
 // PersonalizationResponse is a generic response from the personalization endpoints
 // obtained after a PersonalizationClient.Get call.
 // Common JSON fields are directly available as struct fields, while non-standard

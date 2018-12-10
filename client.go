@@ -156,6 +156,12 @@ func (c *Client) Collections() *CollectionsClient {
 	return &CollectionsClient{client: c.cloneWithURLBuilder(b)}
 }
 
+// Users returns a new UsersClient.
+func (c *Client) Users() *UsersClient {
+	b := newAPIURLBuilder(c.region, c.version)
+	return &UsersClient{client: c.cloneWithURLBuilder(b)}
+}
+
 // Personalization returns a new PersonalizationClient.
 func (c *Client) Personalization() *PersonalizationClient {
 	b := newPersonalizationURLBuilder()
