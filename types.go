@@ -316,6 +316,29 @@ type User struct {
 	Data map[string]interface{} `json:"data,omitempty"`
 }
 
+//Reaction is a reaction retrieved from the API.
+type Reaction struct {
+	AddReactionRequestObject
+	ChildrenReactions map[string][]*Reaction `json:"latest_children,omitempty"`
+	OwnChildren       map[string][]*Reaction `json:"own_children,omitempty"`
+	ChildrenCounters  map[string]interface{} `json:"children_counts,omitempty"`
+}
+
+//AddReactionRequestObject is an object used only when calling the Add* reaction endpoints
+type AddReactionRequestObject struct {
+	ID          string                 `json:"id,omitempty"`
+	ActivityID  string                 `json:"activity_id"`
+	UserID      string                 `json:"user_id"`
+	Data        map[string]interface{} `json:"data,omitempty"`
+	TargetFeeds []string               `json:"target_feeds,omitempty"`
+	ParentID    string                 `json:"parent,omitempty"`
+}
+
+type FilterReactionResponse struct {
+	readResponse
+	// Results FilterReactionResult `json:"results"`
+}
+
 // PersonalizationResponse is a generic response from the personalization endpoints
 // obtained after a PersonalizationClient.Get call.
 // Common JSON fields are directly available as struct fields, while non-standard
