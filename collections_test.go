@@ -14,8 +14,6 @@ func TestRefHelpers(t *testing.T) {
 	client, _ := newClient(t)
 	ref := client.Collections().CreateReference("foo", "bar")
 	assert.Equal(t, "SO:foo:bar", ref)
-	userRef := client.Collections().CreateUserReference("baz")
-	assert.Equal(t, "SO:user:baz", userRef)
 }
 
 func TestUpsertCollectionObjects(t *testing.T) {
@@ -37,7 +35,7 @@ func TestUpsertCollectionObjects(t *testing.T) {
 					},
 				},
 			},
-			expectedURL:  "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key",
+			expectedURL:  "https://api.stream-io-api.com/api/v1.0/collections/?api_key=key",
 			expectedBody: `{"data":{"test-single":[{"hobbies":["playing","sleeping","eating"],"id":"1","name":"Juniper"}]}}`,
 		},
 		{
@@ -58,7 +56,7 @@ func TestUpsertCollectionObjects(t *testing.T) {
 					},
 				},
 			},
-			expectedURL:  "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key",
+			expectedURL:  "https://api.stream-io-api.com/api/v1.0/collections/?api_key=key",
 			expectedBody: `{"data":{"test-many":[{"hobbies":["playing","sleeping","eating"],"id":"1","name":"Juniper"},{"id":"2","interests":["sunbeams","surprise attacks"],"name":"Ruby"}]}}`,
 		},
 	}
@@ -80,12 +78,12 @@ func TestGetCollectionObjects(t *testing.T) {
 		{
 			collection:  "test-single",
 			ids:         []string{"one"},
-			expectedURL: "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key&foreign_ids=" + url.QueryEscape("test-single:one"),
+			expectedURL: "https://api.stream-io-api.com/api/v1.0/collections/?api_key=key&foreign_ids=" + url.QueryEscape("test-single:one"),
 		},
 		{
 			collection:  "test-multiple",
 			ids:         []string{"one", "two", "three"},
-			expectedURL: "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key&foreign_ids=" + url.QueryEscape("test-multiple:one,test-multiple:two,test-multiple:three"),
+			expectedURL: "https://api.stream-io-api.com/api/v1.0/collections/?api_key=key&foreign_ids=" + url.QueryEscape("test-multiple:one,test-multiple:two,test-multiple:three"),
 		},
 	}
 	for _, tc := range testCases {
@@ -105,12 +103,12 @@ func TestDeleteCollectionObjects(t *testing.T) {
 		{
 			collection:  "test-single",
 			ids:         []string{"one"},
-			expectedURL: "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key&collection_name=test-single&ids=one",
+			expectedURL: "https://api.stream-io-api.com/api/v1.0/collections/?api_key=key&collection_name=test-single&ids=one",
 		},
 		{
 			collection:  "test-many",
 			ids:         []string{"one", "two", "three"},
-			expectedURL: "https://api.stream-io-api.com/api/v1.0/meta/?api_key=key&collection_name=test-many&ids=one%2Ctwo%2Cthree",
+			expectedURL: "https://api.stream-io-api.com/api/v1.0/collections/?api_key=key&collection_name=test-many&ids=one%2Ctwo%2Cthree",
 		},
 	}
 	for _, tc := range testCases {
@@ -118,4 +116,74 @@ func TestDeleteCollectionObjects(t *testing.T) {
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodDelete, tc.expectedURL, "")
 	}
+}
+
+func TestGetOneCollectionObject(t *testing.T) {
+	client, requester := newClient(t)
+
+	_, err := client.Collections().GetOne("test-get-one", "id1")
+	require.NoError(t, err)
+	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/collections/test-get-one/id1/?api_key=key", "")
+}
+
+func TestDeleteOneCollectionObject(t *testing.T) {
+	client, requester := newClient(t)
+
+	err := client.Collections().DeleteOne("test-get-one", "id1")
+	require.NoError(t, err)
+	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/collections/test-get-one/id1/?api_key=key", "")
+}
+
+func TestAddCollectionObject(t *testing.T) {
+	client, requester := newClient(t)
+	testCases := []struct {
+		object       stream.CollectionObject
+		collection   string
+		opts         []stream.AddObjectOption
+		expectedURL  string
+		expectedBody string
+	}{
+		{
+			collection: "no_user_id",
+			object: stream.CollectionObject{
+				ID: "1",
+				Data: map[string]interface{}{
+					"name":    "Juniper",
+					"hobbies": []string{"playing", "sleeping", "eating"},
+				},
+			},
+			expectedURL:  "https://api.stream-io-api.com/api/v1.0/collections/no_user_id/?api_key=key",
+			expectedBody: `{"data":{"hobbies":["playing","sleeping","eating"],"name":"Juniper"},"id":"1"}`,
+		},
+		{
+			collection: "with_user_id",
+			object: stream.CollectionObject{
+				ID: "1",
+				Data: map[string]interface{}{
+					"name":    "Juniper",
+					"hobbies": []string{"playing", "sleeping", "eating"},
+				},
+			},
+			opts:         []stream.AddObjectOption{stream.WithUserID("user1")},
+			expectedURL:  "https://api.stream-io-api.com/api/v1.0/collections/with_user_id/?api_key=key",
+			expectedBody: `{"data":{"hobbies":["playing","sleeping","eating"],"name":"Juniper"},"id":"1","user_id":"user1"}`,
+		},
+	}
+	for _, tc := range testCases {
+		_, err := client.Collections().Add(tc.collection, tc.object, tc.opts...)
+		require.NoError(t, err)
+		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
+	}
+}
+
+func TestUpdateCollectionObject(t *testing.T) {
+	client, requester := newClient(t)
+
+	data := map[string]interface{}{
+		"name": "Jane",
+	}
+	_, err := client.Collections().Update("test-collection", "123", data)
+	require.NoError(t, err)
+	expectedBody := `{"data":{"name":"Jane"}}`
+	testRequest(t, requester.req, http.MethodPut, "https://api.stream-io-api.com/api/v1.0/collections/test-collection/123/?api_key=key", expectedBody)
 }

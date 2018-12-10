@@ -225,6 +225,17 @@ func WithToTargetsRemove(targets ...string) UpdateToTargetsOption {
 	}
 }
 
+type AddObjectOption func(interface{})
+
+func WithUserID(userID string) AddObjectOption {
+	return func(req interface{}) {
+		switch r := req.(type) {
+		case *addCollectionRequest:
+			r.UserID = &userID
+		}
+	}
+}
+
 type nop struct{}
 
 func (nop) values() (string, string) {

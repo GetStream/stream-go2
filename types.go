@@ -263,8 +263,8 @@ type UnfollowRelationship struct {
 
 // CollectionObject is a collection's object.
 type CollectionObject struct {
-	ID   string
-	Data map[string]interface{}
+	ID   string                 `json:"id"`
+	Data map[string]interface{} `json:"data"`
 }
 
 // MarshalJSON marshals the CollectionObject to a flat JSON object.
@@ -284,6 +284,23 @@ type getCollectionResponseWrap struct {
 
 type getCollectionResponse struct {
 	Data []GetCollectionResponseObject `json:"data"`
+}
+
+type addCollectionRequest struct {
+	UserID *string `json:"user_id,omitempty"`
+	CollectionObject
+}
+
+func (r addCollectionRequest) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
+		"id":   r.ID,
+		"data": r.Data,
+	}
+	if r.UserID != nil {
+		m["user_id"] = r.UserID
+	}
+
+	return json.Marshal(m)
 }
 
 // GetCollectionResponseObject represent a single response coming from a Collection

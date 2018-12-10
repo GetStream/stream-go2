@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 )
 
@@ -303,6 +304,10 @@ func (c *Client) get(endpoint endpoint, data interface{}, authFn authFunc) ([]by
 
 func (c *Client) post(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
 	return c.request(http.MethodPost, endpoint, data, authFn)
+}
+
+func (c *Client) put(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+	return c.request(http.MethodPut, endpoint, data, authFn)
 }
 
 func (c *Client) delete(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
