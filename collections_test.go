@@ -67,7 +67,7 @@ func TestUpsertCollectionObjects(t *testing.T) {
 	}
 }
 
-func TestGetCollectionObjects(t *testing.T) {
+func TestSelectCollectionObjects(t *testing.T) {
 	client, requester := newClient(t)
 	testCases := []struct {
 		ids          []string
@@ -93,7 +93,7 @@ func TestGetCollectionObjects(t *testing.T) {
 	}
 }
 
-func TestDeleteCollectionObjects(t *testing.T) {
+func TestDeleteManyCollectionObjects(t *testing.T) {
 	client, requester := newClient(t)
 	testCases := []struct {
 		ids         []string
@@ -126,7 +126,7 @@ func TestGetCollectionObject(t *testing.T) {
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/collections/test-get-one/id1/?api_key=key", "")
 }
 
-func TestDeleteOneCollectionObject(t *testing.T) {
+func TestDeleteCollectionObject(t *testing.T) {
 	client, requester := newClient(t)
 
 	err := client.Collections().Delete("test-get-one", "id1")

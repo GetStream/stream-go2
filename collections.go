@@ -26,7 +26,7 @@ func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObjec
 	return err
 }
 
-// Get returns a list of CollectionObjects for the given collection name
+// Select returns a list of CollectionObjects for the given collection name
 // having the given IDs.
 func (c *CollectionsClient) Select(collection string, ids ...string) ([]GetCollectionResponseObject, error) {
 	if collection == "" {
@@ -50,7 +50,7 @@ func (c *CollectionsClient) Select(collection string, ids ...string) ([]GetColle
 	return selectResp.Response.Data, nil
 }
 
-// Delete removes from a collection the objects having the given IDs.
+// DeleteMany removes from a collection the objects having the given IDs.
 func (c *CollectionsClient) DeleteMany(collection string, ids ...string) error {
 	if collection == "" {
 		return fmt.Errorf("collection name required")
