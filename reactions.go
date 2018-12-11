@@ -3,9 +3,10 @@ package stream
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
-// UsersClient is a specialized client used to interact with the Reactions endpoints.
+// ReactionsClient is a specialized client used to interact with the Reactions endpoints.
 type ReactionsClient struct {
 	client *Client
 }
@@ -50,7 +51,7 @@ func (c *ReactionsClient) AddChild(parentID string, r AddReactionRequestObject) 
 
 // Update updates the reaction's data and/or target feeds.
 func (c *ReactionsClient) Update(id string, data map[string]interface{}, targetFeeds []string) (*Reaction, error) {
-	endpoint := c.client.makeEndpoint("user/%s/", id)
+	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
 	reqData := map[string]interface{}{
 		"data":         data,
@@ -94,4 +95,35 @@ func (c *ReactionsClient) Delete(id string) error {
 	return err
 }
 
-func (c *ReactionsClient) Filter() {}
+//Filter lists reactions based on the provided criteria and with the specified pagination.
+func (c *ReactionsClient) Filter(attr FilterReactionsAttribute, opts ...FilterReactionsOption) (*FilterReactionResponse, error) {
+	var endpointURI string
+
+	endpointURI = fmt.Sprintf("reaction/%s/", attr())
+
+	endpoint := c.client.makeEndpoint(endpointURI)
+	for _, opt := range opts {
+		endpoint.addQueryParam(opt)
+	}
+
+	resp, err := c.client.get(endpoint, nil, c.client.authenticator.reactionsAuth)
+	if err != nil {
+		return nil, err
+	}
+	result := &FilterReactionResponse{}
+	err = json.Unmarshal(resp, result)
+	if err != nil {
+		return nil, err
+	}
+	result.meta.attr = attr
+	return result, nil
+}
+
+// GetNextPageFilteredReactions returns the reactions at the "next" page of a previous *FilterReactionResponse response, if any.
+func (c *ReactionsClient) GetNextPageFilteredReactions(resp *FilterReactionResponse) (*FilterReactionResponse, error) {
+	opts, err := resp.parseNext()
+	if err != nil {
+		return nil, err
+	}
+	return c.Filter(resp.meta.attr, opts...)
+}

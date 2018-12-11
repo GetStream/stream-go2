@@ -327,6 +327,7 @@ type Reaction struct {
 //AddReactionRequestObject is an object used only when calling the Add* reaction endpoints
 type AddReactionRequestObject struct {
 	ID          string                 `json:"id,omitempty"`
+	Kind        string                 `json:"kind"`
 	ActivityID  string                 `json:"activity_id"`
 	UserID      string                 `json:"user_id"`
 	Data        map[string]interface{} `json:"data,omitempty"`
@@ -334,9 +335,64 @@ type AddReactionRequestObject struct {
 	ParentID    string                 `json:"parent,omitempty"`
 }
 
+// readResponse is the part of StreamAPI responses common for FilterReactions API requests.
+type filterResponse struct {
+	response
+	Next string `json:"next,omitempty"`
+}
+
+func (r filterResponse) parseNext() ([]FilterReactionsOption, error) {
+	if r.Next == "" {
+		return nil, ErrMissingNextPage
+	}
+
+	urlParts := strings.Split(r.Next, "?")
+	if len(urlParts) != 2 {
+		return nil, ErrInvalidNextPage
+	}
+	values, err := url.ParseQuery(urlParts[1])
+	if err != nil {
+		return nil, ErrInvalidNextPage
+	}
+
+	var opts []FilterReactionsOption
+
+	limit, ok, err := parseIntValue(values, "limit")
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		opts = append(opts, WithLimit(limit))
+	}
+
+	if idLT := values.Get("id_lt"); idLT != "" {
+		opts = append(opts, WithIDLT(idLT))
+	}
+
+	if idLT := values.Get("id_gt"); idLT != "" {
+		opts = append(opts, WithIDGT(idLT))
+	}
+
+	if withActData := values.Get("with_activity_data"); withActData != "" {
+		if val := strings.ToLower(withActData); val == "true" || val == "t" || val == "1" {
+			opts = append(opts, WithActivityData())
+		}
+	}
+
+	return opts, nil
+}
+
+// FilterReactionResponse is the response received from the ReactionsClient.Filter call.
 type FilterReactionResponse struct {
-	readResponse
-	// Results FilterReactionResult `json:"results"`
+	filterResponse
+	Results  []Reaction             `json:"results"`
+	Activity map[string]interface{} `json:"activity"`
+	meta     filterReactionsRequestMetadata
+}
+
+// filterReactionsRequestMetadata holds the initial request metadata used for pagination.
+type filterReactionsRequestMetadata struct {
+	attr FilterReactionsAttribute
 }
 
 // PersonalizationResponse is a generic response from the personalization endpoints

@@ -225,14 +225,92 @@ func WithToTargetsRemove(targets ...string) UpdateToTargetsOption {
 	}
 }
 
-type AddObjectOption func(interface{})
+//AddObjectOption is an option usable by the Collections.Add method.
+type AddObjectOption func(*addCollectionRequest)
 
+//WithUserID adds the user id to the Collections.Add request object.
 func WithUserID(userID string) AddObjectOption {
-	return func(req interface{}) {
-		switch r := req.(type) {
-		case *addCollectionRequest:
-			r.UserID = &userID
-		}
+	return func(req *addCollectionRequest) {
+		req.UserID = &userID
+	}
+}
+
+// FilterReactionsOption is an option usable by FilterReactions methods for flat and aggregated feeds.
+type FilterReactionsOption struct {
+	requestOption
+}
+
+// WithLimit adds the limit parameter to API calls which support it, limiting
+// the number of results in the response to the provided limit threshold.
+// Supported operations: retrieve activities, retrieve followers, retrieve
+// following.
+func WithLimit(limit int) FilterReactionsOption {
+	return FilterReactionsOption{withLimit(limit)}
+}
+
+// WithIDGTE adds the id_gte parameter to API calls, used when retrieving
+// paginated reactions, returning activities with ID greater or
+// equal than the provided id.
+func WithIDGTE(id string) FilterReactionsOption {
+	return FilterReactionsOption{makeRequestOption("id_gte", id)}
+}
+
+// WithIDGT adds the id_gt parameter to API calls, used when retrieving
+// paginated reactions, returning activities with ID greater
+// than the provided id.
+func WithIDGT(id string) FilterReactionsOption {
+	return FilterReactionsOption{makeRequestOption("id_gt", id)}
+}
+
+// WithIDLTE adds the id_lte parameter to API calls, used when retrieving
+// paginated reactions, returning activities with ID lesser or
+// equal than the provided id.
+func WithIDLTE(id string) FilterReactionsOption {
+	return FilterReactionsOption{makeRequestOption("id_lte", id)}
+}
+
+// WithIDLT adds the id_lt parameter to API calls, used when retrieving
+// paginated reactions, returning activities with ID lesser
+// than the provided id.
+func WithIDLT(id string) FilterReactionsOption {
+	return FilterReactionsOption{makeRequestOption("id_lt", id)}
+}
+
+// WithActivityData will enable returning the activity data when filtering
+// reactions by activity_id.
+func WithActivityData() FilterReactionsOption {
+	return FilterReactionsOption{makeRequestOption("with_activity_data", true)}
+}
+
+//FilterReactionsAttribute specifies the filtering method of Reactions.Filter()
+type FilterReactionsAttribute func() string
+
+//ByKind filters reactions by kind, after the initial desired filtering method was applied.
+func (a FilterReactionsAttribute) ByKind(kind string) FilterReactionsAttribute {
+	return func() string {
+		base := a()
+		return fmt.Sprintf("%s/%s", base, kind)
+	}
+}
+
+//ByActivityID will filter reactions based on the specified activity id.
+func ByActivityID(activityID string) FilterReactionsAttribute {
+	return func() string {
+		return fmt.Sprintf("activity_id/%s", activityID)
+	}
+}
+
+//ByReactionID will filter reactions based on the specified parent reaction id.
+func ByReactionID(reactionID string) FilterReactionsAttribute {
+	return func() string {
+		return fmt.Sprintf("reaction_id/%s", reactionID)
+	}
+}
+
+//ByUserID will filter reactions based on the specified user id.
+func ByUserID(userID string) FilterReactionsAttribute {
+	return func() string {
+		return fmt.Sprintf("user_id/%s", userID)
 	}
 }
 

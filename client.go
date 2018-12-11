@@ -162,6 +162,12 @@ func (c *Client) Users() *UsersClient {
 	return &UsersClient{client: c.cloneWithURLBuilder(b)}
 }
 
+// Reactions returns a new ReactionsClient.
+func (c *Client) Reactions() *ReactionsClient {
+	b := newAPIURLBuilder(c.region, c.version)
+	return &ReactionsClient{client: c.cloneWithURLBuilder(b)}
+}
+
 // Personalization returns a new PersonalizationClient.
 func (c *Client) Personalization() *PersonalizationClient {
 	b := newPersonalizationURLBuilder()
