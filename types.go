@@ -379,6 +379,12 @@ func (r filterResponse) parseNext() ([]FilterReactionsOption, error) {
 		}
 	}
 
+	if withOwnChildren := values.Get("with_own_children"); withOwnChildren != "" {
+		if val := strings.ToLower(withOwnChildren); val == "true" || val == "t" || val == "1" {
+			opts = append(opts, WithOwnChildren())
+		}
+	}
+
 	return opts, nil
 }
 

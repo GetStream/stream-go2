@@ -282,6 +282,12 @@ func WithActivityData() FilterReactionsOption {
 	return FilterReactionsOption{makeRequestOption("with_activity_data", true)}
 }
 
+// WithOwnChildren will enable returning the activity data when filtering
+// reactions by activity_id.
+func WithOwnChildren() FilterReactionsOption {
+	return FilterReactionsOption{makeRequestOption("with_own_children", true)}
+}
+
 //FilterReactionsAttribute specifies the filtering method of Reactions.Filter()
 type FilterReactionsAttribute func() string
 

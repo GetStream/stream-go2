@@ -165,6 +165,14 @@ func TestGetNextPageReactions(t *testing.T) {
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/reaction/user_id/uid/like/?api_key=key&id_gt=uid1&limit=100&with_activity_data=true", "")
 	require.NoError(t, err)
 
+	requester.resp = `{"next":"/api/v1.0/reaction/user_id/uid/upvote/?api_key=key&id_gt=uid1&limit=100&with_own_children=true"}`
+	resp, err = client.Reactions().Filter(stream.ByUserID("uid").ByKind("like"), stream.WithLimit(10), stream.WithActivityData(), stream.WithIDGT("id1"))
+	require.NoError(t, err)
+
+	_, err = client.Reactions().GetNextPageFilteredReactions(resp)
+	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/reaction/user_id/uid/like/?api_key=key&id_gt=uid1&limit=100&with_own_children=true", "")
+	require.NoError(t, err)
+
 	requester.resp = `{"next":"/api/v1.0/reaction/user_id/uid/upvote/?api_key=key&id_gt=uid1&limit=100&with_activity_data=false"}`
 	resp, err = client.Reactions().Filter(stream.ByUserID("uid").ByKind("like"), stream.WithLimit(10), stream.WithActivityData(), stream.WithIDGT("id1"))
 	require.NoError(t, err)
