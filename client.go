@@ -443,6 +443,15 @@ func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) error {
 
 func (c *Client) getActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
+	return c.getActivitiesInternal(endpoint, feed, opts...)
+}
+
+func (c *Client) getEnrichedActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
+	endpoint := c.makeEndpoint("enrich/feed/%s/%s/", feed.Slug(), feed.UserID())
+	return c.getActivitiesInternal(endpoint, feed, opts...)
+}
+
+func (c *Client) getActivitiesInternal(endpoint endpoint, feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}

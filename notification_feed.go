@@ -30,3 +30,27 @@ func (f *NotificationFeed) GetNextPageActivities(resp *NotificationFeedResponse)
 	}
 	return f.GetActivities(opts...)
 }
+
+// GetEnrichedActivities returns the enriched activities for the given NotificationFeed, filtering
+// results with the provided GetActivitiesOption parameters.
+func (f *NotificationFeed) GetEnrichedActivities(opts ...GetActivitiesOption) (*EnrichedNotificationFeedResponse, error) {
+	body, err := f.client.getEnrichedActivities(f, opts...)
+	if err != nil {
+		return nil, err
+	}
+	var resp EnrichedNotificationFeedResponse
+	if err := json.Unmarshal(body, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// GetNextPageEnrichedActivities returns the enriched activities for the given NotificationFeed at the "next" page
+// of a previous *NotificationFeedResponse response, if any.
+func (f *NotificationFeed) GetNextPageEnrichedActivities(resp *EnrichedNotificationFeedResponse) (*EnrichedNotificationFeedResponse, error) {
+	opts, err := resp.parseNext()
+	if err != nil {
+		return nil, err
+	}
+	return f.GetEnrichedActivities(opts...)
+}

@@ -77,12 +77,17 @@ func (a *Activity) decode(data map[string]interface{}) error {
 	return nil
 }
 
+// baseActivityGroup is the common part of responses obtained from reading normal or enriched aggregated feeds.
+type baseActivityGroup struct {
+	ActivityCount int    `json:"activity_count,omitempty"`
+	ActorCount    int    `json:"actor_count,omitempty"`
+	Group         string `json:"group,omitempty"`
+	ID            string `json:"id,omitempty"`
+	Verb          string `json:"verb,omitempty"`
+}
+
 // ActivityGroup is a group of Activity obtained from aggregated feeds.
 type ActivityGroup struct {
-	Activities    []Activity `json:"activities,omitempty"`
-	ActivityCount int        `json:"activity_count,omitempty"`
-	ActorCount    int        `json:"actor_count,omitempty"`
-	Group         string     `json:"group,omitempty"`
-	ID            string     `json:"id,omitempty"`
-	Verb          string     `json:"verb,omitempty"`
+	baseActivityGroup
+	Activities []Activity `json:"activities,omitempty"`
 }

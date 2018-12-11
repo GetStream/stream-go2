@@ -135,6 +135,24 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 	return opts, nil
 }
 
+// baseNotificationFeedResponse is the common part of responses obtained from reading normal or enriched notification feeds.
+type baseNotificationFeedResponse struct {
+	readResponse
+	Unseen int `json:"unseen"`
+	Unread int `json:"unread"`
+}
+
+// baseNotificationFeedResukt is the common part of responses obtained from reading normal or enriched notification feeds.
+type baseNotificationFeedResult struct {
+	ID            string `json:"id"`
+	ActivityCount int    `json:"activity_count"`
+	ActorCount    int    `json:"actor_count"`
+	Group         string `json:"group"`
+	IsRead        bool   `json:"is_read"`
+	IsSeen        bool   `json:"is_seen"`
+	Verb          string `json:"verb"`
+}
+
 // FlatFeedResponse is the API response obtained when retrieving activities from
 // a flat feed.
 type FlatFeedResponse struct {
@@ -152,23 +170,15 @@ type AggregatedFeedResponse struct {
 // NotificationFeedResponse is the API response obtained when retrieving activities
 // from a notification feed.
 type NotificationFeedResponse struct {
-	readResponse
-	Unseen  int                      `json:"unseen"`
-	Unread  int                      `json:"unread"`
+	baseNotificationFeedResponse
 	Results []NotificationFeedResult `json:"results"`
 }
 
 // NotificationFeedResult is a notification-feed specific response, containing
 // the list of activities in the group, plus the extra fields about the group read+seen status.
 type NotificationFeedResult struct {
-	ID            string     `json:"id"`
-	Activities    []Activity `json:"activities"`
-	ActivityCount int        `json:"activity_count"`
-	ActorCount    int        `json:"actor_count"`
-	Group         string     `json:"group"`
-	IsRead        bool       `json:"is_read"`
-	IsSeen        bool       `json:"is_seen"`
-	Verb          string     `json:"verb"`
+	baseNotificationFeedResult
+	Activities []Activity `json:"activities"`
 }
 
 // AddActivityResponse is the API response obtained when adding a single activity
@@ -438,6 +448,27 @@ func (r *PersonalizationResponse) UnmarshalJSON(data []byte) error {
 		r.extra[k] = m[k]
 	}
 	return nil
+}
+
+// EnrichedFlatFeedResponse is the API response obtained when retrieving enriched activities from
+// a flat feed.
+type EnrichedFlatFeedResponse struct {
+	readResponse
+	Results []EnrichedActivity `json:"results,omitempty"`
+}
+
+// EnrichedAggregatedFeedResponse is the API response obtained when retrieving
+// enriched activities from an aggregated feed.
+type EnrichedAggregatedFeedResponse struct {
+	readResponse
+	Results []EnrichedActivityGroup `json:"results,omitempty"`
+}
+
+// EnrichedNotificationFeedResponse is the API response obtained when retrieving enriched activities
+// from a notification feed.
+type EnrichedNotificationFeedResponse struct {
+	baseNotificationFeedResponse
+	Results []EnrichedNotificationFeedResult `json:"results"`
 }
 
 // GetActivitiesResponse contains a slice of Activity returned by GetActivitiesByID
