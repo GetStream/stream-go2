@@ -588,6 +588,8 @@ if err != nil {
 }
 ```
 
+See the complete [docs and examples](https://getstream.io/docs/#collections_introduction) about collections on Stream's documentation pages.
+
 ## Users
 
 [Users](https://getstream.io/docs/#users_introduction) endpoints can be reached using a specialized `UsersClient` which, like `CollectionsClient`, can be obtained from a regular `Client`:
