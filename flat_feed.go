@@ -42,7 +42,7 @@ func (f *FlatFeed) GetFollowers(opts ...FollowersOption) (*FollowersResponse, er
 	return f.client.getFollowers(f, opts...)
 }
 
-// GetActivities returns the activities for the given FlatFeed, filtering
+// GetEnrichedActivities returns the enriched activities for the given FlatFeed, filtering
 // results with the provided GetActivitiesOption parameters.
 func (f *FlatFeed) GetEnrichedActivities(opts ...GetActivitiesOption) (*EnrichedFlatFeedResponse, error) {
 	body, err := f.client.getEnrichedActivities(f, opts...)
@@ -56,7 +56,7 @@ func (f *FlatFeed) GetEnrichedActivities(opts ...GetActivitiesOption) (*Enriched
 	return &resp, nil
 }
 
-// GetNextPageActivities returns the activities for the given FlatFeed at the "next" page
+// GetNextPageEnrichedActivities returns the enriched activities for the given FlatFeed at the "next" page
 // of a previous *EnrichedFlatFeedResponse response, if any.
 func (f *FlatFeed) GetNextPageEnrichedActivities(resp *EnrichedFlatFeedResponse) (*EnrichedFlatFeedResponse, error) {
 	opts, err := resp.parseNext()
@@ -66,7 +66,7 @@ func (f *FlatFeed) GetNextPageEnrichedActivities(resp *EnrichedFlatFeedResponse)
 	return f.GetEnrichedActivities(opts...)
 }
 
-// GetActivitiesWithRanking returns the activities (filtered) for the given FlatFeed,
+// GetEnrichedActivitiesWithRanking returns the enriched activities (filtered) for the given FlatFeed,
 // using the provided ranking method.
 func (f *FlatFeed) GetEnrichedActivitiesWithRanking(ranking string, opts ...GetActivitiesOption) (*EnrichedFlatFeedResponse, error) {
 	return f.GetEnrichedActivities(append(opts, withActivitiesRanking(ranking))...)

@@ -48,8 +48,8 @@ func (f *AggregatedFeed) GetEnrichedActivities(opts ...GetActivitiesOption) (*En
 	return &resp, nil
 }
 
-// GetNextPageActivities returns the enriched activities for the given AggregatedFeed at the "next" page
-// of a previous *AggregatedFeedResponse response, if any.
+// GetNextPageEnrichedActivities returns the enriched activities for the given AggregatedFeed at the "next" page
+// of a previous *EnrichedAggregatedFeedResponse response, if any.
 func (f *AggregatedFeed) GetNextPageEnrichedActivities(resp *EnrichedAggregatedFeedResponse) (*EnrichedAggregatedFeedResponse, error) {
 	opts, err := resp.parseNext()
 	if err != nil {

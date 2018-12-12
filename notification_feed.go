@@ -46,7 +46,7 @@ func (f *NotificationFeed) GetEnrichedActivities(opts ...GetActivitiesOption) (*
 }
 
 // GetNextPageEnrichedActivities returns the enriched activities for the given NotificationFeed at the "next" page
-// of a previous *NotificationFeedResponse response, if any.
+// of a previous *EnrichedNotificationFeedResponse response, if any.
 func (f *NotificationFeed) GetNextPageEnrichedActivities(resp *EnrichedNotificationFeedResponse) (*EnrichedNotificationFeedResponse, error) {
 	opts, err := resp.parseNext()
 	if err != nil {

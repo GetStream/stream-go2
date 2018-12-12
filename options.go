@@ -235,15 +235,12 @@ func WithUserID(userID string) AddObjectOption {
 	}
 }
 
-// FilterReactionsOption is an option usable by FilterReactions methods for flat and aggregated feeds.
+// FilterReactionsOption is an option used by Reactions.Filter() to support pagination.
 type FilterReactionsOption struct {
 	requestOption
 }
 
-// WithLimit adds the limit parameter to API calls which support it, limiting
-// the number of results in the response to the provided limit threshold.
-// Supported operations: retrieve activities, retrieve followers, retrieve
-// following.
+// WithLimit adds the limit parameter to the Reactions.Filter() call.
 func WithLimit(limit int) FilterReactionsOption {
 	return FilterReactionsOption{withLimit(limit)}
 }
@@ -256,22 +253,19 @@ func WithIDGTE(id string) FilterReactionsOption {
 }
 
 // WithIDGT adds the id_gt parameter to API calls, used when retrieving
-// paginated reactions, returning activities with ID greater
-// than the provided id.
+// paginated reactions.
 func WithIDGT(id string) FilterReactionsOption {
 	return FilterReactionsOption{makeRequestOption("id_gt", id)}
 }
 
 // WithIDLTE adds the id_lte parameter to API calls, used when retrieving
-// paginated reactions, returning activities with ID lesser or
-// equal than the provided id.
+// paginated reactions.
 func WithIDLTE(id string) FilterReactionsOption {
 	return FilterReactionsOption{makeRequestOption("id_lte", id)}
 }
 
 // WithIDLT adds the id_lt parameter to API calls, used when retrieving
-// paginated reactions, returning activities with ID lesser
-// than the provided id.
+// paginated reactions.
 func WithIDLT(id string) FilterReactionsOption {
 	return FilterReactionsOption{makeRequestOption("id_lt", id)}
 }

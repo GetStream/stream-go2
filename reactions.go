@@ -13,29 +13,20 @@ type ReactionsClient struct {
 
 //Add adds a reaction.
 func (c *ReactionsClient) Add(r AddReactionRequestObject) (*Reaction, error) {
-	endpoint := c.client.makeEndpoint("reaction/")
 	if r.ParentID != "" {
 		return nil, errors.New("`Parent` not empty. For adding child reactions use `AddChild`")
 	}
-
-	resp, err := c.client.post(endpoint, r, c.client.authenticator.reactionsAuth)
-	if err != nil {
-		return nil, err
-	}
-
-	result := &Reaction{}
-	err = json.Unmarshal(resp, result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return c.addReaction(r)
 }
 
 //AddChild adds a child reaction to the provided parent.
 func (c *ReactionsClient) AddChild(parentID string, r AddReactionRequestObject) (*Reaction, error) {
-	endpoint := c.client.makeEndpoint("reaction/")
 	r.ParentID = parentID
+	return c.addReaction(r)
+}
 
+func (c *ReactionsClient) addReaction(r AddReactionRequestObject) (*Reaction, error) {
+	endpoint := c.client.makeEndpoint("reaction/")
 	resp, err := c.client.post(endpoint, r, c.client.authenticator.reactionsAuth)
 	if err != nil {
 		return nil, err

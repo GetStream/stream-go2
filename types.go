@@ -345,7 +345,7 @@ type AddReactionRequestObject struct {
 	ParentID    string                 `json:"parent,omitempty"`
 }
 
-// readResponse is the part of StreamAPI responses common for FilterReactions API requests.
+// filterResponse is the part of StreamAPI responses common for FilterReactions API requests.
 type filterResponse struct {
 	response
 	Next string `json:"next,omitempty"`
