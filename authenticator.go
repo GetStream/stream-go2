@@ -87,7 +87,6 @@ func (a authenticator) feedAuth(resource resource, feed Feed) authFunc {
 func (a authenticator) collectionsAuth(req *http.Request) error {
 	claims := jwt.MapClaims{
 		"action":   "*",
-		"user_id":  "*",
 		"feed_id":  "*",
 		"resource": resCollections,
 	}
@@ -97,7 +96,6 @@ func (a authenticator) collectionsAuth(req *http.Request) error {
 func (a authenticator) usersAuth(req *http.Request) error {
 	claims := jwt.MapClaims{
 		"action":   "*",
-		"user_id":  "*",
 		"feed_id":  "*",
 		"resource": resUsers,
 	}
@@ -107,7 +105,6 @@ func (a authenticator) usersAuth(req *http.Request) error {
 func (a authenticator) reactionsAuth(req *http.Request) error {
 	claims := jwt.MapClaims{
 		"action":   "*",
-		"user_id":  "*",
 		"feed_id":  "*",
 		"resource": resReactions,
 	}
