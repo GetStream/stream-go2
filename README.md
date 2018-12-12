@@ -36,25 +36,30 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
   * [Email tracking](#email-tracking)
 * [Personalization](#personalization)
 * [Collections](#collections)
+* [Users](#users)
+* [Reactions](#reactions)
+* [Enrichment](#enrichment)
 * [License](#license)
 
 ## Usage
 
 Get the client:
 
-```
+```bash
 $ go get gopkg.in/GetStream/stream-go2.v1
 ```
 
 stream-go2 uses [dep](https://github.com/golang/dep) for managing dependencies (see `Gopkg.toml` and `Gopkg.lock`).
 You can get required dependencies simply by running:
-```
+
+```bash
 $ dep ensure
 ```
 
 Even better: at Stream we have developed [vg](https://github.com/GetStream/vg), a powerful workspace manager for Go based on `dep` itself.
 If you use vg (and you should!) you can just:
-```
+
+```bash
 $ vg init && vg ensure
 ```
 
@@ -81,11 +86,13 @@ client, err := stream.NewClient(key, secret,
 ```
 
 You can also create a client using environment variables:
+
 ```go
 client, err := stream.NewClientFromEnv()
 ```
 
 Available environment variables:
+
 * `STREAM_API_KEY`
 * `STREAM_API_SECRET`
 * `STREAM_API_REGION`
@@ -94,16 +101,19 @@ Available environment variables:
 ### Creating a Feed
 
 Create a flat feed from slug and user ID:
+
 ```go
 flat := client.FlatFeed("user", "123")
 ```
 
 Create an aggregated feed from slug and user ID:
+
 ```go
 aggr := client.AggregatedFeed("aggregated", "123")
 ```
 
 Create a notification feed from slug and user ID:
+
 ```go
 notif := client.NotificationFeed("notification", "123")
 ```
@@ -116,6 +126,7 @@ to indicate that only that kind of feed has certain methods or can perform certa
 ### Retrieving activities
 
 #### Flat feeds
+
 ```go
 resp, err := flat.GetActivities()
 if err != nil {
@@ -131,6 +142,7 @@ for _, activity := range resp.Results {
 ```
 
 You can retrieve flat feeds with [custom ranking](https://getstream.io/docs/#custom_ranking), using the dedicated method:
+
 ```go
 resp, err := flat.GetActivitiesWithRanking("popularity")
 if err != nil {
@@ -139,6 +151,7 @@ if err != nil {
 ```
 
 #### Aggregated feeds
+
 ```go
 resp, err := aggregated.GetActivities()
 if err != nil {
@@ -158,6 +171,7 @@ for _, group := range resp.Results {
 ```
 
 #### Notification feeds
+
 ```go
 resp, err := notification.GetActivities()
 if err != nil {
@@ -180,7 +194,9 @@ for _, group := range resp.Results {
 
 
 #### Options
+
 You can pass supported options and filters when retrieving activities:
+
 ```go
 resp, err := flat.GetActivities(
     stream.WithActivitiesIDGTE("f505b3fb-a212-11e7-..."),
@@ -190,7 +206,9 @@ resp, err := flat.GetActivities(
 ```
 
 ### Adding activities
+
 Add a single activity:
+
 ```go
 resp, err := feed.AddActivity(stream.Activity{Actor: "bob", ...})
 if err != nil {
@@ -202,6 +220,7 @@ fmt.Println("Activity:", resp.Activity) // resp wraps the stream.Activity type
 ```
 
 Add multiple activities:
+
 ```go
 a1 := stream.Activity{Actor: "bob", ...}
 a2 := stream.Activity{Actor: "john", ...}
@@ -220,6 +239,7 @@ for _, activity := range resp.Activities {
 ```
 
 ### Updating activities
+
 ```go
 err := feed.UpdateActivities(a1, a2, ...)
 if err != nil {
@@ -228,7 +248,9 @@ if err != nil {
 ```
 
 ### Removing activities
+
 You can either remove activities by ID or ForeignID:
+
 ```go
 err := feed.RemoveActivityByID("f505b3fb-a212-11e7-...")
 if err != nil {
@@ -242,16 +264,20 @@ if err != nil {
 ```
 
 ### Following another feed
+
 ```go
 err := feed.Follow(anotherFeed)
 if err != nil {
     // ...
 }
 ```
+
 Beware that it's possible to follow only flat feeds.
 
 #### Options
+
 You can pass options to the `Follow` method. For example:
+
 ```go
 err := feed.Follow(anotherFeed,
     stream.WithFollowFeedActivityCopyLimit(15),
@@ -260,8 +286,11 @@ err := feed.Follow(anotherFeed,
 ```
 
 ### Retrieving followers and followings
+
 #### Following
+
 Get the feeds that a feed is following:
+
 ```go
 resp, err := feed.GetFollowing()
 if err != nil {
@@ -275,6 +304,7 @@ for _, followed := range resp.Results {
 ```
 
 You can pass options to `GetFollowing`:
+
 ```go
 resp, err := feed.GetFollowing(
     stream.WithFollowingLimit(5),
@@ -283,6 +313,7 @@ resp, err := feed.GetFollowing(
 ```
 
 #### Followers
+
 ```go
 resp, err := flat.GetFollowers()
 if err != nil {
@@ -294,9 +325,11 @@ for _, follower := range resp.Results {
     fmt.Println(follower.FeedID, follower.TargetID)
 }
 ```
+
 Note: this is only possible for `FlatFeed` types.
 
 You can pass options to `GetFollowers`:
+
 ```go
 resp, err := feed.GetFollowing(
     stream.WithFollowersLimit(5),
@@ -305,6 +338,7 @@ resp, err := feed.GetFollowing(
 ```
 
 ### Unfollowing a feed
+
 ```go
 err := flat.Unfollow(anotherFeed)
 if err != nil {
@@ -313,6 +347,7 @@ if err != nil {
 ```
 
 You can pass options to `Unfollow`:
+
 ```go
 err := flat.Unfollow(anotherFeed,
     stream.WithUnfollowKeepHistory(true),
@@ -321,7 +356,9 @@ err := flat.Unfollow(anotherFeed,
 ```
 
 ### Updating an activity's `to` targets
+
 Remove all old targets and set new ones (replace):
+
 ```go
 newTargets := []stream.Feed{f1, f2}
 
@@ -332,6 +369,7 @@ if err != nil {
 ```
 
 Add some targets and remove some others:
+
 ```go
 add := []stream.Feed{target1, target2}
 remove := []stream.Feed{oldTarget1, oldTarget2}
@@ -348,9 +386,10 @@ if err != nil {
 
 Note: you can't mix `stream.WithToTargetsNew` with `stream.WithToTargetsAdd` or `stream.WithToTargetsRemove`.
 
-
 ### Batch adding activities
+
 You can add the same activities to multiple feeds at once with the `(*Client).AddToMany` method ([docs](https://getstream.io/docs_rest/#add_to_many)):
+
 ```go
 err := client.AddToMany(activity,
     feed1, feed2, ...,
@@ -361,7 +400,9 @@ if err != nil {
 ```
 
 ### Batch creating follows
+
 You can create multiple follow relationships at once with the `(*Client).FollowMany` method ([docs](https://getstream.io/docs_rest/#follow_many)):
+
 ```go
 relationships := []stream.FollowRelationship{
     stream.NewFollowRelationship(source, target),
@@ -375,7 +416,9 @@ if err != nil {
 ```
 
 ### Realtime tokens
+
 You can get a token suitable for client-side [real-time feed updates](https://getstream.io/docs/go/#realtime) as:
+
 ```go
 // Read+Write token
 token := feed.RealtimeToken(false)
@@ -729,7 +772,7 @@ if err != nil {
     // ...
 }
 fmt.Println(enrichedResult.Results[0]["actor"].(map[string]interface{})) // Will output the user object
-fmt.Println(enrichedResult.Results[0]["object"].(map[string]interface{})) // Will output the colelction object
+fmt.Println(enrichedResult.Results[0]["object"].(map[string]interface{})) // Will output the collection object
 ```
 
 See the complete [docs and examples](https://getstream.io/docs/#enrichment_introduction) about enrichment on Stream's documentation pages.
