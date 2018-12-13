@@ -135,6 +135,24 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 	return opts, nil
 }
 
+// baseNotificationFeedResponse is the common part of responses obtained from reading normal or enriched notification feeds.
+type baseNotificationFeedResponse struct {
+	readResponse
+	Unseen int `json:"unseen"`
+	Unread int `json:"unread"`
+}
+
+// baseNotificationFeedResukt is the common part of responses obtained from reading normal or enriched notification feeds.
+type baseNotificationFeedResult struct {
+	ID            string `json:"id"`
+	ActivityCount int    `json:"activity_count"`
+	ActorCount    int    `json:"actor_count"`
+	Group         string `json:"group"`
+	IsRead        bool   `json:"is_read"`
+	IsSeen        bool   `json:"is_seen"`
+	Verb          string `json:"verb"`
+}
+
 // FlatFeedResponse is the API response obtained when retrieving activities from
 // a flat feed.
 type FlatFeedResponse struct {
@@ -152,23 +170,15 @@ type AggregatedFeedResponse struct {
 // NotificationFeedResponse is the API response obtained when retrieving activities
 // from a notification feed.
 type NotificationFeedResponse struct {
-	readResponse
-	Unseen  int                      `json:"unseen"`
-	Unread  int                      `json:"unread"`
+	baseNotificationFeedResponse
 	Results []NotificationFeedResult `json:"results"`
 }
 
 // NotificationFeedResult is a notification-feed specific response, containing
 // the list of activities in the group, plus the extra fields about the group read+seen status.
 type NotificationFeedResult struct {
-	ID            string     `json:"id"`
-	Activities    []Activity `json:"activities"`
-	ActivityCount int        `json:"activity_count"`
-	ActorCount    int        `json:"actor_count"`
-	Group         string     `json:"group"`
-	IsRead        bool       `json:"is_read"`
-	IsSeen        bool       `json:"is_seen"`
-	Verb          string     `json:"verb"`
+	baseNotificationFeedResult
+	Activities []Activity `json:"activities"`
 }
 
 // AddActivityResponse is the API response obtained when adding a single activity
@@ -263,8 +273,8 @@ type UnfollowRelationship struct {
 
 // CollectionObject is a collection's object.
 type CollectionObject struct {
-	ID   string
-	Data map[string]interface{}
+	ID   string                 `json:"id"`
+	Data map[string]interface{} `json:"data"`
 }
 
 // MarshalJSON marshals the CollectionObject to a flat JSON object.
@@ -286,11 +296,119 @@ type getCollectionResponse struct {
 	Data []GetCollectionResponseObject `json:"data"`
 }
 
+type addCollectionRequest struct {
+	UserID *string `json:"user_id,omitempty"`
+	CollectionObject
+}
+
+func (r addCollectionRequest) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
+		"id":   r.ID,
+		"data": r.Data,
+	}
+	if r.UserID != nil {
+		m["user_id"] = r.UserID
+	}
+
+	return json.Marshal(m)
+}
+
 // GetCollectionResponseObject represent a single response coming from a Collection
 // Get request after a CollectionsClient.Get call.
 type GetCollectionResponseObject struct {
 	ForeignID string                 `json:"foreign_id"`
 	Data      map[string]interface{} `json:"data"`
+}
+
+//User represents a user
+type User struct {
+	ID   string                 `json:"id"`
+	Data map[string]interface{} `json:"data,omitempty"`
+}
+
+//Reaction is a reaction retrieved from the API.
+type Reaction struct {
+	AddReactionRequestObject
+	ChildrenReactions map[string][]*Reaction `json:"latest_children,omitempty"`
+	OwnChildren       map[string][]*Reaction `json:"own_children,omitempty"`
+	ChildrenCounters  map[string]interface{} `json:"children_counts,omitempty"`
+}
+
+//AddReactionRequestObject is an object used only when calling the Add* reaction endpoints
+type AddReactionRequestObject struct {
+	ID          string                 `json:"id,omitempty"`
+	Kind        string                 `json:"kind"`
+	ActivityID  string                 `json:"activity_id"`
+	UserID      string                 `json:"user_id"`
+	Data        map[string]interface{} `json:"data,omitempty"`
+	TargetFeeds []string               `json:"target_feeds,omitempty"`
+	ParentID    string                 `json:"parent,omitempty"`
+}
+
+// filterResponse is the part of StreamAPI responses common for FilterReactions API requests.
+type filterResponse struct {
+	response
+	Next string `json:"next,omitempty"`
+}
+
+func (r filterResponse) parseNext() ([]FilterReactionsOption, error) {
+	if r.Next == "" {
+		return nil, ErrMissingNextPage
+	}
+
+	urlParts := strings.Split(r.Next, "?")
+	if len(urlParts) != 2 {
+		return nil, ErrInvalidNextPage
+	}
+	values, err := url.ParseQuery(urlParts[1])
+	if err != nil {
+		return nil, ErrInvalidNextPage
+	}
+
+	var opts []FilterReactionsOption
+
+	limit, ok, err := parseIntValue(values, "limit")
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		opts = append(opts, WithLimit(limit))
+	}
+
+	if idLT := values.Get("id_lt"); idLT != "" {
+		opts = append(opts, WithIDLT(idLT))
+	}
+
+	if idLT := values.Get("id_gt"); idLT != "" {
+		opts = append(opts, WithIDGT(idLT))
+	}
+
+	if withActData := values.Get("with_activity_data"); withActData != "" {
+		if val := strings.ToLower(withActData); val == "true" || val == "t" || val == "1" {
+			opts = append(opts, WithActivityData())
+		}
+	}
+
+	if withOwnChildren := values.Get("with_own_children"); withOwnChildren != "" {
+		if val := strings.ToLower(withOwnChildren); val == "true" || val == "t" || val == "1" {
+			opts = append(opts, WithOwnChildren())
+		}
+	}
+
+	return opts, nil
+}
+
+// FilterReactionResponse is the response received from the ReactionsClient.Filter call.
+type FilterReactionResponse struct {
+	filterResponse
+	Results  []Reaction             `json:"results"`
+	Activity map[string]interface{} `json:"activity"`
+	meta     filterReactionsRequestMetadata
+}
+
+// filterReactionsRequestMetadata holds the initial request metadata used for pagination.
+type filterReactionsRequestMetadata struct {
+	attr FilterReactionsAttribute
 }
 
 // PersonalizationResponse is a generic response from the personalization endpoints
@@ -330,6 +448,27 @@ func (r *PersonalizationResponse) UnmarshalJSON(data []byte) error {
 		r.extra[k] = m[k]
 	}
 	return nil
+}
+
+// EnrichedFlatFeedResponse is the API response obtained when retrieving enriched activities from
+// a flat feed.
+type EnrichedFlatFeedResponse struct {
+	readResponse
+	Results []EnrichedActivity `json:"results,omitempty"`
+}
+
+// EnrichedAggregatedFeedResponse is the API response obtained when retrieving
+// enriched activities from an aggregated feed.
+type EnrichedAggregatedFeedResponse struct {
+	readResponse
+	Results []EnrichedActivityGroup `json:"results,omitempty"`
+}
+
+// EnrichedNotificationFeedResponse is the API response obtained when retrieving enriched activities
+// from a notification feed.
+type EnrichedNotificationFeedResponse struct {
+	baseNotificationFeedResponse
+	Results []EnrichedNotificationFeedResult `json:"results"`
 }
 
 // GetActivitiesResponse contains a slice of Activity returned by GetActivitiesByID

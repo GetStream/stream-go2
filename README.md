@@ -36,25 +36,30 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
   * [Email tracking](#email-tracking)
 * [Personalization](#personalization)
 * [Collections](#collections)
+* [Users](#users)
+* [Reactions](#reactions)
+* [Enrichment](#enrichment)
 * [License](#license)
 
 ## Usage
 
 Get the client:
 
-```
+```bash
 $ go get gopkg.in/GetStream/stream-go2.v1
 ```
 
 stream-go2 uses [dep](https://github.com/golang/dep) for managing dependencies (see `Gopkg.toml` and `Gopkg.lock`).
 You can get required dependencies simply by running:
-```
+
+```bash
 $ dep ensure
 ```
 
 Even better: at Stream we have developed [vg](https://github.com/GetStream/vg), a powerful workspace manager for Go based on `dep` itself.
 If you use vg (and you should!) you can just:
-```
+
+```bash
 $ vg init && vg ensure
 ```
 
@@ -73,7 +78,7 @@ if err != nil {
 You can pass additional options when creating a client using the available `ClientOption` functions:
 
 ```go
-client, err := stream.NewClient(key, secret, 
+client, err := stream.NewClient(key, secret,
     stream.WithAPIRegion("us-east"),
     stream.WithAPIVersion("1.0"),
     ...,
@@ -81,11 +86,13 @@ client, err := stream.NewClient(key, secret,
 ```
 
 You can also create a client using environment variables:
+
 ```go
 client, err := stream.NewClientFromEnv()
 ```
 
 Available environment variables:
+
 * `STREAM_API_KEY`
 * `STREAM_API_SECRET`
 * `STREAM_API_REGION`
@@ -94,16 +101,19 @@ Available environment variables:
 ### Creating a Feed
 
 Create a flat feed from slug and user ID:
+
 ```go
 flat := client.FlatFeed("user", "123")
 ```
 
 Create an aggregated feed from slug and user ID:
+
 ```go
 aggr := client.AggregatedFeed("aggregated", "123")
 ```
 
 Create a notification feed from slug and user ID:
+
 ```go
 notif := client.NotificationFeed("notification", "123")
 ```
@@ -116,6 +126,7 @@ to indicate that only that kind of feed has certain methods or can perform certa
 ### Retrieving activities
 
 #### Flat feeds
+
 ```go
 resp, err := flat.GetActivities()
 if err != nil {
@@ -131,6 +142,7 @@ for _, activity := range resp.Results {
 ```
 
 You can retrieve flat feeds with [custom ranking](https://getstream.io/docs/#custom_ranking), using the dedicated method:
+
 ```go
 resp, err := flat.GetActivitiesWithRanking("popularity")
 if err != nil {
@@ -139,6 +151,7 @@ if err != nil {
 ```
 
 #### Aggregated feeds
+
 ```go
 resp, err := aggregated.GetActivities()
 if err != nil {
@@ -158,6 +171,7 @@ for _, group := range resp.Results {
 ```
 
 #### Notification feeds
+
 ```go
 resp, err := notification.GetActivities()
 if err != nil {
@@ -180,17 +194,21 @@ for _, group := range resp.Results {
 
 
 #### Options
+
 You can pass supported options and filters when retrieving activities:
+
 ```go
 resp, err := flat.GetActivities(
     stream.WithActivitiesIDGTE("f505b3fb-a212-11e7-..."),
-    stream.WithActivitiesLimit(5), 
+    stream.WithActivitiesLimit(5),
     ...,
 )
 ```
 
 ### Adding activities
+
 Add a single activity:
+
 ```go
 resp, err := feed.AddActivity(stream.Activity{Actor: "bob", ...})
 if err != nil {
@@ -202,6 +220,7 @@ fmt.Println("Activity:", resp.Activity) // resp wraps the stream.Activity type
 ```
 
 Add multiple activities:
+
 ```go
 a1 := stream.Activity{Actor: "bob", ...}
 a2 := stream.Activity{Actor: "john", ...}
@@ -220,6 +239,7 @@ for _, activity := range resp.Activities {
 ```
 
 ### Updating activities
+
 ```go
 err := feed.UpdateActivities(a1, a2, ...)
 if err != nil {
@@ -228,7 +248,9 @@ if err != nil {
 ```
 
 ### Removing activities
+
 You can either remove activities by ID or ForeignID:
+
 ```go
 err := feed.RemoveActivityByID("f505b3fb-a212-11e7-...")
 if err != nil {
@@ -242,26 +264,33 @@ if err != nil {
 ```
 
 ### Following another feed
+
 ```go
 err := feed.Follow(anotherFeed)
 if err != nil {
     // ...
 }
 ```
+
 Beware that it's possible to follow only flat feeds.
 
 #### Options
+
 You can pass options to the `Follow` method. For example:
+
 ```go
-err := feed.Follow(anotherFeed, 
-    stream.WithFollowFeedActivityCopyLimit(15), 
+err := feed.Follow(anotherFeed,
+    stream.WithFollowFeedActivityCopyLimit(15),
     ...,
 )
 ```
 
 ### Retrieving followers and followings
+
 #### Following
+
 Get the feeds that a feed is following:
+
 ```go
 resp, err := feed.GetFollowing()
 if err != nil {
@@ -275,6 +304,7 @@ for _, followed := range resp.Results {
 ```
 
 You can pass options to `GetFollowing`:
+
 ```go
 resp, err := feed.GetFollowing(
     stream.WithFollowingLimit(5),
@@ -283,6 +313,7 @@ resp, err := feed.GetFollowing(
 ```
 
 #### Followers
+
 ```go
 resp, err := flat.GetFollowers()
 if err != nil {
@@ -294,9 +325,11 @@ for _, follower := range resp.Results {
     fmt.Println(follower.FeedID, follower.TargetID)
 }
 ```
+
 Note: this is only possible for `FlatFeed` types.
 
 You can pass options to `GetFollowers`:
+
 ```go
 resp, err := feed.GetFollowing(
     stream.WithFollowersLimit(5),
@@ -305,6 +338,7 @@ resp, err := feed.GetFollowing(
 ```
 
 ### Unfollowing a feed
+
 ```go
 err := flat.Unfollow(anotherFeed)
 if err != nil {
@@ -313,6 +347,7 @@ if err != nil {
 ```
 
 You can pass options to `Unfollow`:
+
 ```go
 err := flat.Unfollow(anotherFeed,
     stream.WithUnfollowKeepHistory(true),
@@ -321,7 +356,9 @@ err := flat.Unfollow(anotherFeed,
 ```
 
 ### Updating an activity's `to` targets
+
 Remove all old targets and set new ones (replace):
+
 ```go
 newTargets := []stream.Feed{f1, f2}
 
@@ -332,12 +369,13 @@ if err != nil {
 ```
 
 Add some targets and remove some others:
+
 ```go
 add := []stream.Feed{target1, target2}
 remove := []stream.Feed{oldTarget1, oldTarget2}
 
 err := feed.UpdateToTargets(
-    activity, 
+    activity,
     stream.WithToTargetsAdd(add),
     stream.WithToTargetsRemove(remove),
 )
@@ -348,9 +386,10 @@ if err != nil {
 
 Note: you can't mix `stream.WithToTargetsNew` with `stream.WithToTargetsAdd` or `stream.WithToTargetsRemove`.
 
-
 ### Batch adding activities
+
 You can add the same activities to multiple feeds at once with the `(*Client).AddToMany` method ([docs](https://getstream.io/docs_rest/#add_to_many)):
+
 ```go
 err := client.AddToMany(activity,
     feed1, feed2, ...,
@@ -361,7 +400,9 @@ if err != nil {
 ```
 
 ### Batch creating follows
+
 You can create multiple follow relationships at once with the `(*Client).FollowMany` method ([docs](https://getstream.io/docs_rest/#follow_many)):
+
 ```go
 relationships := []stream.FollowRelationship{
     stream.NewFollowRelationship(source, target),
@@ -375,7 +416,9 @@ if err != nil {
 ```
 
 ### Realtime tokens
+
 You can get a token suitable for client-side [real-time feed updates](https://getstream.io/docs/go/#realtime) as:
+
 ```go
 // Read+Write token
 token := feed.RealtimeToken(false)
@@ -504,44 +547,240 @@ See the complete [docs and examples](https://getstream.io/docs/#personalization_
 
 ## Collections
 
-[Collections](https://getstream.io/docs/#collections) endpoints for enabled apps can be reached using a specialized `CollectionsClient` which, like `PersonalizationClient`, can be obtained from a regular `Client`:
+[Collections](https://getstream.io/docs/#collections_introduction) endpoints can be reached using a specialized `CollectionsClient` which, like `PersonalizationClient`, can be obtained from a regular `Client`:
 
 ```go
 collections := client.Collections()
 ```
 
-`CollectionsClient` exposes three functions, `Upsert`, `Get`, and `Delete`:
+`CollectionsClient` exposes three batch functions, `Upsert`, `Select`, and `DeleteMany` as well as CRUD functions: `Add`, `Get`, `Update`, `Delete`:
 
 ```go
-// Upsert the "user" collection
+// Upsert the "picture" collection
 object := stream.CollectionObject{
     ID:   "123",
-    Name: "johndoe",
     Data: map[string]interface{}{
-        "favorite_color": "blue",
+        "name": "Rocky Mountains",
+        "location": "North America",
     },
 }
-err = collections.Upsert("user", object)
+err = collections.Upsert("picture", object)
 if err != nil {
     // ...
 }
 
-// Get the data from the "user" collection for ID "123" and "456"
-objects, err := collections.Get("user", "123", "456")
+// Get the data from the "picture" collection for ID "123" and "456"
+objects, err := collections.Select("picture", "123", "456")
 if err != nil {
     // ...
 }
 
-// Delete the data from the "user" collection for user with ID "123"
-err = collections.Delete("user", "123")
+// Delete the data from the "picture" collection for picture with ID "123"
+err = collections.Delete("picture", "123")
+if err != nil {
+    // ...
+}
+
+// Get a single collection object from the "pictures" collection with ID "123"
+err = collections.Delete("pictures", "123")
 if err != nil {
     // ...
 }
 ```
 
-See the complete [docs and examples](https://getstream.io/docs/#collections) about collections on Stream's documentation pages.
+See the complete [docs and examples](https://getstream.io/docs/#collections_introduction) about collections on Stream's documentation pages.
+
+## Users
+
+[Users](https://getstream.io/docs/#users_introduction) endpoints can be reached using a specialized `UsersClient` which, like `CollectionsClient`, can be obtained from a regular `Client`:
+
+```go
+users := client.Users()
+```
+
+`UsersClient` exposes CRUD functions: `Add`, `Get`, `Update`, `Delete`:
+
+```go
+user := stream.User{
+    ID: "123",
+    Data: map[string]interface{}{
+        "name": "Bobby Tables",
+    },
+}
+
+insertedUser, err := users.Add(user, false)
+if err != nil {
+    // ...
+}
+
+newUserData :=map[string]interface{}{
+    "name": "Bobby Tables",
+    "age": 7,
+}
+
+updatedUser, err := users.Update("123", newUserData)
+if err != nil {
+    // ...
+}
+
+err = users.Delete("123")
+if err != nil {
+    // ...
+}
+```
+
+See the complete [docs and examples](https://getstream.io/docs/#users_introduction) about users on Stream's documentation pages.
+
+## Reactions
+
+[Reactions](https://getstream.io/docs/#reactions_introduction) endpoints can be reached using a specialized `Reactions` which, like `CollectionsClient`, can be obtained from a regular `Client`:
+
+```go
+reactions := client.Reactions()
+```
+
+`Reactions` exposes CRUD functions: `Add`, `Get`, `Update`, `Delete`, as well as two specialized functions `AddChild` and `Filter`:
+
+```go
+r := stream.AddReactionRequestObject{
+    Kind: "comment",
+    UserID: "123",
+    ActivityID: "87a9eec0-fd5f-11e8-8080-80013fed2f5b",
+    Data: map[string]interface{}{
+        "text": "Nice post!!",
+    },
+    TargetFeeds: []string{"user:bob", "timeline:alice"},
+}
+
+comment, err := reactions.Add(r)
+if err != nil {
+    // ...
+}
+
+like := stream.AddReactionRequestObject{
+    Kind: "like",
+    UserID: "456",
+}
+
+childReaction, err := reactions.AddChild(comment.ID, like)
+if err != nil {
+    // ...
+}
+
+//If we fetch the "comment" reaction now, it will have the child reaction(s) present.
+parent, err := reactions.Get(comment.ID)
+if err != nil {
+    // ...
+}
+
+for kind, children := range parent.ChildrenReactions {
+    //child reactions are grouped by kind
+}
+
+//update the target feeds for the `comment` reaction
+updatedReaction, err := reactions.Update(comment.ID, nil, []string{"timeline:jeff"})
+if err != nil {
+    // ...
+}
+
+//get all reactions for the activity "87a9eec0-fd5f-11e8-8080-80013fed2f5b", paginated 5 at a time, including the activity data
+response, err := reactions.Filter(stream.ByActivityID("87a9eec0-fd5f-11e8-8080-80013fed2f5b"), stream.WithLimit(5), stream.WithActivityData())
+if err != nil {
+    // ...
+}
+
+//since we requested the activity, it will be present in the response
+fmt.Println(response.Activity)
+
+for _, reaction := range response.Results{
+    //do something for each reaction
+}
+
+//get the next page of reactions
+response, err = reactions.GetNextPageFilteredReactions(response)
+if err != nil {
+    // ...
+}
+
+// get all likes by user "123"
+response, err = reactions.Filter(stream.ByUserID("123").ByKind("like"))
+if err != nil {
+    // ...
+}
+```
+
+See the complete [docs and examples](https://getstream.io/docs/#reactions_introduction) about reactions on Stream's documentation pages.
+
+## Enrichment
+
+[Enrichment](https://getstream.io/docs/#enrichment_introduction) is a way of retrieving activities from feeds in which references to `Users` and `Collections` will be replaced with the corresponding objects
+
+`FlatFeed`, `AggregatedFeed` and `NotificationFeed` each have a `GetEnrichedActivities` function to retrieve enriched activities.
+
+```go
+
+u := stream.User{
+    ID: "123",
+    Data: map[string]interface{}{
+        "name": "Bobby Tables",
+    },
+}
+
+//We add a user
+user, err := client.Users().Add(u, true)
+if err != nil {
+    // ...
+}
+
+c := stream.CollectionObject{
+    ID: "123",
+    Data: map[string]interface{}{
+        "name":     "Rocky Mountains",
+        "location": "North America",
+    },
+}
+
+//We add a colection object
+collectionObject, err := client.Collections().Add("picture", c)
+if err != nil {
+    // ...
+}
+
+act := stream.Activity{
+    Time:      stream.Time{Time: time.Now()},
+    Actor:     client.Users().CreateReference(user.ID),
+    Verb:      "post",
+    Object:    client.Collections().CreateReference("picture", collectionObject.ID),
+    ForeignID: "picture:1",
+}
+
+
+//We add the activity to the user's feed
+feed := client.FlatFeed("user", "123")
+_, err = feed.AddActivity(act)
+if err != nil {
+    // ...
+}
+
+result, err := feed.GetActivities()
+if err != nil {
+    // ...
+}
+fmt.Println(result.Results[0].Actor) // Will ouput the user reference
+fmt.Println(result.Results[0].Object) // Will ouput the collection reference
+
+enrichedResult, err := feed.GetEnrichedActivities()
+if err != nil {
+    // ...
+}
+fmt.Println(enrichedResult.Results[0]["actor"].(map[string]interface{})) // Will output the user object
+fmt.Println(enrichedResult.Results[0]["object"].(map[string]interface{})) // Will output the collection object
+```
+
+See the complete [docs and examples](https://getstream.io/docs/#enrichment_introduction) about enrichment on Stream's documentation pages.
 
 ## License
+
 stream-go2 is licensed under the [GNU General Public License v3.0](LICENSE).
 
 Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
@@ -549,6 +788,7 @@ Permissions of this strong copyleft license are conditioned on making available 
 See the [LICENSE](LICENSE) file.
 
 ## We're hiring!
+
 Would you like to work on cool projects like this?
 
 We are currently hiring for talented Gophers in Amsterdam and Boulder, get in touch with us if you are interested! tommaso@getstream.io

@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 )
 
@@ -153,6 +154,18 @@ func (c *Client) Analytics() *AnalyticsClient {
 func (c *Client) Collections() *CollectionsClient {
 	b := newAPIURLBuilder(c.region, c.version)
 	return &CollectionsClient{client: c.cloneWithURLBuilder(b)}
+}
+
+// Users returns a new UsersClient.
+func (c *Client) Users() *UsersClient {
+	b := newAPIURLBuilder(c.region, c.version)
+	return &UsersClient{client: c.cloneWithURLBuilder(b)}
+}
+
+// Reactions returns a new ReactionsClient.
+func (c *Client) Reactions() *ReactionsClient {
+	b := newAPIURLBuilder(c.region, c.version)
+	return &ReactionsClient{client: c.cloneWithURLBuilder(b)}
 }
 
 // Personalization returns a new PersonalizationClient.
@@ -305,6 +318,10 @@ func (c *Client) post(endpoint endpoint, data interface{}, authFn authFunc) ([]b
 	return c.request(http.MethodPost, endpoint, data, authFn)
 }
 
+func (c *Client) put(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+	return c.request(http.MethodPut, endpoint, data, authFn)
+}
+
 func (c *Client) delete(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
 	return c.request(http.MethodDelete, endpoint, data, authFn)
 }
@@ -426,6 +443,15 @@ func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) error {
 
 func (c *Client) getActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
+	return c.getActivitiesInternal(endpoint, feed, opts...)
+}
+
+func (c *Client) getEnrichedActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
+	endpoint := c.makeEndpoint("enrich/feed/%s/%s/", feed.Slug(), feed.UserID())
+	return c.getActivitiesInternal(endpoint, feed, opts...)
+}
+
+func (c *Client) getActivitiesInternal(endpoint endpoint, feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
