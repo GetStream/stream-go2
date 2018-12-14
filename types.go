@@ -132,6 +132,35 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 		opts = append(opts, withActivitiesRanking(ranking))
 	}
 
+	if enrichOpt := values.Get("withOwnReactions"); parseBool(enrichOpt) {
+		opts = append(opts, WithEnrichOwnReactions())
+	}
+
+	if enrichOpt := values.Get("withRecentReactions"); parseBool(enrichOpt) {
+		opts = append(opts, WithEnrichRecentReactions())
+	}
+
+	if enrichOpt := values.Get("withReactionCounts"); parseBool(enrichOpt) {
+		opts = append(opts, WithEnrichReactionCounts())
+	}
+
+	if enrichOpt := values.Get("withOwnChildren"); parseBool(enrichOpt) {
+		opts = append(opts, WithEnrichOwnChildren())
+	}
+
+	reactionsLimit, ok, err := parseIntValue(values, "recentReactionsLimit")
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		opts = append(opts, WithEnrichRecentReactionsLimit(reactionsLimit))
+	}
+
+	if enrichOpt := values.Get("reactionKindsFilter"); enrichOpt != "" {
+		kinds := strings.Split(enrichOpt, ",")
+		opts = append(opts, WithEnrichReactionKindsFilter(kinds...))
+	}
+
 	return opts, nil
 }
 
@@ -273,7 +302,7 @@ type UnfollowRelationship struct {
 
 // CollectionObject is a collection's object.
 type CollectionObject struct {
-	ID   string                 `json:"id"`
+	ID   string                 `json:"id,omitempty"`
 	Data map[string]interface{} `json:"data"`
 }
 
