@@ -302,7 +302,7 @@ type UnfollowRelationship struct {
 
 // CollectionObject is a collection's object.
 type CollectionObject struct {
-	ID   string                 `json:"id"`
+	ID   string                 `json:"id,omitempty"`
 	Data map[string]interface{} `json:"data"`
 }
 
