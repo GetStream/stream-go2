@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -53,4 +54,9 @@ func parseIntValue(values url.Values, key string) (int, bool, error) {
 		return 0, false, err
 	}
 	return i, true, nil
+}
+
+func parseBool(value string) bool {
+	v := strings.ToLower(value)
+	return v != "" && v != "false" && v != "f" && v != "0"
 }

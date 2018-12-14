@@ -132,19 +132,19 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 		opts = append(opts, withActivitiesRanking(ranking))
 	}
 
-	if enrichOpt := values.Get("withOwnReactions"); enrichOpt != "" {
+	if enrichOpt := values.Get("withOwnReactions"); parseBool(enrichOpt) {
 		opts = append(opts, WithEnrichOwnReactions())
 	}
 
-	if enrichOpt := values.Get("withRecentReactions"); enrichOpt != "" {
+	if enrichOpt := values.Get("withRecentReactions"); parseBool(enrichOpt) {
 		opts = append(opts, WithEnrichRecentReactions())
 	}
 
-	if enrichOpt := values.Get("withReactionCounts"); enrichOpt != "" {
+	if enrichOpt := values.Get("withReactionCounts"); parseBool(enrichOpt) {
 		opts = append(opts, WithEnrichReactionCounts())
 	}
 
-	if enrichOpt := values.Get("withOwnChildren"); enrichOpt != "" {
+	if enrichOpt := values.Get("withOwnChildren"); parseBool(enrichOpt) {
 		opts = append(opts, WithEnrichOwnChildren())
 	}
 
