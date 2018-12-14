@@ -124,6 +124,36 @@ func WithCustomParam(name, value string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption(name, value)}
 }
 
+// WithEnrichOwnReactions enriches the activities with the reactions to them.
+func WithEnrichOwnReactions() GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("withOwnReactions", true)}
+}
+
+// WithEnrichRecentReactions enriches the activities with the recent reactions to them.
+func WithEnrichRecentReactions() GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("withRecentReactions", true)}
+}
+
+// WithEnrichReactionCounts enriches the activities with the reaction counts.
+func WithEnrichReactionCounts() GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("withReactionCounts", true)}
+}
+
+// WithEnrichOwnChildren enriches the activities with the children reactions.
+func WithEnrichOwnChildren() GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("withOwnChildren", true)}
+}
+
+// WithEnrichRecentReactionsLimit specifies how many recent reactions to include in the enrichment.
+func WithEnrichRecentReactionsLimit(limit int) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("recentReactionsLimit", limit)}
+}
+
+// WithEnrichmReactionKindsFilter filters the reactions by the specified kinds
+func WithEnrichReactionKindsFilter(kinds ...string) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("reactionKindsFilter", strings.Join(kinds, ","))}
+}
+
 // FollowingOption is an option usable by following feed methods.
 type FollowingOption struct {
 	requestOption
