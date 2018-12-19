@@ -450,6 +450,7 @@ type PersonalizationResponse struct {
 	Limit    int                      `json:"limit"`
 	Offset   int                      `json:"offset"`
 	Version  string                   `json:"version"`
+	Next     string                   `json:"next"`
 	Results  []map[string]interface{} `json:"results"`
 	extra    map[string]interface{}
 }
