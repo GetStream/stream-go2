@@ -74,26 +74,14 @@ func getTime(t time.Time) stream.Time {
 	return stream.Time{Time: st}
 }
 
-func newFlatFeed(c *stream.Client) *stream.FlatFeed {
-	return newFlatFeedWithUserID(c, randString(10))
-}
-
-func newFlatFeedWithUserID(c *stream.Client, userID string) *stream.FlatFeed {
+func newFlatFeedWithUserID(c *stream.Client, userID string) (*stream.FlatFeed, error) {
 	return c.FlatFeed("flat", userID)
 }
 
-func newAggregatedFeed(c *stream.Client) *stream.AggregatedFeed {
-	return newAggregatedFeedWithUserID(c, randString(10))
-}
-
-func newAggregatedFeedWithUserID(c *stream.Client, userID string) *stream.AggregatedFeed {
+func newAggregatedFeedWithUserID(c *stream.Client, userID string) (*stream.AggregatedFeed, error) {
 	return c.AggregatedFeed("aggregated", userID)
 }
 
-func newNotificationFeed(c *stream.Client) *stream.NotificationFeed {
-	return newNotificationFeedWithUserID(c, randString(10))
-}
-
-func newNotificationFeedWithUserID(c *stream.Client, userID string) *stream.NotificationFeed {
+func newNotificationFeedWithUserID(c *stream.Client, userID string) (*stream.NotificationFeed, error) {
 	return c.NotificationFeed("notification", userID)
 }

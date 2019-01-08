@@ -12,7 +12,7 @@ import (
 
 func TestAggregatedFeedGetActivities(t *testing.T) {
 	client, requester := newClient(t)
-	aggregated := newAggregatedFeedWithUserID(client, "123")
+	aggregated, _ := newAggregatedFeedWithUserID(client, "123")
 	testCases := []struct {
 		opts        []stream.GetActivitiesOption
 		url         string
@@ -46,7 +46,7 @@ func TestAggregatedFeedGetActivities(t *testing.T) {
 
 func TestAggregatedFeedGetNextPageActivities(t *testing.T) {
 	client, requester := newClient(t)
-	aggregated := newAggregatedFeedWithUserID(client, "123")
+	aggregated, _ := newAggregatedFeedWithUserID(client, "123")
 
 	requester.resp = `{"next":"/api/v1.0/feed/aggregated/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
 	resp, err := aggregated.GetActivities()

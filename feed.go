@@ -1,6 +1,9 @@
 package stream
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+)
 
 // Feed is a generic Stream feed, exporting the generic functions common to any
 // Stream feed.
@@ -40,8 +43,13 @@ func (f *feed) UserID() string {
 	return f.userID
 }
 
-func newFeed(slug, userID string, client *Client) feed {
-	return feed{userID: userID, slug: slug, client: client}
+func newFeed(slug, userID string, client *Client) (*feed, error) {
+	userIDRegex := regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+	ok := userIDRegex.Match([]byte(userID))
+	if !ok {
+		return nil, errInvalidUserID
+	}
+	return &feed{userID: userID, slug: slug, client: client}, nil
 }
 
 // AddActivity adds a new Activity to the feed.

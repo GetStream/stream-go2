@@ -87,20 +87,32 @@ func WithHTTPRequester(requester Requester) ClientOption {
 }
 
 // FlatFeed returns a new Flat Feed with the provided slug and userID.
-func (c *Client) FlatFeed(slug, userID string) *FlatFeed {
-	return &FlatFeed{newFeed(slug, userID, c)}
+func (c *Client) FlatFeed(slug, userID string) (*FlatFeed, error) {
+	feed, err := newFeed(slug, userID, c)
+	if err != nil {
+		return nil, err
+	}
+	return &FlatFeed{*feed}, nil
 }
 
 // AggregatedFeed returns a new Aggregated Feed with the provided slug and
 // userID.
-func (c *Client) AggregatedFeed(slug, userID string) *AggregatedFeed {
-	return &AggregatedFeed{newFeed(slug, userID, c)}
+func (c *Client) AggregatedFeed(slug, userID string) (*AggregatedFeed, error) {
+	feed, err := newFeed(slug, userID, c)
+	if err != nil {
+		return nil, err
+	}
+	return &AggregatedFeed{*feed}, nil
 }
 
 // NotificationFeed returns a new Notification Feed with the provided slug and
 // userID.
-func (c *Client) NotificationFeed(slug, userID string) *NotificationFeed {
-	return &NotificationFeed{newFeed(slug, userID, c)}
+func (c *Client) NotificationFeed(slug, userID string) (*NotificationFeed, error) {
+	feed, err := newFeed(slug, userID, c)
+	if err != nil {
+		return nil, err
+	}
+	return &NotificationFeed{*feed}, nil
 }
 
 // AddToMany adds an activity to multiple feeds at once.
