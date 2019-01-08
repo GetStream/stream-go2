@@ -103,19 +103,19 @@ Available environment variables:
 Create a flat feed from slug and user ID:
 
 ```go
-flat := client.FlatFeed("user", "123")
+flat, err := client.FlatFeed("user", "123")
 ```
 
 Create an aggregated feed from slug and user ID:
 
 ```go
-aggr := client.AggregatedFeed("aggregated", "123")
+aggr, err := client.AggregatedFeed("aggregated", "123")
 ```
 
 Create a notification feed from slug and user ID:
 
 ```go
-notif := client.NotificationFeed("notification", "123")
+notif, err := client.NotificationFeed("notification", "123")
 ```
 
 Flat, aggregated, and notification feeds implement the `Feed` interface methods.
@@ -756,7 +756,7 @@ act := stream.Activity{
 
 
 //We add the activity to the user's feed
-feed := client.FlatFeed("user", "123")
+feed, _ := client.FlatFeed("user", "123")
 _, err = feed.AddActivity(act)
 if err != nil {
     // ...

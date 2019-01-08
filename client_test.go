@@ -15,7 +15,10 @@ import (
 
 func TestHeaders(t *testing.T) {
 	client, requester := newClient(t)
-	_, err := client.FlatFeed("user", "123").GetActivities()
+	feed, err := client.FlatFeed("user", "123")
+	require.NoError(t, err)
+
+	_, err = feed.GetActivities()
 	require.NoError(t, err)
 	assert.Equal(t, "application/json", requester.req.Header.Get("content-type"))
 	assert.Regexp(t, "^stream-go2-client-v[0-9\\.]+$", requester.req.Header.Get("x-stream-client"))
@@ -25,8 +28,8 @@ func TestAddToMany(t *testing.T) {
 	var (
 		client, requester = newClient(t)
 		activity          = stream.Activity{Actor: "bob", Verb: "like", Object: "cake"}
-		flat              = newFlatFeedWithUserID(client, "123")
-		aggregated        = newAggregatedFeedWithUserID(client, "123")
+		flat, _           = newFlatFeedWithUserID(client, "123")
+		aggregated, _     = newAggregatedFeedWithUserID(client, "123")
 	)
 
 	err := client.AddToMany(activity, flat, aggregated)
@@ -39,11 +42,11 @@ func TestFollowMany(t *testing.T) {
 	var (
 		client, requester = newClient(t)
 		relationships     = make([]stream.FollowRelationship, 3)
-		flat              = newFlatFeedWithUserID(client, "123")
+		flat, _           = newFlatFeedWithUserID(client, "123")
 	)
 
 	for i := range relationships {
-		other := newAggregatedFeedWithUserID(client, strconv.Itoa(i))
+		other, _ := newAggregatedFeedWithUserID(client, strconv.Itoa(i))
 		relationships[i] = stream.NewFollowRelationship(other, flat)
 	}
 
@@ -62,11 +65,11 @@ func TestFollowManyActivityCopyLimit(t *testing.T) {
 	var (
 		client, requester = newClient(t)
 		relationships     = make([]stream.FollowRelationship, 3)
-		flat              = newFlatFeedWithUserID(client, "123")
+		flat, _           = newFlatFeedWithUserID(client, "123")
 	)
 
 	for i := range relationships {
-		other := newAggregatedFeedWithUserID(client, strconv.Itoa(i))
+		other, _ := newAggregatedFeedWithUserID(client, strconv.Itoa(i))
 		relationships[i] = stream.NewFollowRelationship(other, flat, stream.WithFollowRelationshipActivityCopyLimit(i))
 	}
 
@@ -157,17 +160,17 @@ func TestUserSessionToken(t *testing.T) {
 	tokenString, err := client.GetUserSessionToken("user")
 	require.NoError(t, err)
 	assert.Equal(t, tokenString, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidXNlciJ9.0Kiui6HUywyU-C-00E68n1iq_3o7Eh0aE5VGSOc3pU4")
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {return []byte("secret"), nil})
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) { return []byte("secret"), nil })
 	assert.Equal(t, true, token.Valid)
 	assert.Equal(t, token.Claims, jwt.MapClaims{"user_id": "user"})
 }
 
 func TestUserSessionTokenWithClaims(t *testing.T) {
 	client, _ := newClient(t)
-	tokenString, err := client.GetUserSessionTokenWithClaims("user", map[string]interface{}{"client": "go",})
+	tokenString, err := client.GetUserSessionTokenWithClaims("user", map[string]interface{}{"client": "go"})
 	require.NoError(t, err)
 	assert.Equal(t, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJnbyIsInVzZXJfaWQiOiJ1c2VyIn0.Us6UIuH83dJe1cXQIiudseFz9-1kVMr6-SL6-idzIB0", tokenString)
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {return []byte("secret"), nil})
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) { return []byte("secret"), nil })
 	assert.Equal(t, true, token.Valid)
 	assert.Equal(t, token.Claims, jwt.MapClaims{"user_id": "user", "client": "go"})
 }

@@ -6,6 +6,7 @@ import (
 
 var (
 	errMissingCredentials = fmt.Errorf("missing API key or secret")
+	errInvalidUserID      = fmt.Errorf("invalid userID provided")
 )
 
 // APIError is an error returned by Stream API when the request cannot be

@@ -12,7 +12,7 @@ import (
 
 func TestFlatFeedGetActivities(t *testing.T) {
 	client, requester := newClient(t)
-	flat := newFlatFeedWithUserID(client, "123")
+	flat, _ := newFlatFeedWithUserID(client, "123")
 	testCases := []struct {
 		opts        []stream.GetActivitiesOption
 		url         string
@@ -69,7 +69,7 @@ func TestFlatFeedGetActivities(t *testing.T) {
 
 func TestFlatFeedGetNextPageActivities(t *testing.T) {
 	client, requester := newClient(t)
-	flat := newFlatFeedWithUserID(client, "123")
+	flat, _ := newFlatFeedWithUserID(client, "123")
 
 	requester.resp = `{"next":"/api/v1.0/feed/flat/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
 	resp, err := flat.GetActivities()

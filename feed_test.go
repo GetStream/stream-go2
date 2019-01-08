@@ -13,16 +13,28 @@ import (
 
 func TestFeedID(t *testing.T) {
 	client, _ := newClient(t)
-	flat := client.FlatFeed("flat", "123")
+	flat, _ := client.FlatFeed("flat", "123")
 	assert.Equal(t, "flat:123", flat.ID())
-	aggregated := client.AggregatedFeed("aggregated", "456")
+	aggregated, _ := client.AggregatedFeed("aggregated", "456")
 	assert.Equal(t, "aggregated:456", aggregated.ID())
+}
+
+func TestInvalidFeedUserID(t *testing.T) {
+	client, _ := newClient(t)
+
+	_, err := client.FlatFeed("flat", "jones:134")
+	assert.NotNil(t, err)
+	assert.Equal(t, "invalid userID provided", err.Error())
+
+	_, err = client.AggregatedFeed("aggregated", "jones,kim")
+	assert.NotNil(t, err)
+	assert.Equal(t, "invalid userID provided", err.Error())
 }
 
 func TestAddActivity(t *testing.T) {
 	var (
 		client, requester = newClient(t)
-		flat              = newFlatFeedWithUserID(client, "123")
+		flat, _           = newFlatFeedWithUserID(client, "123")
 		bobActivity       = stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{"flat:456"}}
 	)
 	_, err := flat.AddActivity(bobActivity)
@@ -38,7 +50,7 @@ func TestAddActivity(t *testing.T) {
 func TestAddActivities(t *testing.T) {
 	var (
 		client, requester = newClient(t)
-		flat              = newFlatFeedWithUserID(client, "123")
+		flat, _           = newFlatFeedWithUserID(client, "123")
 		bobActivity       = stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream"}
 		aliceActivity     = stream.Activity{Actor: "alice", Verb: "dislike", Object: "ice-cream", To: []string{"flat:456"}}
 	)
@@ -71,7 +83,8 @@ func TestUpdateActivities(t *testing.T) {
 func TestFollow(t *testing.T) {
 	var (
 		client, requester = newClient(t)
-		f1, f2            = newFlatFeedWithUserID(client, "f1"), newFlatFeedWithUserID(client, "f2")
+		f1, _             = newFlatFeedWithUserID(client, "f1")
+		f2, _             = newFlatFeedWithUserID(client, "f2")
 	)
 	testCases := []struct {
 		opts         []stream.FollowFeedOption
@@ -98,7 +111,7 @@ func TestFollow(t *testing.T) {
 func TestGetFollowing(t *testing.T) {
 	var (
 		client, requester = newClient(t)
-		f1                = newFlatFeedWithUserID(client, "f1")
+		f1, _             = newFlatFeedWithUserID(client, "f1")
 	)
 	testCases := []struct {
 		opts     []stream.FollowingOption
@@ -122,7 +135,7 @@ func TestGetFollowing(t *testing.T) {
 func TestGetFollowers(t *testing.T) {
 	var (
 		client, requester = newClient(t)
-		f1                = newFlatFeedWithUserID(client, "f1")
+		f1, _             = newFlatFeedWithUserID(client, "f1")
 	)
 	testCases := []struct {
 		opts     []stream.FollowersOption
@@ -146,7 +159,8 @@ func TestGetFollowers(t *testing.T) {
 func TestUnfollow(t *testing.T) {
 	var (
 		client, requester = newClient(t)
-		f1, f2            = newFlatFeedWithUserID(client, "f1"), newFlatFeedWithUserID(client, "f2")
+		f1, _             = newFlatFeedWithUserID(client, "f1")
+		f2, _             = newFlatFeedWithUserID(client, "f2")
 	)
 	testCases := []struct {
 		opts     []stream.UnfollowOption
@@ -174,7 +188,7 @@ func TestUnfollow(t *testing.T) {
 
 func TestRemoveActivities(t *testing.T) {
 	client, requester := newClient(t)
-	flat := newFlatFeedWithUserID(client, "123")
+	flat, _ := newFlatFeedWithUserID(client, "123")
 	err := flat.RemoveActivityByID("id-to-remove")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/id-to-remove/?api_key=key", "")
@@ -186,8 +200,10 @@ func TestRemoveActivities(t *testing.T) {
 func TestUpdateToTargets(t *testing.T) {
 	var (
 		client, requester = newClient(t)
-		flat              = newFlatFeedWithUserID(client, "123")
-		f1, f2, f3        = newFlatFeedWithUserID(client, "f1"), newFlatFeedWithUserID(client, "f2"), newFlatFeedWithUserID(client, "f3")
+		flat, _           = newFlatFeedWithUserID(client, "123")
+		f1, _             = newFlatFeedWithUserID(client, "f1")
+		f2, _             = newFlatFeedWithUserID(client, "f2")
+		f3, _             = newFlatFeedWithUserID(client, "f3")
 		now               = getTime(time.Now())
 		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}, Extra: map[string]interface{}{"popularity": 9000}}
 	)
@@ -204,7 +220,7 @@ func TestUpdateToTargets(t *testing.T) {
 func TestRealtimeToken(t *testing.T) {
 	client, err := stream.NewClient("key", "super secret")
 	require.NoError(t, err)
-	flat := newFlatFeedWithUserID(client, "sample")
+	flat, _ := newFlatFeedWithUserID(client, "sample")
 	testCases := []struct {
 		readOnly bool
 		expected string
