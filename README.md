@@ -21,6 +21,7 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
   * [Options](#options)
 * [Adding activities](#adding-activities)
 * [Updating activities](#updating-activities)
+* [Partially updating activities](#partially-updating-activities)
 * [Removing activities](#removing-activities)
 * [Retrieving follows](#retrieving-followers-and-followings)
   * [Following](#following)
@@ -242,6 +243,17 @@ for _, activity := range resp.Activities {
 
 ```go
 err := feed.UpdateActivities(a1, a2, ...)
+if err != nil {
+    // ...
+}
+```
+
+### Partially updating activities
+
+``` go
+changesetA := stream.NewUpdateActivityRequestByID("f505b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
+changesetB := stream.NewUpdateActivityRequestByID("f707b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
+resp, err := client.PartialUpdateActivities(changesetA, changesetB)
 if err != nil {
     // ...
 }
