@@ -522,7 +522,8 @@ func NewForeignIDTimePair(foreignID string, timestamp Time) ForeignIDTimePair {
 	}
 }
 
-type updateActivityRequest struct {
+// UpdateActivityRequest is the API request body for partially updating an activity.
+type UpdateActivityRequest struct {
 	ID        *string                `json:"id,omitempty"`
 	ForeignID *string                `json:"foreign_id,omitempty"`
 	Time      *Time                  `json:"time,omitempty"`
@@ -530,8 +531,31 @@ type updateActivityRequest struct {
 	Unset     []string               `json:"unset,omitempty"`
 }
 
+// NewUpdateActivityRequestByID creates a new UpdateActivityRequest to be used by PartialUpdateActivities
+func NewUpdateActivityRequestByID(id string, set map[string]interface{}, unset []string) UpdateActivityRequest {
+	return UpdateActivityRequest{
+		ID:    &id,
+		Set:   set,
+		Unset: unset,
+	}
+}
+
+// NewUpdateActivityRequestByForeignID creates a new UpdateActivityRequest to be used by PartialUpdateActivities
+func NewUpdateActivityRequestByForeignID(foreignID string, timestamp Time, set map[string]interface{}, unset []string) UpdateActivityRequest {
+	return UpdateActivityRequest{
+		ForeignID: &foreignID,
+		Time:      &timestamp,
+		Set:       set,
+		Unset:     unset,
+	}
+}
+
 // UpdateActivityResponse is the response returned by the UpdateActivityByID and
 // UpdateActivityByForeignID methods.
 type UpdateActivityResponse struct {
 	Activity
+}
+
+type UpdateActivitiesResponse struct {
+	Activities []*Activity `json:"activities"`
 }

@@ -235,10 +235,32 @@ func (c *Client) UpdateActivities(activities ...Activity) error {
 	return err
 }
 
+// PartialUpdateActivities performs a partial update on multiple activities with the given set and unset operations
+// specified by each changeset. This returns the affected activities.
+func (c *Client) PartialUpdateActivities(changesets ...UpdateActivityRequest) (*UpdateActivitiesResponse, error) {
+	req := struct {
+		Activities []UpdateActivityRequest `json:"changes,omitempty"`
+	}{
+		Activities: changesets,
+	}
+	endpoint := c.makeEndpoint("activity/")
+	data, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
+	if err != nil {
+		return nil, err
+	}
+	var resp UpdateActivitiesResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, err
+}
+
 // UpdateActivityByID performs a partial activity update with the given set and unset operations, returning the
 // affected activity, on the activity with the given ID.
 func (c *Client) UpdateActivityByID(id string, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
-	return c.updateActivity(updateActivityRequest{
+	return c.updateActivity(UpdateActivityRequest{
 		ID:    &id,
 		Set:   set,
 		Unset: unset,
@@ -248,7 +270,7 @@ func (c *Client) UpdateActivityByID(id string, set map[string]interface{}, unset
 // UpdateActivityByForeignID performs a partial activity update with the given set and unset operations, returning the
 // affected activity, on the activity with the given foreign ID and timestamp.
 func (c *Client) UpdateActivityByForeignID(foreignID string, timestamp Time, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
-	return c.updateActivity(updateActivityRequest{
+	return c.updateActivity(UpdateActivityRequest{
 		ForeignID: &foreignID,
 		Time:      &timestamp,
 		Set:       set,
@@ -256,7 +278,7 @@ func (c *Client) UpdateActivityByForeignID(foreignID string, timestamp Time, set
 	})
 }
 
-func (c *Client) updateActivity(req updateActivityRequest) (*UpdateActivityResponse, error) {
+func (c *Client) updateActivity(req UpdateActivityRequest) (*UpdateActivityResponse, error) {
 	endpoint := c.makeEndpoint("activity/")
 	data, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
 	if err != nil {
