@@ -134,6 +134,45 @@ func TestUpdateActivityByID(t *testing.T) {
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
 }
 
+func TestPartialUpdateActivities(t *testing.T) {
+	client, requester := newClient(t)
+
+	_, err := client.PartialUpdateActivities(
+		stream.NewUpdateActivityRequestByID(
+			"abcdef",
+			map[string]interface{}{"foo.bar": "baz"},
+			[]string{"qux", "tty"},
+		),
+		stream.NewUpdateActivityRequestByID(
+			"ghijkl",
+			map[string]interface{}{"foo.bar": "baz"},
+			[]string{"quux", "ttl"},
+		),
+	)
+	require.NoError(t, err)
+	body := `{"changes":[{"id":"abcdef","set":{"foo.bar":"baz"},"unset":["qux","tty"]},{"id":"ghijkl","set":{"foo.bar":"baz"},"unset":["quux","ttl"]}]}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+
+	tt, _ := time.Parse(stream.TimeLayout, "2006-01-02T15:04:05.999999")
+	_, err = client.PartialUpdateActivities(
+		stream.NewUpdateActivityRequestByForeignID(
+			"abcdef:123",
+			stream.Time{Time: tt},
+			map[string]interface{}{"foo.bar": "baz"},
+			nil,
+		),
+		stream.NewUpdateActivityRequestByForeignID(
+			"ghijkl:1234",
+			stream.Time{Time: tt},
+			nil,
+			[]string{"quux", "ttl"},
+		),
+	)
+	require.NoError(t, err)
+	body = `{"changes":[{"foreign_id":"abcdef:123","time":"2006-01-02T15:04:05.999999","set":{"foo.bar":"baz"}},{"foreign_id":"ghijkl:1234","time":"2006-01-02T15:04:05.999999","unset":["quux","ttl"]}]}`
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
+}
+
 func TestUpdateActivityByForeignID(t *testing.T) {
 	client, requester := newClient(t)
 
