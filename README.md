@@ -263,8 +263,8 @@ if err != nil {
 
 or by a ForeignID and timestamp pair:
 ``` go
-changesetA := stream.NewUpdateActivityRequestByForeignID("dothings:1", time.Now(), map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
-changesetB := stream.NewUpdateActivityRequestByForeignID("dothings:2", time.Now(), map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
+changesetA := stream.NewUpdateActivityRequestByForeignID("dothings:1", stream.Time{...}, map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
+changesetB := stream.NewUpdateActivityRequestByForeignID("dothings:2", stream.Time{...}, map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
 resp, err := client.PartialUpdateActivities(changesetA, changesetB)
 if err != nil {
     // ...
