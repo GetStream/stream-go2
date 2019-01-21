@@ -250,9 +250,21 @@ if err != nil {
 
 ### Partially updating activities
 
+You can partial update activities identified either by ID: 
+
 ``` go
 changesetA := stream.NewUpdateActivityRequestByID("f505b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
 changesetB := stream.NewUpdateActivityRequestByID("f707b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
+resp, err := client.PartialUpdateActivities(changesetA, changesetB)
+if err != nil {
+    // ...
+}
+```
+
+or by a ForeignID and timestamp pair:
+``` go
+changesetA := stream.NewUpdateActivityRequestByForeignID("dothings:1", time.Now(), map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
+changesetB := stream.NewUpdateActivityRequestByForeignID("dothings:2", time.Now(), map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
 resp, err := client.PartialUpdateActivities(changesetA, changesetB)
 if err != nil {
     // ...
