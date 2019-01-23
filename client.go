@@ -126,7 +126,7 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 		Activity: activity,
 		FeedIDs:  ids,
 	}
-	_, err := c.post(endpoint, req, c.authenticator.applicationAuth(c.key))
+	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resFeed, nil))
 	return err
 }
 
@@ -136,14 +136,14 @@ func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowMa
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
-	_, err := c.post(endpoint, relationships, c.authenticator.applicationAuth(c.key))
+	_, err := c.post(endpoint, relationships, c.authenticator.feedAuth(resFollower, nil))
 	return err
 }
 
 // UnfollowMany removes multiple follow relationships at once.
 func (c *Client) UnfollowMany(relationships []UnfollowRelationship) error {
 	endpoint := c.makeEndpoint("unfollow_many/")
-	_, err := c.post(endpoint, relationships, c.authenticator.applicationAuth(c.key))
+	_, err := c.post(endpoint, relationships, c.authenticator.feedAuth(resFollower, nil))
 	return err
 }
 
@@ -224,11 +224,10 @@ func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, err
 
 // UpdateActivities updates existing activities.
 func (c *Client) UpdateActivities(activities ...Activity) error {
-	signedActivities := c.signActivities(activities)
 	req := struct {
 		Activities []Activity `json:"activities,omitempty"`
 	}{
-		Activities: signedActivities,
+		Activities: activities,
 	}
 	endpoint := c.makeEndpoint("activities/")
 	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
@@ -404,31 +403,9 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 	return body, nil
 }
 
-func (c *Client) signActivity(activity Activity) Activity {
-	if len(activity.To) == 0 {
-		return activity
-	}
-	tos := make([]string, len(activity.To))
-	signed := activity
-	for i, id := range activity.To {
-		tos[i] = c.authenticator.feedSignature(id)
-	}
-	signed.To = tos
-	return signed
-}
-
-func (c *Client) signActivities(activities []Activity) []Activity {
-	signed := make([]Activity, len(activities))
-	for i := range activities {
-		signed[i] = c.signActivity(activities[i])
-	}
-	return signed
-}
-
 func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
-	signedActivity := c.signActivity(activity)
-	resp, err := c.post(endpoint, signedActivity, c.authenticator.feedAuth(resFeed, feed))
+	resp, err := c.post(endpoint, activity, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
 		return nil, err
 	}
@@ -444,11 +421,10 @@ func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse
 }
 
 func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitiesResponse, error) {
-	signedActivities := c.signActivities(activities)
 	reqBody := struct {
 		Activities []Activity `json:"activities,omitempty"`
 	}{
-		Activities: signedActivities,
+		Activities: activities,
 	}
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
 	resp, err := c.post(endpoint, reqBody, c.authenticator.feedAuth(resFeed, feed))
