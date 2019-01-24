@@ -1,4 +1,4 @@
 package stream
 
 // Version is the current release version for this client
-var Version = "v3.1.0"
+var Version = "v3.1.1"
