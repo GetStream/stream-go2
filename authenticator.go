@@ -1,14 +1,10 @@
 package stream
 
 import (
-	"crypto/hmac"
-	"crypto/sha1"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strings"
 
-	httpsig "gopkg.in/LeisureLink/httpsig.v1"
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 )
 
@@ -49,20 +45,6 @@ var actions = map[string]action{
 
 type authenticator struct {
 	secret string
-}
-
-func (a authenticator) feedSignature(feedID string) string {
-	return fmt.Sprintf("%s %s", feedID, a.feedToken(feedID))
-}
-
-func (a authenticator) feedToken(feedID string) string {
-	id := strings.Replace(feedID, ":", "", -1)
-	hash := sha1.New()
-	hash.Write([]byte(a.secret))
-	mac := hmac.New(sha1.New, hash.Sum(nil))
-	mac.Write([]byte(id))
-	digest := base64.StdEncoding.EncodeToString(mac.Sum(nil))
-	return a.urlSafe(digest)
 }
 
 func (a authenticator) feedID(feed Feed) string {
@@ -143,16 +125,6 @@ func (a authenticator) signAnalyticsRedirectEndpoint(endpoint *endpoint) error {
 	endpoint.addQueryParam(makeRequestOption("stream-auth-type", "jwt"))
 	endpoint.addQueryParam(makeRequestOption("authorization", signature))
 	return nil
-}
-func (a authenticator) applicationAuth(key string) authFunc {
-	return func(req *http.Request) error {
-		req.Header.Set("X-API-Key", key)
-		signer, err := httpsig.NewRequestSigner(key, a.secret, "hmac-sha256")
-		if err != nil {
-			return fmt.Errorf("cannot sign request: %s", err)
-		}
-		return signer.SignRequest(req, []string{}, nil)
-	}
 }
 
 func (a authenticator) jwtSignatureFromClaims(claims jwt.MapClaims) (string, error) {

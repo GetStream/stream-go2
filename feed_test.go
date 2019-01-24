@@ -39,7 +39,7 @@ func TestAddActivity(t *testing.T) {
 	)
 	_, err := flat.AddActivity(bobActivity)
 	require.NoError(t, err)
-	body := `{"actor":"bob","object":"ice-cream","to":["flat:456 BpEkhYaXtVxbITXiIcpdYWVL9T8"],"verb":"like"}`
+	body := `{"actor":"bob","object":"ice-cream","to":["flat:456"],"verb":"like"}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key", body)
 
 	requester.resp = `{"duration": "1ms"}`
@@ -56,7 +56,7 @@ func TestAddActivities(t *testing.T) {
 	)
 	_, err := flat.AddActivities(bobActivity, aliceActivity)
 	require.NoError(t, err)
-	body := `{"activities":[{"actor":"bob","object":"ice-cream","verb":"like"},{"actor":"alice","object":"ice-cream","to":["flat:456 BpEkhYaXtVxbITXiIcpdYWVL9T8"],"verb":"dislike"}]}`
+	body := `{"activities":[{"actor":"bob","object":"ice-cream","verb":"like"},{"actor":"alice","object":"ice-cream","to":["flat:456"],"verb":"dislike"}]}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key", body)
 }
 
