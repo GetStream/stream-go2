@@ -25,6 +25,8 @@ type Client struct {
 	version       string
 }
 
+var _ ClientInterface = &Client{}
+
 // Requester performs HTTP requests.
 type Requester interface {
 	Do(*http.Request) (*http.Response, error)
