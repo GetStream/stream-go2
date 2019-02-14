@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_decodeJSONStringTimes(t *testing.T) {
+func Test_decodeJSONHook(t *testing.T) {
 	now, _ := time.Parse(TimeLayout, "2006-01-02T15:04:05.999999")
 	testCases := []struct {
 		f           reflect.Type
@@ -61,9 +61,32 @@ func Test_decodeJSONStringTimes(t *testing.T) {
 			data:        struct{}{},
 			shouldError: true,
 		},
+		{
+			f:           reflect.TypeOf(string("")),
+			typ:         reflect.TypeOf(Data{}),
+			data:        "test",
+			shouldError: false,
+			expected:    Data{ID: "test"},
+		},
+		{
+			f:   reflect.TypeOf(map[string]interface{}{}),
+			typ: reflect.TypeOf(Data{}),
+			data: map[string]interface{}{
+				"id":    "test",
+				"extra": "data",
+			},
+			shouldError: false,
+			expected:    Data{ID: "test", Extra: map[string]interface{}{"extra": "data"}},
+		},
+		{
+			f:           reflect.TypeOf(float64(0)),
+			typ:         reflect.TypeOf(Data{}),
+			data:        struct{}{},
+			shouldError: true,
+		},
 	}
 	for _, tc := range testCases {
-		out, err := decodeJSONStringTimes(tc.f, tc.typ, tc.data)
+		out, err := decodeJSONHook(tc.f, tc.typ, tc.data)
 		if tc.shouldError {
 			require.Error(t, err)
 		} else {

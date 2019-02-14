@@ -10,7 +10,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func decodeJSONStringTimes(f reflect.Type, typ reflect.Type, data interface{}) (interface{}, error) {
+func decodeJSONHook(f reflect.Type, typ reflect.Type, data interface{}) (interface{}, error) {
 	switch typ {
 	case reflect.TypeOf(Time{}):
 		return timeFromString(data.(string))
@@ -23,13 +23,28 @@ func decodeJSONStringTimes(f reflect.Type, typ reflect.Type, data interface{}) (
 		default:
 			return nil, fmt.Errorf("invalid duration")
 		}
+	case reflect.TypeOf(Data{}):
+		switch v := data.(type) {
+		case string:
+			return Data{
+				ID: v,
+			}, nil
+		case map[string]interface{}:
+			a := Data{}
+			if err := a.decode(v); err != nil {
+				return nil, err
+			}
+			return a, nil
+		default:
+			return nil, fmt.Errorf("invalid data")
+		}
 	}
 	return data, nil
 }
 
 func decodeData(data map[string]interface{}, target interface{}) (*mapstructure.Metadata, error) {
 	cfg := &mapstructure.DecoderConfig{
-		DecodeHook: decodeJSONStringTimes,
+		DecodeHook: decodeJSONHook,
 		Result:     target,
 		Metadata:   &mapstructure.Metadata{},
 		TagName:    "json",
