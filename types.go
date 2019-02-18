@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 // Duration wraps time.Duration, used because of JSON marshaling and
@@ -70,6 +72,38 @@ func timeFromString(s string) (Time, error) {
 		}
 	}
 	return Time{}, err
+}
+
+// Data is a representation of an enriched activities enriched object,
+// such as the the user or the object
+type Data struct {
+	ID    string                 `json:"id"`
+	Extra map[string]interface{} `json:"-"`
+}
+
+func (a *Data) decode(data map[string]interface{}) error {
+	// We are not using decodeData here because we do not need the DecodeHook
+	// since it leads to a stack overflow
+	cfg := &mapstructure.DecoderConfig{
+		Result:   a,
+		Metadata: &mapstructure.Metadata{},
+		TagName:  "json",
+	}
+	dec, err := mapstructure.NewDecoder(cfg)
+	if err != nil {
+		return err
+	}
+	if err := dec.Decode(data); err != nil {
+		return err
+	}
+
+	if len(cfg.Metadata.Unused) > 0 {
+		a.Extra = make(map[string]interface{})
+		for _, k := range cfg.Metadata.Unused {
+			a.Extra[k] = data[k]
+		}
+	}
+	return nil
 }
 
 // Response is the part of StreamAPI responses common throughout the API.
