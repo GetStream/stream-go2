@@ -34,3 +34,27 @@ func Test_URLString(t *testing.T) {
 		assert.Equal(t, tc.expected, tc.urlBuilder.url())
 	}
 }
+
+func Test_PersonalizationURLString(t *testing.T) {
+	testCases := []struct {
+		urlBuilder personalizationURLBuilder
+		expected   string
+	}{
+		{
+			urlBuilder: personalizationURLBuilder{},
+			expected:   "https://personalization.stream-io-api.com/personalization/v1.0/",
+		},
+		{
+			urlBuilder: personalizationURLBuilder{"us-east"},
+			expected:   "https://personalization.stream-io-api.com/personalization/v1.0/",
+		},
+		{
+			urlBuilder: personalizationURLBuilder{"eu-west"},
+			expected:   "https://dublin-personalization.stream-io-api.com/personalization/v1.0/",
+		},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.expected, tc.urlBuilder.url())
+	}
+}

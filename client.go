@@ -184,7 +184,7 @@ func (c *Client) Reactions() *ReactionsClient {
 
 // Personalization returns a new PersonalizationClient.
 func (c *Client) Personalization() *PersonalizationClient {
-	b := newPersonalizationURLBuilder()
+	b := newPersonalizationURLBuilder(c.region)
 	return &PersonalizationClient{client: c.cloneWithURLBuilder(b)}
 }
 
