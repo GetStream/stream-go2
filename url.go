@@ -18,6 +18,10 @@ var regionOverrides = map[string]string{
 	"singapore": "singapore-api",
 }
 
+var personalizationOverrides = map[string]string{
+	"eu-west": "dublin",
+}
+
 type regionalURLBuilder struct {
 	region  string
 	version string
@@ -66,17 +70,26 @@ func (u apiURLBuilder) url() string {
 	return fmt.Sprintf("%s/api/v%s/", u.makeHost("api"), u.makeVersion())
 }
 
-type personalizationURLBuilder struct{}
+type personalizationURLBuilder struct {
+	region string
+}
 
-func newPersonalizationURLBuilder() personalizationURLBuilder {
-	return personalizationURLBuilder{}
+func newPersonalizationURLBuilder(region string) personalizationURLBuilder {
+	return personalizationURLBuilder{
+		region: region,
+	}
 }
 
 func (b personalizationURLBuilder) url() string {
 	if envHost := os.Getenv("STREAM_URL"); envHost != "" {
 		return envHost
 	}
-	return "https://personalization.stream-io-api.com/personalization/v1.0/"
+	defaultPath := fmt.Sprintf("personalization.%s/personalization/v1.0/", domain)
+	if override, ok := personalizationOverrides[b.region]; ok {
+		return fmt.Sprintf("https://%s-%s", override, defaultPath)
+	}
+
+	return fmt.Sprintf("https://%s", defaultPath)
 }
 
 type analyticsURLBuilder struct {
