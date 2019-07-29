@@ -48,13 +48,15 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 	for _, opt := range opts {
 		opt(c)
 	}
-	c.requester = &http.Client{
-		Timeout: c.timeout,
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout: 2 * time.Second,
-			}).DialContext,
-		},
+	if c.requester == nil {
+		c.requester = &http.Client{
+			Timeout: c.timeout,
+			Transport: &http.Transport{
+				DialContext: (&net.Dialer{
+					Timeout: 2 * time.Second,
+				}).DialContext,
+			},
+		}
 	}
 	c.urlBuilder = newAPIURLBuilder(c.region, c.version)
 	return c, nil
