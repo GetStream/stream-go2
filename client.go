@@ -42,6 +42,7 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 	}
 	c := &Client{
 		key:           key,
+		timeout:       time.Second * 6,
 		authenticator: authenticator{secret: secret},
 	}
 	for _, opt := range opts {
