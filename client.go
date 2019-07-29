@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -24,6 +26,7 @@ type Client struct {
 	urlBuilder    urlBuilder
 	region        string
 	version       string
+	timeout       time.Duration
 }
 
 // Requester performs HTTP requests.
@@ -38,14 +41,19 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		return nil, errMissingCredentials
 	}
 	c := &Client{
-		key: key,
-		requester: &http.Client{
-			Transport: &http.Transport{},
-		},
+		key:           key,
 		authenticator: authenticator{secret: secret},
 	}
 	for _, opt := range opts {
 		opt(c)
+	}
+	c.requester = &http.Client{
+		Timeout: c.timeout,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: 2 * time.Second,
+			}).DialContext,
+		},
 	}
 	c.urlBuilder = newAPIURLBuilder(c.region, c.version)
 	return c, nil
@@ -84,6 +92,13 @@ func WithAPIVersion(version string) ClientOption {
 func WithHTTPRequester(requester Requester) ClientOption {
 	return func(c *Client) {
 		c.requester = requester
+	}
+}
+
+// WithTimeout sets the HTTP request timeout
+func WithTimeout(dur time.Duration) ClientOption {
+	return func(c *Client) {
+		c.timeout = dur
 	}
 }
 
