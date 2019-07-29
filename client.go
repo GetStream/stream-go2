@@ -309,6 +309,9 @@ func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
 	if err := json.Unmarshal(errBody, &streamErr); err != nil {
 		return fmt.Errorf("unexpected error (status code %d)", statusCode)
 	}
+	if streamErr.Detail == "" {
+		streamErr.Detail = string(errBody)
+	}
 	streamErr.StatusCode = statusCode
 	return streamErr
 }
