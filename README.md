@@ -790,8 +790,8 @@ result, err := feed.GetActivities()
 if err != nil {
     // ...
 }
-fmt.Println(result.Results[0].Actor) // Will ouput the user reference
-fmt.Println(result.Results[0].Object) // Will ouput the collection reference
+fmt.Println(result.Results[0].Actor) // Will output the user reference
+fmt.Println(result.Results[0].Object) // Will output the collection reference
 
 enrichedResult, err := feed.GetEnrichedActivities()
 if err != nil {
