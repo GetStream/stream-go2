@@ -5,7 +5,8 @@ import (
 	"testing"
 	"time"
 
-	stream "github.com/GetStream/stream-go2"
+	stream "github.com/GetStream/stream-go2/v4"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
