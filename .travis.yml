@@ -1,15 +1,14 @@
 language: go
 
-install:
-  - go get -t ./...
-
 go:
   - 1.12.x
   - 1.13.x
-  - tip
+
+install: true
 
 script:
-  - ./test.sh
+  - go mod tidy && git diff --no-patch --exit-error
+  - go test -v -race -cover -coverpkg=./... -covermode=atomic -coverprofile=coverage.txt ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
