@@ -47,26 +47,14 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
 Get the client:
 
 ```bash
-$ go get gopkg.in/GetStream/stream-go2.v1
-```
-
-stream-go2 uses [dep](https://github.com/golang/dep) for managing dependencies (see `Gopkg.toml` and `Gopkg.lock`).
-You can get required dependencies simply by running:
-
-```bash
-$ dep ensure
-```
-
-Even better: at Stream we have developed [vg](https://github.com/GetStream/vg), a powerful workspace manager for Go based on `dep` itself.
-If you use vg (and you should!) you can just:
-
-```bash
-$ vg init && vg ensure
+$ go get github.com/GetStream/stream-go2/v4
 ```
 
 ### Creating a Client
 
 ```go
+import stream "github.com/GetStream/stream-go2/v4"
+
 key := "YOUR_API_KEY"
 secret := "YOUR_API_SECRET"
 
