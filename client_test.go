@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	stream "github.com/GetStream/stream-go2/v4"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
+
+	stream "github.com/GetStream/stream-go2/v4"
 )
 
 func TestHeaders(t *testing.T) {
@@ -177,7 +177,7 @@ func TestPartialUpdateActivities(t *testing.T) {
 func TestUpdateActivityByForeignID(t *testing.T) {
 	client, requester := newClient(t)
 
-	tt := stream.Time{Time: time.Date(2018, 06, 24, 11, 28, 0, 0, time.UTC)}
+	tt := stream.Time{Time: time.Date(2018, 6, 24, 11, 28, 0, 0, time.UTC)}
 
 	_, err := client.UpdateActivityByForeignID("fid:123", tt, map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, []string{"a", "b", "c"})
 	require.NoError(t, err)
@@ -201,6 +201,7 @@ func TestUserSessionToken(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, tokenString, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidXNlciJ9.0Kiui6HUywyU-C-00E68n1iq_3o7Eh0aE5VGSOc3pU4")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) { return []byte("secret"), nil })
+	require.NoError(t, err)
 	assert.Equal(t, true, token.Valid)
 	assert.Equal(t, token.Claims, jwt.MapClaims{"user_id": "user"})
 }
@@ -211,6 +212,7 @@ func TestUserSessionTokenWithClaims(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJnbyIsInVzZXJfaWQiOiJ1c2VyIn0.Us6UIuH83dJe1cXQIiudseFz9-1kVMr6-SL6-idzIB0", tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) { return []byte("secret"), nil })
+	require.NoError(t, err)
 	assert.Equal(t, true, token.Valid)
 	assert.Equal(t, token.Claims, jwt.MapClaims{"user_id": "user", "client": "go"})
 }

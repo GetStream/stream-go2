@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	stream "github.com/GetStream/stream-go2/v4"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	stream "github.com/GetStream/stream-go2/v4"
 )
 
 func init() {
@@ -58,16 +58,6 @@ func testRequest(t *testing.T, req *http.Request, method, url, body string) {
 		assert.NotEmpty(t, headers.Get("Stream-Auth-Type"))
 		assert.NotEmpty(t, headers.Get("Authorization"))
 	}
-}
-
-var runes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-func randString(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = runes[rand.Intn(len(runes))]
-	}
-	return string(b)
 }
 
 func getTime(t time.Time) stream.Time {

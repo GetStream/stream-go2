@@ -32,7 +32,7 @@ func makeRequestOption(key string, value interface{}) requestOption {
 	}
 }
 
-func (o baseRequestOption) values() (string, string) {
+func (o baseRequestOption) values() (key, value string) {
 	return o.key, o.value
 }
 
@@ -255,10 +255,10 @@ func WithToTargetsRemove(targets ...string) UpdateToTargetsOption {
 	}
 }
 
-//AddObjectOption is an option usable by the Collections.Add method.
+// AddObjectOption is an option usable by the Collections.Add method.
 type AddObjectOption func(*addCollectionRequest)
 
-//WithUserID adds the user id to the Collections.Add request object.
+// WithUserID adds the user id to the Collections.Add request object.
 func WithUserID(userID string) AddObjectOption {
 	return func(req *addCollectionRequest) {
 		req.UserID = &userID
@@ -312,10 +312,10 @@ func WithOwnChildren() FilterReactionsOption {
 	return FilterReactionsOption{makeRequestOption("with_own_children", true)}
 }
 
-//FilterReactionsAttribute specifies the filtering method of Reactions.Filter()
+// FilterReactionsAttribute specifies the filtering method of Reactions.Filter()
 type FilterReactionsAttribute func() string
 
-//ByKind filters reactions by kind, after the initial desired filtering method was applied.
+// ByKind filters reactions by kind, after the initial desired filtering method was applied.
 func (a FilterReactionsAttribute) ByKind(kind string) FilterReactionsAttribute {
 	return func() string {
 		base := a()
@@ -323,21 +323,21 @@ func (a FilterReactionsAttribute) ByKind(kind string) FilterReactionsAttribute {
 	}
 }
 
-//ByActivityID will filter reactions based on the specified activity id.
+// ByActivityID will filter reactions based on the specified activity id.
 func ByActivityID(activityID string) FilterReactionsAttribute {
 	return func() string {
 		return fmt.Sprintf("activity_id/%s", activityID)
 	}
 }
 
-//ByReactionID will filter reactions based on the specified parent reaction id.
+// ByReactionID will filter reactions based on the specified parent reaction id.
 func ByReactionID(reactionID string) FilterReactionsAttribute {
 	return func() string {
 		return fmt.Sprintf("reaction_id/%s", reactionID)
 	}
 }
 
-//ByUserID will filter reactions based on the specified user id.
+// ByUserID will filter reactions based on the specified user id.
 func ByUserID(userID string) FilterReactionsAttribute {
 	return func() string {
 		return fmt.Sprintf("user_id/%s", userID)
@@ -346,7 +346,7 @@ func ByUserID(userID string) FilterReactionsAttribute {
 
 type nop struct{}
 
-func (nop) values() (string, string) {
+func (nop) values() (key, value string) {
 	return "", ""
 }
 

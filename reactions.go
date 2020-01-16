@@ -11,7 +11,7 @@ type ReactionsClient struct {
 	client *Client
 }
 
-//Add adds a reaction.
+// Add adds a reaction.
 func (c *ReactionsClient) Add(r AddReactionRequestObject) (*Reaction, error) {
 	if r.ParentID != "" {
 		return nil, errors.New("`Parent` not empty. For adding child reactions use `AddChild`")
@@ -19,7 +19,7 @@ func (c *ReactionsClient) Add(r AddReactionRequestObject) (*Reaction, error) {
 	return c.addReaction(r)
 }
 
-//AddChild adds a child reaction to the provided parent.
+// AddChild adds a child reaction to the provided parent.
 func (c *ReactionsClient) AddChild(parentID string, r AddReactionRequestObject) (*Reaction, error) {
 	r.ParentID = parentID
 	return c.addReaction(r)
@@ -61,7 +61,7 @@ func (c *ReactionsClient) Update(id string, data map[string]interface{}, targetF
 	return result, nil
 }
 
-//Get retrieves a reaction having the given id.
+// Get retrieves a reaction having the given id.
 func (c *ReactionsClient) Get(id string) (*Reaction, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
@@ -78,7 +78,7 @@ func (c *ReactionsClient) Get(id string) (*Reaction, error) {
 	return result, nil
 }
 
-//Delete deletes a reaction having the given id.
+// Delete deletes a reaction having the given id.
 func (c *ReactionsClient) Delete(id string) error {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
@@ -86,11 +86,9 @@ func (c *ReactionsClient) Delete(id string) error {
 	return err
 }
 
-//Filter lists reactions based on the provided criteria and with the specified pagination.
+// Filter lists reactions based on the provided criteria and with the specified pagination.
 func (c *ReactionsClient) Filter(attr FilterReactionsAttribute, opts ...FilterReactionsOption) (*FilterReactionResponse, error) {
-	var endpointURI string
-
-	endpointURI = fmt.Sprintf("reaction/%s/", attr())
+	endpointURI := fmt.Sprintf("reaction/%s/", attr())
 
 	endpoint := c.client.makeEndpoint(endpointURI)
 	for _, opt := range opts {
