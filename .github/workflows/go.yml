@@ -1,0 +1,31 @@
+name: Go
+on: [push, pull_request]
+jobs:
+  test-build:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goVer: [1.12, 1.13]
+    steps:
+      - name: Set up Go ${{ matrix.goVer }}
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.goVer }}
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Lint and Test via ${{ matrix.goVer }}
+        env:
+          STREAM_API_KEY: ${{ secrets.STREAM_API_KEY }}
+          STREAM_API_SECRET: ${{ secrets.STREAM_API_SECRET }}
+          STREAM_API_REGION: ${{ secrets.STREAM_API_REGION }}
+          STREAM_API_VERSION: ${{ secrets.STREAM_API_VERSION }}
+        run: |
+          go mod tidy -v && git diff --no-patch --exit-code
+          go test -v -race -cover -coverpkg=./... -covermode=atomic -coverprofile=coverage.txt ./... && bash <(curl -s https://codecov.io/bash)
+
+      - name: Build on ${{ matrix.goVer }}
+        run: go build ./...
