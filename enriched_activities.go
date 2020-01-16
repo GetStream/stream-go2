@@ -54,10 +54,11 @@ func (a *EnrichedActivity) UnmarshalJSON(b []byte) error {
 		tos := data["to"].([]interface{})
 		simpleTos := make([]string, len(tos))
 		for i := range tos {
-			if sliceTos, isString := tos[i].(string); isString {
-				simpleTos[i] = sliceTos
-			} else if sliceTos, isSlice := tos[i].([]interface{}); isSlice {
-				tos, ok := sliceTos[0].(string)
+			switch to := tos[i].(type) {
+			case string:
+				simpleTos[i] = to
+			case []interface{}:
+				tos, ok := to[0].(string)
 				if !ok {
 					return fmt.Errorf("invalid format for to targets")
 				}

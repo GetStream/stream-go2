@@ -151,8 +151,8 @@ func (a authenticator) jwtSignRequest(req *http.Request, claims jwt.MapClaims) e
 }
 
 func (a authenticator) urlSafe(src string) string {
-	src = strings.Replace(src, "+", "-", -1)
-	src = strings.Replace(src, "/", "_", -1)
+	src = strings.ReplaceAll(src, "+", "-")
+	src = strings.ReplaceAll(src, "/", "_")
 	src = strings.Trim(src, "=")
 	return src
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func decodeJSONHook(f reflect.Type, typ reflect.Type, data interface{}) (interface{}, error) {
+func decodeJSONHook(f, typ reflect.Type, data interface{}) (interface{}, error) {
 	switch typ {
 	case reflect.TypeOf(Time{}):
 		return timeFromString(data.(string))
@@ -59,7 +59,7 @@ func decodeData(data map[string]interface{}, target interface{}) (*mapstructure.
 	return cfg.Metadata, nil
 }
 
-func parseIntValue(values url.Values, key string) (int, bool, error) {
+func parseIntValue(values url.Values, key string) (val int, exits bool, err error) {
 	v := values.Get(key)
 	if v == "" {
 		return 0, false, nil

@@ -62,7 +62,7 @@ func (c *CollectionsClient) DeleteMany(collection string, ids ...string) error {
 	return err
 }
 
-//Add adds a single object to a collection.
+// Add adds a single object to a collection.
 func (c *CollectionsClient) Add(collection string, object CollectionObject, opts ...AddObjectOption) (*CollectionObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
@@ -90,8 +90,8 @@ func (c *CollectionsClient) Add(collection string, object CollectionObject, opts
 	return result, nil
 }
 
-//Get retrives a collection object having the given ID.
-func (c *CollectionsClient) Get(collection string, id string) (*CollectionObject, error) {
+// Get retrieves a collection object having the given ID.
+func (c *CollectionsClient) Get(collection, id string) (*CollectionObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
 	}
@@ -109,8 +109,8 @@ func (c *CollectionsClient) Get(collection string, id string) (*CollectionObject
 	return result, nil
 }
 
-//Update updates the given collection object's data.
-func (c *CollectionsClient) Update(collection string, id string, data map[string]interface{}) (*CollectionObject, error) {
+// Update updates the given collection object's data.
+func (c *CollectionsClient) Update(collection, id string, data map[string]interface{}) (*CollectionObject, error) {
 	if collection == "" {
 		return nil, fmt.Errorf("collection name required")
 	}
@@ -132,7 +132,7 @@ func (c *CollectionsClient) Update(collection string, id string, data map[string
 }
 
 // Delete removes from a collection the object having the given ID.
-func (c *CollectionsClient) Delete(collection string, id string) error {
+func (c *CollectionsClient) Delete(collection, id string) error {
 	if collection == "" {
 		return fmt.Errorf("collection name required")
 	}

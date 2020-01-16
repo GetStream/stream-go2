@@ -48,7 +48,7 @@ func (c *UsersClient) Update(id string, data map[string]interface{}) (*User, err
 	return result, nil
 }
 
-//Get retrieves a user having the given id.
+// Get retrieves a user having the given id.
 func (c *UsersClient) Get(id string) (*User, error) {
 	endpoint := c.client.makeEndpoint("user/%s/", id)
 
@@ -65,7 +65,7 @@ func (c *UsersClient) Get(id string) (*User, error) {
 	return result, nil
 }
 
-//Delete deletes a user having the given id.
+// Delete deletes a user having the given id.
 func (c *UsersClient) Delete(id string) error {
 	endpoint := c.client.makeEndpoint("user/%s/", id)
 

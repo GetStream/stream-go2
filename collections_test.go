@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"testing"
 
-	stream "github.com/GetStream/stream-go2/v4"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	stream "github.com/GetStream/stream-go2/v4"
 )
 
 func TestCollectionRefHelpers(t *testing.T) {

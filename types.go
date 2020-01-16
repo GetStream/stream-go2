@@ -53,7 +53,7 @@ type Time struct {
 // UnmarshalJSON for Time is required because of the incoming time string format.
 func (t *Time) UnmarshalJSON(b []byte) error {
 	var err error
-	*t, err = timeFromString(strings.Replace(string(b), `"`, "", -1))
+	*t, err = timeFromString(strings.ReplaceAll(string(b), `"`, ""))
 	return err
 }
 
@@ -383,13 +383,13 @@ type GetCollectionResponseObject struct {
 	Data      map[string]interface{} `json:"data"`
 }
 
-//User represents a user
+// User represents a user
 type User struct {
 	ID   string                 `json:"id"`
 	Data map[string]interface{} `json:"data,omitempty"`
 }
 
-//Reaction is a reaction retrieved from the API.
+// Reaction is a reaction retrieved from the API.
 type Reaction struct {
 	AddReactionRequestObject
 	ChildrenReactions map[string][]*Reaction `json:"latest_children,omitempty"`
@@ -397,7 +397,7 @@ type Reaction struct {
 	ChildrenCounters  map[string]interface{} `json:"children_counts,omitempty"`
 }
 
-//AddReactionRequestObject is an object used only when calling the Add* reaction endpoints
+// AddReactionRequestObject is an object used only when calling the Add* reaction endpoints
 type AddReactionRequestObject struct {
 	ID          string                 `json:"id,omitempty"`
 	Kind        string                 `json:"kind"`

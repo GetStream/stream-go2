@@ -32,7 +32,7 @@ func (c *PersonalizationClient) Get(resource string, params map[string]interface
 }
 
 // Post sends data to the given resource, adding the given params to the request.
-func (c *PersonalizationClient) Post(resource string, params map[string]interface{}, data map[string]interface{}) error {
+func (c *PersonalizationClient) Post(resource string, params, data map[string]interface{}) error {
 	if resource == "" {
 		return fmt.Errorf("missing resource")
 	}

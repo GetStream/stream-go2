@@ -38,6 +38,6 @@ func (c *AnalyticsClient) RedirectAndTrack(url string, events ...map[string]inte
 	}
 	endpoint.addQueryParam(makeRequestOption("events", string(eventsData)))
 	endpoint.addQueryParam(makeRequestOption("url", url))
-	c.client.authenticator.signAnalyticsRedirectEndpoint(&endpoint)
-	return endpoint.String(), nil
+	err = c.client.authenticator.signAnalyticsRedirectEndpoint(&endpoint)
+	return endpoint.String(), err
 }

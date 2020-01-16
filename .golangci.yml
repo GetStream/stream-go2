@@ -1,0 +1,55 @@
+run:
+  deadline: 210s
+
+linters:
+  disable-all: true
+  enable:
+    - deadcode
+    - dupl
+    - errcheck
+    - gas
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - golint
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - unconvert
+    - staticcheck
+    - varcheck
+
+linters-settings:
+  goconst:
+    min-len: 5
+    min-occurrences: 5
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/GetStream/stream-go2
+  gocritic:
+    disabled-checks:
+      - whyNoLint
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    settings:
+      hugeParam:
+        sizeThreshold: 364
+      rangeValCopy:
+        sizeThreshold: 364
+        skipTestFuncs: true
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - dupl
+    - path: _feed\.go # should reuse code between aggregated and notification feeds
+      linters:
+        - dupl

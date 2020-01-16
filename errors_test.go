@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	stream "github.com/GetStream/stream-go2/v4"
-
 	"github.com/stretchr/testify/assert"
+
+	stream "github.com/GetStream/stream-go2/v4"
 )
 
 func TestErrorUnmarshal(t *testing.T) {
