@@ -4,7 +4,7 @@ stream-go2 is a Go client for [Stream](https://getstream.io) API.
 
 You can sign up for a Stream account at [getstream.io/get_started](https://getstream.io/get_started/).
 
-[![Actions Status](https://github.com/GetStream/stream-go2/workflows/Go/badge.svg)](https://github.com/GetStream/stream-go2/actions)
+[![build](https://github.com/GetStream/stream-go2/workflows/build/badge.svg)](https://github.com/GetStream/stream-go2/actions)
 [![godoc](https://godoc.org/github.com/GetStream/stream-go2?status.svg)](https://godoc.org/github.com/GetStream/stream-go2)
 [![codecov](https://codecov.io/gh/GetStream/stream-go2/branch/master/graph/badge.svg)](https://codecov.io/gh/GetStream/stream-go2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GetStream/stream-go2)](https://goreportcard.com/report/github.com/GetStream/stream-go2)
