@@ -2,6 +2,7 @@ package stream
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -13,7 +14,7 @@ type PersonalizationClient struct {
 // Get obtains a PersonalizationResponse for the given resource and params.
 func (c *PersonalizationClient) Get(resource string, params map[string]interface{}) (*PersonalizationResponse, error) {
 	if resource == "" {
-		return nil, fmt.Errorf("missing resource")
+		return nil, errors.New("missing resource")
 	}
 	endpoint := c.client.makeEndpoint("%s/", resource)
 	for k, v := range params {
@@ -26,7 +27,7 @@ func (c *PersonalizationClient) Get(resource string, params map[string]interface
 	var personalizationResp PersonalizationResponse
 	err = json.Unmarshal(resp, &personalizationResp)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal resp: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal resp: %w", err)
 	}
 	return &personalizationResp, nil
 }
@@ -34,7 +35,7 @@ func (c *PersonalizationClient) Get(resource string, params map[string]interface
 // Post sends data to the given resource, adding the given params to the request.
 func (c *PersonalizationClient) Post(resource string, params, data map[string]interface{}) error {
 	if resource == "" {
-		return fmt.Errorf("missing resource")
+		return errors.New("missing resource")
 	}
 	endpoint := c.client.makeEndpoint("%s/", resource)
 	for k, v := range params {
@@ -52,7 +53,7 @@ func (c *PersonalizationClient) Post(resource string, params, data map[string]in
 // Delete removes data from the given resource, adding the given params to the request.
 func (c *PersonalizationClient) Delete(resource string, params map[string]interface{}) error {
 	if resource == "" {
-		return fmt.Errorf("missing resource")
+		return errors.New("missing resource")
 	}
 	endpoint := c.client.makeEndpoint("%s/", resource)
 	for k, v := range params {

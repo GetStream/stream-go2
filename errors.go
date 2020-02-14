@@ -1,12 +1,12 @@
 package stream
 
 import (
-	"fmt"
+	"errors"
 )
 
 var (
-	errMissingCredentials = fmt.Errorf("missing API key or secret")
-	errInvalidUserID      = fmt.Errorf("invalid userID provided")
+	errMissingCredentials = errors.New("missing API key or secret")
+	errInvalidUserID      = errors.New("invalid userID provided")
 )
 
 // APIError is an error returned by Stream API when the request cannot be

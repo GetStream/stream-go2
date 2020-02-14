@@ -2,6 +2,7 @@ package stream
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -14,7 +15,7 @@ type CollectionsClient struct {
 // Upsert creates new or updates existing objects for the given collection's name.
 func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObject) error {
 	if collection == "" {
-		return fmt.Errorf("collection name required")
+		return errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/")
 	data := map[string]interface{}{
@@ -30,7 +31,7 @@ func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObjec
 // having the given IDs.
 func (c *CollectionsClient) Select(collection string, ids ...string) ([]GetCollectionResponseObject, error) {
 	if collection == "" {
-		return nil, fmt.Errorf("collection name required")
+		return nil, errors.New("collection name required")
 	}
 	foreignIDs := make([]string, len(ids))
 	for i := range ids {
@@ -53,7 +54,7 @@ func (c *CollectionsClient) Select(collection string, ids ...string) ([]GetColle
 // DeleteMany removes from a collection the objects having the given IDs.
 func (c *CollectionsClient) DeleteMany(collection string, ids ...string) error {
 	if collection == "" {
-		return fmt.Errorf("collection name required")
+		return errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/")
 	endpoint.addQueryParam(makeRequestOption("collection_name", collection))
@@ -65,7 +66,7 @@ func (c *CollectionsClient) DeleteMany(collection string, ids ...string) error {
 // Add adds a single object to a collection.
 func (c *CollectionsClient) Add(collection string, object CollectionObject, opts ...AddObjectOption) (*CollectionObject, error) {
 	if collection == "" {
-		return nil, fmt.Errorf("collection name required")
+		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/%s/", collection)
 
@@ -93,7 +94,7 @@ func (c *CollectionsClient) Add(collection string, object CollectionObject, opts
 // Get retrieves a collection object having the given ID.
 func (c *CollectionsClient) Get(collection, id string) (*CollectionObject, error) {
 	if collection == "" {
-		return nil, fmt.Errorf("collection name required")
+		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/%s/%s/", collection, id)
 
@@ -112,7 +113,7 @@ func (c *CollectionsClient) Get(collection, id string) (*CollectionObject, error
 // Update updates the given collection object's data.
 func (c *CollectionsClient) Update(collection, id string, data map[string]interface{}) (*CollectionObject, error) {
 	if collection == "" {
-		return nil, fmt.Errorf("collection name required")
+		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/%s/%s/", collection, id)
 	reqData := map[string]interface{}{
@@ -134,7 +135,7 @@ func (c *CollectionsClient) Update(collection, id string, data map[string]interf
 // Delete removes from a collection the object having the given ID.
 func (c *CollectionsClient) Delete(collection, id string) error {
 	if collection == "" {
-		return fmt.Errorf("collection name required")
+		return errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/%s/%s/", collection, id)
 

@@ -2,7 +2,7 @@ package stream
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 
 	"github.com/fatih/structs"
 )
@@ -40,7 +40,7 @@ func (a *Activity) UnmarshalJSON(b []byte) error {
 			case []interface{}:
 				tos, ok := to[0].(string)
 				if !ok {
-					return fmt.Errorf("invalid format for to targets")
+					return errors.New("invalid format for to targets")
 				}
 				simpleTos[i] = tos
 			}

@@ -143,7 +143,7 @@ func (a authenticator) jwtFeedClaims(resource resource, action action, feedID st
 func (a authenticator) jwtSignRequest(req *http.Request, claims jwt.MapClaims) error {
 	auth, err := a.jwtSignatureFromClaims(claims)
 	if err != nil {
-		return fmt.Errorf("cannot make auth: %s", err)
+		return fmt.Errorf("cannot make auth: %w", err)
 	}
 	req.Header.Add("Stream-Auth-Type", "jwt")
 	req.Header.Add("Authorization", auth)

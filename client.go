@@ -3,6 +3,7 @@ package stream
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -299,7 +300,7 @@ func (c *Client) updateActivity(req UpdateActivityRequest) (*UpdateActivityRespo
 
 func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
 	if body == nil {
-		return fmt.Errorf("invalid body")
+		return errors.New("invalid body")
 	}
 	errBody, err := ioutil.ReadAll(body)
 	if err != nil {
@@ -371,14 +372,14 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 	if data != nil {
 		payload, err := json.Marshal(data)
 		if err != nil {
-			return nil, fmt.Errorf("cannot marshal request: %s", err)
+			return nil, fmt.Errorf("cannot marshal request: %w", err)
 		}
 		reader = bytes.NewReader(payload)
 	}
 
 	req, err := http.NewRequest(method, endpoint.String(), reader)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create request: %s", err)
+		return nil, fmt.Errorf("cannot create request: %w", err)
 	}
 	c.setBaseHeaders(req)
 
@@ -390,7 +391,7 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 
 	resp, err := c.requester.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("cannot perform request: %s", err)
+		return nil, fmt.Errorf("cannot perform request: %w", err)
 	}
 	if resp.StatusCode/100 != 2 {
 		return nil, c.makeStreamError(resp.StatusCode, resp.Body)
@@ -399,7 +400,7 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("cannot read response: %s", err)
+		return nil, fmt.Errorf("cannot read response: %w", err)
 	}
 
 	return body, nil
@@ -435,7 +436,7 @@ func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitie
 	}
 	var out AddActivitiesResponse
 	if err := json.Unmarshal(resp, &out); err != nil {
-		return nil, fmt.Errorf("cannot unmarshal response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal response: %w", err)
 	}
 	return &out, nil
 }

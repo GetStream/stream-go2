@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -21,7 +22,7 @@ func decodeJSONHook(f, typ reflect.Type, data interface{}) (interface{}, error) 
 		case float64:
 			return durationFromString(fmt.Sprintf("%fs", v))
 		default:
-			return nil, fmt.Errorf("invalid duration")
+			return nil, errors.New("invalid duration")
 		}
 	case reflect.TypeOf(Data{}):
 		switch v := data.(type) {
@@ -36,7 +37,7 @@ func decodeJSONHook(f, typ reflect.Type, data interface{}) (interface{}, error) 
 			}
 			return a, nil
 		default:
-			return nil, fmt.Errorf("invalid data")
+			return nil, errors.New("invalid data")
 		}
 	}
 	return data, nil
