@@ -22,6 +22,14 @@ type Feed interface {
 	RealtimeToken(bool) string
 }
 
+var (
+	userIDRegex *regexp.Regexp
+)
+
+func init() {
+	userIDRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+}
+
 type feed struct {
 	slug   string
 	userID string
@@ -44,7 +52,6 @@ func (f *feed) UserID() string {
 }
 
 func newFeed(slug, userID string, client *Client) (*feed, error) {
-	userIDRegex := regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 	ok := userIDRegex.Match([]byte(userID))
 	if !ok {
 		return nil, errInvalidUserID
