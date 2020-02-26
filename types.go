@@ -2,6 +2,7 @@ package stream
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -29,7 +30,7 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 	case float64:
 		*d, err = durationFromString(fmt.Sprintf("%fs", v))
 	default:
-		err = fmt.Errorf("invalid duration")
+		err = errors.New("invalid duration")
 	}
 	return err
 }
@@ -120,10 +121,10 @@ type readResponse struct {
 var (
 	// ErrMissingNextPage is returned when trying to read the next page of a response
 	// which has an empty "next" field.
-	ErrMissingNextPage = fmt.Errorf("request missing next page")
+	ErrMissingNextPage = errors.New("request missing next page")
 	// ErrInvalidNextPage is returned when trying to read the next page of a response
 	// which has an invalid "next" field.
-	ErrInvalidNextPage = fmt.Errorf("invalid format for Next field")
+	ErrInvalidNextPage = errors.New("invalid format for Next field")
 )
 
 func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
