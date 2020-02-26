@@ -3,7 +3,6 @@ package stream
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 )
@@ -148,11 +147,4 @@ func (a authenticator) jwtSignRequest(req *http.Request, claims jwt.MapClaims) e
 	req.Header.Add("Stream-Auth-Type", "jwt")
 	req.Header.Add("Authorization", auth)
 	return nil
-}
-
-func (a authenticator) urlSafe(src string) string {
-	src = strings.ReplaceAll(src, "+", "-")
-	src = strings.ReplaceAll(src, "/", "_")
-	src = strings.Trim(src, "=")
-	return src
 }
