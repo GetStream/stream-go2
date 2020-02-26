@@ -12,3 +12,5 @@
 
 # coverage
 coverage.txt
+
+.vscode/

@@ -8,4 +8,4 @@ require (
 	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0
 )
 
-go 1.12
+go 1.13
