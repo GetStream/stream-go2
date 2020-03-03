@@ -5,7 +5,7 @@ stream-go2 is a Go client for [Stream](https://getstream.io) API.
 You can sign up for a Stream account at [getstream.io/get_started](https://getstream.io/get_started/).
 
 [![build](https://github.com/GetStream/stream-go2/workflows/build/badge.svg)](https://github.com/GetStream/stream-go2/actions)
-[![godoc](https://godoc.org/github.com/GetStream/stream-go2?status.svg)](https://godoc.org/github.com/GetStream/stream-go2)
+[![godoc](https://godoc.org/github.com/GetStream/stream-go2?status.svg)](https://pkg.go.dev/github.com/GetStream/stream-go2/v4?tab=doc)
 [![codecov](https://codecov.io/gh/GetStream/stream-go2/branch/master/graph/badge.svg)](https://codecov.io/gh/GetStream/stream-go2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GetStream/stream-go2)](https://goreportcard.com/report/github.com/GetStream/stream-go2)
 
@@ -238,7 +238,7 @@ if err != nil {
 
 ### Partially updating activities
 
-You can partial update activities identified either by ID: 
+You can partial update activities identified either by ID:
 
 ``` go
 changesetA := stream.NewUpdateActivityRequestByID("f505b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
