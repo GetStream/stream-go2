@@ -543,6 +543,13 @@ type GetActivitiesResponse struct {
 	Results []Activity `json:"results"`
 }
 
+// GetEnrichedActivitiesResponse contains a slice of enriched Activity returned by GetEnrichedActivitiesByID
+// and GetEnrichedActivitiesByForeignID requests.
+type GetEnrichedActivitiesResponse struct {
+	response
+	Results []EnrichedActivity `json:"results"`
+}
+
 // ForeignIDTimePair couples an activity's foreignID and timestamp.
 type ForeignIDTimePair struct {
 	ForeignID string
