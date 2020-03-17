@@ -147,3 +147,6 @@ func (c *CollectionsClient) Delete(collection, id string) error {
 func (c *CollectionsClient) CreateReference(collection, id string) string {
 	return fmt.Sprintf("SO:%s:%s", collection, id)
 }
+
+// CreateCollectionReference is a convenience helper not to require a client.
+var CreateCollectionReference = (&CollectionsClient{}).CreateReference

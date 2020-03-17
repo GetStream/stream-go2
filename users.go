@@ -77,3 +77,6 @@ func (c *UsersClient) Delete(id string) error {
 func (c *UsersClient) CreateReference(id string) string {
 	return fmt.Sprintf("SU:%s", id)
 }
+
+// CreateUserReference is a convenience helper not to require a client.
+var CreateUserReference = (&UsersClient{}).CreateReference
