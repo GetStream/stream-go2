@@ -116,6 +116,19 @@ func TestGetActivities(t *testing.T) {
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/activities/?api_key=key&foreign_ids=foo%2Cbar&timestamps=0001-01-01T00%3A00%3A00%2C0001-01-01T00%3A00%3A01", "")
 }
 
+func TestGetEnrichedActivities(t *testing.T) {
+	client, requester := newClient(t)
+	_, err := client.GetEnrichedActivitiesByID("foo", "bar", "baz")
+	require.NoError(t, err)
+	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/enrich/activities/?api_key=key&ids=foo%2Cbar%2Cbaz", "")
+	_, err = client.GetEnrichedActivitiesByForeignID(
+		stream.NewForeignIDTimePair("foo", stream.Time{}),
+		stream.NewForeignIDTimePair("bar", stream.Time{Time: time.Time{}.Add(time.Second)}),
+	)
+	require.NoError(t, err)
+	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/enrich/activities/?api_key=key&foreign_ids=foo%2Cbar&timestamps=0001-01-01T00%3A00%3A00%2C0001-01-01T00%3A00%3A01", "")
+}
+
 func TestUpdateActivityByID(t *testing.T) {
 	client, requester := newClient(t)
 

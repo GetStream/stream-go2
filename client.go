@@ -225,6 +225,42 @@ func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, err
 	return &resp, nil
 }
 
+// GetEnrichedActivitiesByID returns enriched activities for the current app having the given IDs.
+func (c *Client) GetEnrichedActivitiesByID(ids ...string) (*GetEnrichedActivitiesResponse, error) {
+	return c.getAppEnrichedActivities(makeRequestOption("ids", strings.Join(ids, ",")))
+}
+
+// GetEnrichedActivitiesByForeignID returns enriched activities for the current app having the given foreign IDs and timestamps.
+func (c *Client) GetEnrichedActivitiesByForeignID(values ...ForeignIDTimePair) (*GetEnrichedActivitiesResponse, error) {
+	foreignIDs := make([]string, len(values))
+	timestamps := make([]string, len(values))
+	for i, v := range values {
+		foreignIDs[i] = v.ForeignID
+		timestamps[i] = v.Timestamp.Format(TimeLayout)
+	}
+	return c.getAppEnrichedActivities(
+		makeRequestOption("foreign_ids", strings.Join(foreignIDs, ",")),
+		makeRequestOption("timestamps", strings.Join(timestamps, ",")),
+	)
+}
+
+func (c *Client) getAppEnrichedActivities(values ...valuer) (*GetEnrichedActivitiesResponse, error) {
+	endpoint := c.makeEndpoint("enrich/activities/")
+	for _, v := range values {
+		endpoint.addQueryParam(v)
+	}
+	data, err := c.get(endpoint, nil, c.authenticator.feedAuth(resActivities, nil))
+	if err != nil {
+		return nil, err
+	}
+	var resp GetEnrichedActivitiesResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // UpdateActivities updates existing activities.
 func (c *Client) UpdateActivities(activities ...Activity) error {
 	req := struct {
