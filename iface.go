@@ -27,8 +27,12 @@ type ClientInterface interface {
 	Personalization() *PersonalizationClient
 	// GetActivitiesByID returns activities for the current app having the given IDs.
 	GetActivitiesByID(ids ...string) (*GetActivitiesResponse, error)
+	// GetEnrichedActivitiesByID returns enriched activities for the current app having the given IDs.
+	GetEnrichedActivitiesByID(ids ...string) (*GetEnrichedActivitiesResponse, error)
 	// GetActivitiesByForeignID returns activities for the current app having the given foreign IDs and timestamps.
 	GetActivitiesByForeignID(values ...ForeignIDTimePair) (*GetActivitiesResponse, error)
+	// GetEnrichedActivitiesByForeignID returns enriched activities for the current app having the given foreign IDs and timestamps.
+	GetEnrichedActivitiesByForeignID(values ...ForeignIDTimePair) (*GetEnrichedActivitiesResponse, error)
 	// UpdateActivities updates existing activities.
 	UpdateActivities(activities ...Activity) error
 	// PartialUpdateActivities performs a partial update on multiple activities with the given set and unset operations
