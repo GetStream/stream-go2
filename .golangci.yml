@@ -4,6 +4,7 @@ run:
 linters:
   disable-all: true
   enable:
+    - bodyclose
     - deadcode
     - dupl
     - errcheck
@@ -46,6 +47,9 @@ linters-settings:
       rangeValCopy:
         sizeThreshold: 364
         skipTestFuncs: true
+  govet:
+    enable-all: true
+    disable: shadow
 issues:
   exclude-rules:
     - path: _test\.go
