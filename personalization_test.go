@@ -23,10 +23,10 @@ func TestPersonalizationPost(t *testing.T) {
 	client, requester := newClient(t)
 	p := client.Personalization()
 	params := map[string]interface{}{"answer": 42, "feed": "user:123"}
-	err := p.Post("", params, nil)
+	_, err := p.Post("", params, nil)
 	require.Error(t, err)
 	data := map[string]interface{}{"foo": "bar", "baz": 42}
-	err = p.Post("some_resource", params, data)
+	_, err = p.Post("some_resource", params, data)
 	require.NoError(t, err)
 	expectedURL := "https://personalization.stream-io-api.com/personalization/v1.0/some_resource/?answer=42&api_key=key&feed=user%3A123"
 	expectedBody := `{"data":{"baz":42,"foo":"bar"}}`
@@ -37,9 +37,9 @@ func TestPersonalizationDelete(t *testing.T) {
 	client, requester := newClient(t)
 	p := client.Personalization()
 	params := map[string]interface{}{"answer": 42, "feed": "user:123"}
-	err := p.Delete("", params)
+	_, err := p.Delete("", params)
 	require.Error(t, err)
-	err = p.Delete("some_resource", params)
+	_, err = p.Delete("some_resource", params)
 	require.NoError(t, err)
 	expectedURL := "https://personalization.stream-io-api.com/personalization/v1.0/some_resource/?answer=42&api_key=key&feed=user%3A123"
 	testRequest(t, requester.req, http.MethodDelete, expectedURL, "")

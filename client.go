@@ -332,7 +332,7 @@ func (c *Client) updateActivity(req UpdateActivityRequest) (*UpdateActivityRespo
 	return &resp, nil
 }
 
-func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
+func (c *Client) makeStreamError(statusCode int, rate *Rate, body io.Reader) error {
 	if body == nil {
 		return errors.New("invalid body")
 	}
@@ -345,6 +345,7 @@ func (c *Client) makeStreamError(statusCode int, body io.Reader) error {
 		return fmt.Errorf("unexpected error (status code %d)", statusCode)
 	}
 	streamErr.StatusCode = statusCode
+	streamErr.Rate = rate
 	return streamErr
 }
 
@@ -428,12 +429,26 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 		return nil, fmt.Errorf("cannot perform request: %w", err)
 	}
 	defer resp.Body.Close()
+
+	rate := NewRate(resp.Header)
+
 	if resp.StatusCode/100 != 2 {
-		return nil, c.makeStreamError(resp.StatusCode, resp.Body)
+		return nil, c.makeStreamError(resp.StatusCode, rate, resp.Body)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		return nil, fmt.Errorf("cannot read response: %w", err)
+	}
+
+	out := map[string]interface{}{}
+	if err := json.Unmarshal(body, &out); err != nil {
+		return nil, fmt.Errorf("cannot read response: %w", err)
+	}
+
+	out["ratelimit"] = rate
+
+	if body, err = json.Marshal(out); err != nil {
 		return nil, fmt.Errorf("cannot read response: %w", err)
 	}
 
@@ -449,10 +464,6 @@ func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse
 	var out AddActivityResponse
 	if err := json.Unmarshal(resp, &out); err != nil {
 		return nil, err
-	}
-	_, ok := out.Extra["duration"].(string)
-	if ok {
-		delete(out.Extra, "duration")
 	}
 	return &out, nil
 }

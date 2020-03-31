@@ -9,6 +9,13 @@ var (
 	errInvalidUserID      = errors.New("invalid userID provided")
 )
 
+// Rate limit headers
+const (
+	HeaderRateLimit     = "X-Ratelimit-Limit"
+	HeaderRateRemaining = "X-Ratelimit-Remaining"
+	HeaderRateReset     = "X-Ratelimit-Reset"
+)
+
 // APIError is an error returned by Stream API when the request cannot be
 // performed or errored server side.
 type APIError struct {
@@ -18,6 +25,7 @@ type APIError struct {
 	Exception       string                   `json:"exception,omitempty"`
 	ExceptionFields map[string][]interface{} `json:"exception_fields,omitempty"`
 	StatusCode      int                      `json:"status_code,omitempty"`
+	Rate            *Rate                    `json:"-"`
 }
 
 func (e APIError) Error() string {

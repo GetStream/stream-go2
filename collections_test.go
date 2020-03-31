@@ -62,7 +62,7 @@ func TestUpsertCollectionObjects(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		err := client.Collections().Upsert(tc.collection, tc.objects...)
+		_, err := client.Collections().Upsert(tc.collection, tc.objects...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
 	}
@@ -113,7 +113,7 @@ func TestDeleteManyCollectionObjects(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		err := client.Collections().DeleteMany(tc.collection, tc.ids...)
+		_, err := client.Collections().DeleteMany(tc.collection, tc.ids...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodDelete, tc.expectedURL, "")
 	}
@@ -130,7 +130,7 @@ func TestGetCollectionObject(t *testing.T) {
 func TestDeleteCollectionObject(t *testing.T) {
 	client, requester := newClient(t)
 
-	err := client.Collections().Delete("test-get-one", "id1")
+	_, err := client.Collections().Delete("test-get-one", "id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/collections/test-get-one/id1/?api_key=key", "")
 }
