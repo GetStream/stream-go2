@@ -793,9 +793,9 @@ See the complete [docs and examples](https://getstream.io/docs/#enrichment_intro
 
 ## License
 
-stream-go2 is licensed under the [GNU General Public License v3.0](LICENSE).
+stream-go2 is licensed under the [BSD 3-Clause](LICENSE).
 
-Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.
+A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the project or its contributors to promote derived products without written consent.
 
 See the [LICENSE](LICENSE) file.
 
