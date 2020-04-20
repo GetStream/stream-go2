@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	jwt "gopkg.in/dgrijalva/jwt-go.v3"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type authFunc func(*http.Request) error

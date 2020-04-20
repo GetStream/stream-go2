@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jwt "gopkg.in/dgrijalva/jwt-go.v3"
 
 	stream "github.com/GetStream/stream-go2/v4"
 )

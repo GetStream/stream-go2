@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	jwt "gopkg.in/dgrijalva/jwt-go.v3"
+	"github.com/dgrijalva/jwt-go"
 )
 
 // Client is a Stream API client used for retrieving feeds and performing API
