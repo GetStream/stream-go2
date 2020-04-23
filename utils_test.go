@@ -20,7 +20,7 @@ func init() {
 
 func newClient(t *testing.T) (*stream.Client, *mockRequester) {
 	requester := &mockRequester{}
-	client, err := stream.NewClient("key", "secret", stream.WithHTTPRequester(requester))
+	client, err := stream.New("key", "secret", stream.WithHTTPRequester(requester))
 	require.NoError(t, err)
 	return client, requester
 }

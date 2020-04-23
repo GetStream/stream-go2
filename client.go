@@ -34,9 +34,9 @@ type Requester interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-// NewClient builds a new Client with the provided API key and secret. It can be
+// New builds a new Client with the provided API key and secret. It can be
 // configured further by passing any number of ClientOption parameters.
-func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
+func New(key, secret string, opts ...ClientOption) (*Client, error) {
 	if key == "" || secret == "" {
 		return nil, errMissingCredentials
 	}
@@ -66,15 +66,15 @@ func newRequester(timeout time.Duration) Requester {
 	}
 }
 
-// NewClientFromEnv build a new Client using environment variables values, with
+// NewFromEnv build a new Client using environment variables values, with
 // possible values being STREAM_API_KEY, STREAM_API_SECRET, STREAM_API_REGION,
 // and STREAM_API_VERSION.
-func NewClientFromEnv() (*Client, error) {
+func NewFromEnv() (*Client, error) {
 	key := os.Getenv("STREAM_API_KEY")
 	secret := os.Getenv("STREAM_API_SECRET")
 	region := os.Getenv("STREAM_API_REGION")
 	version := os.Getenv("STREAM_API_VERSION")
-	return NewClient(key, secret, WithAPIRegion(region), WithAPIVersion(version))
+	return New(key, secret, WithAPIRegion(region), WithAPIVersion(version))
 }
 
 // ClientOption is a function used for adding specific configuration options to
