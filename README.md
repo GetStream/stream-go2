@@ -1,6 +1,6 @@
 # stream-go2
 
-stream-go2 is a Go client for [Stream](https://getstream.io) API. Some test message
+stream-go2 is a Go client for [Stream](https://getstream.io) API.
 
 You can sign up for a Stream account at [getstream.io/get_started](https://getstream.io/get_started/).
 
