@@ -13,6 +13,7 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
 
 * [Getting started](#usage)
 * [Creating a Client](#creating-a-client)
+* [Rate Limits](#rate-limits)
 * [Creating a Feed](#creating-a-feed)
 * [Retrieving Activities](#retrieving-activities)
   * [Flat feeds](#flat-feeds)
@@ -49,6 +50,8 @@ Get the client:
 ```bash
 $ go get github.com/GetStream/stream-go2/v5
 ```
+
+> For `v4`, use `github.com/GetStream/stream-go2/v4` but updating to the last version is highly recommended.
 
 ### Creating a Client
 
@@ -87,6 +90,14 @@ Available environment variables:
 * `STREAM_API_SECRET`
 * `STREAM_API_REGION`
 * `STREAM_API_VERSION`
+
+### Rate Limits
+
+API has different rate limits for each distinct endpoint and this information is returned to the client in response headers and SDK parses headers into `Rate` type.
+
+This info is provided to the user in 2 ways:
+* in responses; `resp, _ := feed.GetActivities; resp.Rate`.
+* in errors; if request doesn't succeed then error is a type of `APIError` and headers are accessible via `err.(APIError).Rate`.
 
 ### Creating a Feed
 
