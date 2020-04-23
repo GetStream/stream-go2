@@ -1,5 +1,3 @@
-github.com/GetStream/stream-go2 v1.14.0 h1:ewVqvTilLsKo5MhpaADt1sEOmRk3kuAhctAyKc5ATuU=
-github.com/GetStream/stream-go2 v3.2.1+incompatible h1:hvTIS7EUkvOMyJvizMPiIuhKeM/6yLjd3ABvC45ZakA=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
