@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -107,9 +109,43 @@ func (a *Data) decode(data map[string]interface{}) error {
 	return nil
 }
 
+// Rate is the information to be filled if a rate limited response
+type Rate struct {
+	// Limit is the existing limit for the resource
+	Limit int
+
+	// Remaining is the remaining possible calls
+	Remaining int
+
+	// Reset is the time for limit to reset
+	Reset Time
+}
+
+func NewRate(headers http.Header) *Rate {
+	var r Rate
+	limit, err := strconv.Atoi(headers.Get(HeaderRateLimit))
+	if err == nil {
+		r.Limit = limit
+	}
+	remaining, err := strconv.Atoi(headers.Get(HeaderRateRemaining))
+	if err == nil {
+		r.Remaining = remaining
+	}
+	reset, err := strconv.ParseInt(headers.Get(HeaderRateRemaining), 10, 64)
+	if err == nil && reset > 0 {
+		r.Reset = Time{Time: time.Unix(reset, 0)}
+	}
+	return &r
+}
+
 // Response is the part of StreamAPI responses common throughout the API.
 type response struct {
 	Duration Duration `json:"duration,omitempty"`
+	Rate     Rate     `json:"ratelimit,omitempty"`
+}
+
+type BaseResponse struct {
+	response
 }
 
 // readResponse is the part of StreamAPI responses common for GetActivities API requests.
@@ -206,7 +242,7 @@ type baseNotificationFeedResponse struct {
 	Unread int `json:"unread"`
 }
 
-// baseNotificationFeedResukt is the common part of responses obtained from reading normal or enriched notification feeds.
+// baseNotificationFeedResult is the common part of responses obtained from reading normal or enriched notification feeds.
 type baseNotificationFeedResult struct {
 	ID            string `json:"id"`
 	ActivityCount int    `json:"activity_count"`
@@ -248,6 +284,7 @@ type NotificationFeedResult struct {
 // AddActivityResponse is the API response obtained when adding a single activity
 // to a feed.
 type AddActivityResponse struct {
+	response
 	Activity
 }
 
@@ -264,6 +301,7 @@ type Follower struct {
 	TargetID string `json:"target_id,omitempty"`
 }
 
+// followResponse is the API response obtained when retrieving follow graph
 type followResponse struct {
 	response
 	Results []Follower `json:"results,omitempty"`
@@ -341,6 +379,11 @@ type CollectionObject struct {
 	Data map[string]interface{} `json:"data"`
 }
 
+type CollectionObjectResponse struct {
+	response
+	CollectionObject `json:",inline"`
+}
+
 // MarshalJSON marshals the CollectionObject to a flat JSON object.
 func (o CollectionObject) MarshalJSON() ([]byte, error) {
 	m := map[string]interface{}{
@@ -350,14 +393,6 @@ func (o CollectionObject) MarshalJSON() ([]byte, error) {
 		m[k] = v
 	}
 	return json.Marshal(m)
-}
-
-type getCollectionResponseWrap struct {
-	Response getCollectionResponse `json:"response"`
-}
-
-type getCollectionResponse struct {
-	Data []GetCollectionResponseObject `json:"data"`
 }
 
 type addCollectionRequest struct {
@@ -384,10 +419,24 @@ type GetCollectionResponseObject struct {
 	Data      map[string]interface{} `json:"data"`
 }
 
+type getCollectionResponse struct {
+	Data []GetCollectionResponseObject `json:"data"`
+}
+
+type GetCollectionResponse struct {
+	response
+	Response getCollectionResponse `json:"response"`
+}
+
 // User represents a user
 type User struct {
 	ID   string                 `json:"id"`
 	Data map[string]interface{} `json:"data,omitempty"`
+}
+
+type UserResponse struct {
+	response
+	User `json:",inline"`
 }
 
 // Reaction is a reaction retrieved from the API.
@@ -396,6 +445,11 @@ type Reaction struct {
 	ChildrenReactions map[string][]*Reaction `json:"latest_children,omitempty"`
 	OwnChildren       map[string][]*Reaction `json:"own_children,omitempty"`
 	ChildrenCounters  map[string]interface{} `json:"children_counts,omitempty"`
+}
+
+type ReactionResponse struct {
+	response
+	Reaction `json:",inline"`
 }
 
 // AddReactionRequestObject is an object used only when calling the Add* reaction endpoints
@@ -482,6 +536,7 @@ type filterReactionsRequestMetadata struct {
 type PersonalizationResponse struct {
 	AppID    int                      `json:"app_id"`
 	Duration Duration                 `json:"duration"`
+	Rate     Rate                     `json:"ratelimit"`
 	Limit    int                      `json:"limit"`
 	Offset   int                      `json:"offset"`
 	Version  string                   `json:"version"`
@@ -595,9 +650,11 @@ func NewUpdateActivityRequestByForeignID(foreignID string, timestamp Time, set m
 // UpdateActivityResponse is the response returned by the UpdateActivityByID and
 // UpdateActivityByForeignID methods.
 type UpdateActivityResponse struct {
+	response
 	Activity
 }
 
 type UpdateActivitiesResponse struct {
+	response
 	Activities []*Activity `json:"activities"`
 }

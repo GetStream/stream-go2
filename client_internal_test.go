@@ -168,7 +168,7 @@ func Test_makeStreamError(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		err := (&Client{}).makeStreamError(123, tc.body)
+		err := (&Client{}).makeStreamError(123, nil, tc.body)
 		assert.Equal(t, tc.expected.Error(), err.Error())
 		if tc.apiErr.Code != 0 {
 			assert.Equal(t, tc.apiErr, err)

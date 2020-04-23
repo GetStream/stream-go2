@@ -18,7 +18,7 @@ func TestGetReaction(t *testing.T) {
 
 func TestDeleteReaction(t *testing.T) {
 	client, requester := newClient(t)
-	err := client.Reactions().Delete("id1")
+	_, err := client.Reactions().Delete("id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/reaction/id1/?api_key=key", "")
 }

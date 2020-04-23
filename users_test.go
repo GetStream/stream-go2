@@ -27,7 +27,7 @@ func TestGetUser(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	client, requester := newClient(t)
 
-	err := client.Users().Delete("id1")
+	_, err := client.Users().Delete("id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/user/id1/?api_key=key", "")
 }

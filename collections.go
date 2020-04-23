@@ -13,9 +13,9 @@ type CollectionsClient struct {
 }
 
 // Upsert creates new or updates existing objects for the given collection's name.
-func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObject) error {
+func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObject) (*BaseResponse, error) {
 	if collection == "" {
-		return errors.New("collection name required")
+		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/")
 	data := map[string]interface{}{
@@ -23,13 +23,12 @@ func (c *CollectionsClient) Upsert(collection string, objects ...CollectionObjec
 			collection: objects,
 		},
 	}
-	_, err := c.client.post(endpoint, data, c.client.authenticator.collectionsAuth)
-	return err
+	return decode(c.client.post(endpoint, data, c.client.authenticator.collectionsAuth))
 }
 
 // Select returns a list of CollectionObjects for the given collection name
 // having the given IDs.
-func (c *CollectionsClient) Select(collection string, ids ...string) ([]GetCollectionResponseObject, error) {
+func (c *CollectionsClient) Select(collection string, ids ...string) (*GetCollectionResponse, error) {
 	if collection == "" {
 		return nil, errors.New("collection name required")
 	}
@@ -43,28 +42,37 @@ func (c *CollectionsClient) Select(collection string, ids ...string) ([]GetColle
 	if err != nil {
 		return nil, err
 	}
-	var selectResp getCollectionResponseWrap
-	err = json.Unmarshal(resp, &selectResp)
-	if err != nil {
+	var result GetCollectionResponse
+	if err := json.Unmarshal(resp, &result); err != nil {
 		return nil, err
 	}
-	return selectResp.Response.Data, nil
+	return &result, nil
 }
 
 // DeleteMany removes from a collection the objects having the given IDs.
-func (c *CollectionsClient) DeleteMany(collection string, ids ...string) error {
+func (c *CollectionsClient) DeleteMany(collection string, ids ...string) (*BaseResponse, error) {
 	if collection == "" {
-		return errors.New("collection name required")
+		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/")
 	endpoint.addQueryParam(makeRequestOption("collection_name", collection))
 	endpoint.addQueryParam(makeRequestOption("ids", strings.Join(ids, ",")))
-	_, err := c.client.delete(endpoint, nil, c.client.authenticator.collectionsAuth)
-	return err
+	return decode(c.client.delete(endpoint, nil, c.client.authenticator.collectionsAuth))
+}
+
+func (c *CollectionsClient) decodeObject(resp []byte, err error) (*CollectionObjectResponse, error) {
+	if err != nil {
+		return nil, err
+	}
+	var result CollectionObjectResponse
+	if err := json.Unmarshal(resp, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 // Add adds a single object to a collection.
-func (c *CollectionsClient) Add(collection string, object CollectionObject, opts ...AddObjectOption) (*CollectionObject, error) {
+func (c *CollectionsClient) Add(collection string, object CollectionObject, opts ...AddObjectOption) (*CollectionObjectResponse, error) {
 	if collection == "" {
 		return nil, errors.New("collection name required")
 	}
@@ -79,39 +87,21 @@ func (c *CollectionsClient) Add(collection string, object CollectionObject, opts
 	req.ID = object.ID
 	req.Data = object.Data
 
-	resp, err := c.client.post(endpoint, req, c.client.authenticator.collectionsAuth)
-	if err != nil {
-		return nil, err
-	}
-	result := &CollectionObject{}
-	err = json.Unmarshal(resp, result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return c.decodeObject(c.client.post(endpoint, req, c.client.authenticator.collectionsAuth))
 }
 
 // Get retrieves a collection object having the given ID.
-func (c *CollectionsClient) Get(collection, id string) (*CollectionObject, error) {
+func (c *CollectionsClient) Get(collection, id string) (*CollectionObjectResponse, error) {
 	if collection == "" {
 		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/%s/%s/", collection, id)
 
-	resp, err := c.client.get(endpoint, nil, c.client.authenticator.collectionsAuth)
-	if err != nil {
-		return nil, err
-	}
-	result := &CollectionObject{}
-	err = json.Unmarshal(resp, result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return c.decodeObject(c.client.get(endpoint, nil, c.client.authenticator.collectionsAuth))
 }
 
 // Update updates the given collection object's data.
-func (c *CollectionsClient) Update(collection, id string, data map[string]interface{}) (*CollectionObject, error) {
+func (c *CollectionsClient) Update(collection, id string, data map[string]interface{}) (*CollectionObjectResponse, error) {
 	if collection == "" {
 		return nil, errors.New("collection name required")
 	}
@@ -120,27 +110,17 @@ func (c *CollectionsClient) Update(collection, id string, data map[string]interf
 		"data": data,
 	}
 
-	resp, err := c.client.put(endpoint, reqData, c.client.authenticator.collectionsAuth)
-	if err != nil {
-		return nil, err
-	}
-	result := &CollectionObject{}
-	err = json.Unmarshal(resp, result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return c.decodeObject(c.client.put(endpoint, reqData, c.client.authenticator.collectionsAuth))
 }
 
 // Delete removes from a collection the object having the given ID.
-func (c *CollectionsClient) Delete(collection, id string) error {
+func (c *CollectionsClient) Delete(collection, id string) (*BaseResponse, error) {
 	if collection == "" {
-		return errors.New("collection name required")
+		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/%s/%s/", collection, id)
 
-	_, err := c.client.delete(endpoint, nil, c.client.authenticator.collectionsAuth)
-	return err
+	return decode(c.client.delete(endpoint, nil, c.client.authenticator.collectionsAuth))
 }
 
 // CreateReference returns a new reference string in the form SO:<collection>:<id>.

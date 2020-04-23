@@ -12,7 +12,7 @@ type ReactionsClient struct {
 }
 
 // Add adds a reaction.
-func (c *ReactionsClient) Add(r AddReactionRequestObject) (*Reaction, error) {
+func (c *ReactionsClient) Add(r AddReactionRequestObject) (*ReactionResponse, error) {
 	if r.ParentID != "" {
 		return nil, errors.New("`Parent` not empty. For adding child reactions use `AddChild`")
 	}
@@ -20,70 +20,51 @@ func (c *ReactionsClient) Add(r AddReactionRequestObject) (*Reaction, error) {
 }
 
 // AddChild adds a child reaction to the provided parent.
-func (c *ReactionsClient) AddChild(parentID string, r AddReactionRequestObject) (*Reaction, error) {
+func (c *ReactionsClient) AddChild(parentID string, r AddReactionRequestObject) (*ReactionResponse, error) {
 	r.ParentID = parentID
 	return c.addReaction(r)
 }
 
-func (c *ReactionsClient) addReaction(r AddReactionRequestObject) (*Reaction, error) {
+func (c *ReactionsClient) addReaction(r AddReactionRequestObject) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/")
-	resp, err := c.client.post(endpoint, r, c.client.authenticator.reactionsAuth)
+	return c.decode(c.client.post(endpoint, r, c.client.authenticator.reactionsAuth))
+}
+
+func (c *ReactionsClient) decode(resp []byte, err error) (*ReactionResponse, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	result := &Reaction{}
-	err = json.Unmarshal(resp, result)
-	if err != nil {
+	var result ReactionResponse
+	if err := json.Unmarshal(resp, &result); err != nil {
 		return nil, err
 	}
-	return result, nil
+	return &result, nil
 }
 
 // Update updates the reaction's data and/or target feeds.
-func (c *ReactionsClient) Update(id string, data map[string]interface{}, targetFeeds []string) (*Reaction, error) {
+func (c *ReactionsClient) Update(id string, data map[string]interface{}, targetFeeds []string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
 	reqData := map[string]interface{}{
 		"data":         data,
 		"target_feeds": targetFeeds,
 	}
-	resp, err := c.client.put(endpoint, reqData, c.client.authenticator.reactionsAuth)
-	if err != nil {
-		return nil, err
-	}
-
-	result := &Reaction{}
-	err = json.Unmarshal(resp, result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return c.decode(c.client.put(endpoint, reqData, c.client.authenticator.reactionsAuth))
 }
 
 // Get retrieves a reaction having the given id.
-func (c *ReactionsClient) Get(id string) (*Reaction, error) {
+func (c *ReactionsClient) Get(id string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
-	resp, err := c.client.get(endpoint, nil, c.client.authenticator.reactionsAuth)
-	if err != nil {
-		return nil, err
-	}
-
-	result := &Reaction{}
-	err = json.Unmarshal(resp, result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return c.decode(c.client.get(endpoint, nil, c.client.authenticator.reactionsAuth))
 }
 
 // Delete deletes a reaction having the given id.
-func (c *ReactionsClient) Delete(id string) error {
+func (c *ReactionsClient) Delete(id string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
-	_, err := c.client.delete(endpoint, nil, c.client.authenticator.reactionsAuth)
-	return err
+	return c.decode(c.client.delete(endpoint, nil, c.client.authenticator.reactionsAuth))
 }
 
 // Filter lists reactions based on the provided criteria and with the specified pagination.
@@ -99,13 +80,12 @@ func (c *ReactionsClient) Filter(attr FilterReactionsAttribute, opts ...FilterRe
 	if err != nil {
 		return nil, err
 	}
-	result := &FilterReactionResponse{}
-	err = json.Unmarshal(resp, result)
-	if err != nil {
+	var result FilterReactionResponse
+	if err := json.Unmarshal(resp, &result); err != nil {
 		return nil, err
 	}
 	result.meta.attr = attr
-	return result, nil
+	return &result, nil
 }
 
 // GetNextPageFilteredReactions returns the reactions at the "next" page of a previous *FilterReactionResponse response, if any.

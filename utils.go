@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -75,4 +76,15 @@ func parseIntValue(values url.Values, key string) (val int, exits bool, err erro
 func parseBool(value string) bool {
 	v := strings.ToLower(value)
 	return v != "" && v != "false" && v != "f" && v != "0"
+}
+
+func decode(resp []byte, err error) (*BaseResponse, error) {
+	if err != nil {
+		return nil, err
+	}
+	var result BaseResponse
+	if err := json.Unmarshal(resp, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
