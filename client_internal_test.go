@@ -52,7 +52,7 @@ func TestConfig(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		c, err := NewClient(tc.key, tc.secret, tc.opts...)
+		c, err := New(tc.key, tc.secret, tc.opts...)
 		if tc.shouldError {
 			assert.Error(t, err)
 			continue
@@ -96,7 +96,7 @@ func Test_makeEndpoint(t *testing.T) {
 	}
 }
 
-func TestNewClientFromEnv(t *testing.T) {
+func TestNewFromEnv(t *testing.T) {
 	defer func() {
 		os.Setenv("STREAM_API_KEY", "")
 		os.Setenv("STREAM_API_SECRET", "")
@@ -104,24 +104,24 @@ func TestNewClientFromEnv(t *testing.T) {
 		os.Setenv("STREAM_API_VERSION", "")
 	}()
 
-	_, err := NewClientFromEnv()
+	_, err := NewFromEnv()
 	require.Error(t, err)
 
 	os.Setenv("STREAM_API_KEY", "foo")
 	os.Setenv("STREAM_API_SECRET", "bar")
 
-	client, err := NewClientFromEnv()
+	client, err := NewFromEnv()
 	require.NoError(t, err)
 	assert.Equal(t, "foo", client.key)
 	assert.Equal(t, "bar", client.authenticator.secret)
 
 	os.Setenv("STREAM_API_REGION", "baz")
-	client, err = NewClientFromEnv()
+	client, err = NewFromEnv()
 	require.NoError(t, err)
 	assert.Equal(t, "baz", client.urlBuilder.(apiURLBuilder).region)
 
 	os.Setenv("STREAM_API_VERSION", "qux")
-	client, err = NewClientFromEnv()
+	client, err = NewFromEnv()
 	require.NoError(t, err)
 	assert.Equal(t, "qux", client.urlBuilder.(apiURLBuilder).version)
 }

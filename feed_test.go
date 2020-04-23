@@ -219,7 +219,7 @@ func TestUpdateToTargets(t *testing.T) {
 }
 
 func TestRealtimeToken(t *testing.T) {
-	client, err := stream.NewClient("key", "super secret")
+	client, err := stream.New("key", "super secret")
 	require.NoError(t, err)
 	flat, _ := newFlatFeedWithUserID(client, "sample")
 	testCases := []struct {
