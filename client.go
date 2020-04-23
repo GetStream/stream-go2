@@ -291,15 +291,14 @@ func (c *Client) getAppEnrichedActivities(values ...valuer) (*GetEnrichedActivit
 }
 
 // UpdateActivities updates existing activities.
-func (c *Client) UpdateActivities(activities ...Activity) error {
+func (c *Client) UpdateActivities(activities ...Activity) (*BaseResponse, error) {
 	req := struct {
 		Activities []Activity `json:"activities,omitempty"`
 	}{
 		Activities: activities,
 	}
 	endpoint := c.makeEndpoint("activities/")
-	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
-	return err
+	return decode(c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil)))
 }
 
 // PartialUpdateActivities performs a partial update on multiple activities with the given set and unset operations
@@ -316,11 +315,9 @@ func (c *Client) PartialUpdateActivities(changesets ...UpdateActivityRequest) (*
 		return nil, err
 	}
 	var resp UpdateActivitiesResponse
-	err = json.Unmarshal(data, &resp)
-	if err != nil {
+	if err := json.Unmarshal(data, &resp); err != nil {
 		return nil, err
 	}
-
 	return &resp, err
 }
 
@@ -352,13 +349,8 @@ func (c *Client) updateActivity(req UpdateActivityRequest) (*UpdateActivityRespo
 		return nil, err
 	}
 	var resp UpdateActivityResponse
-	err = json.Unmarshal(data, &resp)
-	if err != nil {
+	if err := json.Unmarshal(data, &resp); err != nil {
 		return nil, err
-	}
-	_, ok := resp.Extra["duration"].(string)
-	if ok {
-		delete(resp.Extra, "duration")
 	}
 	return &resp, nil
 }

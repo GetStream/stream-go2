@@ -74,7 +74,7 @@ func TestUpdateActivities(t *testing.T) {
 			Extra:     map[string]interface{}{"influence": 42},
 		}
 	)
-	err := client.UpdateActivities(bobActivity)
+	_, err := client.UpdateActivities(bobActivity)
 	require.NoError(t, err)
 
 	body := fmt.Sprintf(`{"activities":[{"actor":"bob","foreign_id":"bob:123","influence":42,"object":"ice-cream","time":"%s","verb":"like"}]}`, now.Format(stream.TimeLayout))

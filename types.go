@@ -131,7 +131,7 @@ func NewRate(headers http.Header) *Rate {
 	if err == nil {
 		r.Remaining = remaining
 	}
-	reset, err := strconv.ParseInt(headers.Get(HeaderRateRemaining), 10, 64)
+	reset, err := strconv.ParseInt(headers.Get(HeaderRateReset), 10, 64)
 	if err == nil && reset > 0 {
 		r.Reset = Time{Time: time.Unix(reset, 0)}
 	}
@@ -284,8 +284,29 @@ type NotificationFeedResult struct {
 // AddActivityResponse is the API response obtained when adding a single activity
 // to a feed.
 type AddActivityResponse struct {
+	activityResponse
+}
+
+type activityResponse struct {
 	response
 	Activity
+}
+
+// UnmarshalJSON is the custom unmarshaler since activity custom unmarshaler
+// can take extra values.
+func (a *activityResponse) UnmarshalJSON(buf []byte) error {
+	var r response
+	if err := json.Unmarshal(buf, &r); err != nil {
+		return err
+	}
+	var ac Activity
+	if err := json.Unmarshal(buf, &ac); err != nil {
+		return err
+	}
+	delete(ac.Extra, "duration")
+	delete(ac.Extra, "ratelimit")
+	*a = activityResponse{response: r, Activity: ac}
+	return nil
 }
 
 // RemoveActivityResponse is the API response obtained when removing an activity
@@ -665,8 +686,7 @@ func NewUpdateActivityRequestByForeignID(foreignID string, timestamp Time, set m
 // UpdateActivityResponse is the response returned by the UpdateActivityByID and
 // UpdateActivityByForeignID methods.
 type UpdateActivityResponse struct {
-	response
-	Activity
+	activityResponse
 }
 
 type UpdateActivitiesResponse struct {
