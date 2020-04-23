@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	stream "github.com/GetStream/stream-go2/v4"
+	stream "github.com/GetStream/stream-go2/v5"
 )
 
 func TestFeedID(t *testing.T) {
@@ -103,7 +103,7 @@ func TestFollow(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		err := f1.Follow(f2, tc.opts...)
+		_, err := f1.Follow(f2, tc.opts...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
 	}
@@ -181,7 +181,7 @@ func TestUnfollow(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		err := f1.Unfollow(f2, tc.opts...)
+		_, err := f1.Unfollow(f2, tc.opts...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodDelete, tc.expected, "")
 	}
@@ -190,10 +190,10 @@ func TestUnfollow(t *testing.T) {
 func TestRemoveActivities(t *testing.T) {
 	client, requester := newClient(t)
 	flat, _ := newFlatFeedWithUserID(client, "123")
-	err := flat.RemoveActivityByID("id-to-remove")
+	_, err := flat.RemoveActivityByID("id-to-remove")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/id-to-remove/?api_key=key", "")
-	err = flat.RemoveActivityByForeignID("bob:123")
+	_, err = flat.RemoveActivityByForeignID("bob:123")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/bob:123/?api_key=key&foreign_id=1", "")
 }
@@ -208,11 +208,11 @@ func TestUpdateToTargets(t *testing.T) {
 		now               = getTime(time.Now())
 		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}, Extra: map[string]interface{}{"popularity": 9000}}
 	)
-	err := flat.UpdateToTargets(activity, stream.WithToTargetsAdd(f2.ID()), stream.WithToTargetsRemove(f1.ID()))
+	_, err := flat.UpdateToTargets(activity, stream.WithToTargetsAdd(f2.ID()), stream.WithToTargetsRemove(f1.ID()))
 	require.NoError(t, err)
 	body := fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","added_targets":["flat:f2"],"removed_targets":["flat:f1"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
-	err = flat.UpdateToTargets(activity, stream.WithToTargetsNew(f3.ID()))
+	_, err = flat.UpdateToTargets(activity, stream.WithToTargetsNew(f3.ID()))
 	require.NoError(t, err)
 	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)

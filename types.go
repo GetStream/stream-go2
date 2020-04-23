@@ -288,6 +288,13 @@ type AddActivityResponse struct {
 	Activity
 }
 
+// RemoveActivityResponse is the API response obtained when removing an activity
+// from a feed.
+type RemoveActivityResponse struct {
+	response
+	Removed string `json:"removed"`
+}
+
 // AddActivitiesResponse is the API response obtained when adding activities to
 // a feed.
 type AddActivitiesResponse struct {
@@ -363,6 +370,14 @@ type updateToTargetsRequest struct {
 	New       []string `json:"new_targets,omitempty"`
 	Adds      []string `json:"added_targets,omitempty"`
 	Removes   []string `json:"removed_targets,omitempty"`
+}
+
+// UpdateToTargetsResponse is the response for updating to targets of an activity.
+type UpdateToTargetsResponse struct {
+	response
+	Activity map[string]interface{} `json:"activity"`
+	Added    []string               `json:"added"`
+	Removed  []string               `json:"removed"`
 }
 
 // UnfollowRelationship represents a single follow relationship to remove, used for

@@ -5,6 +5,10 @@ import (
 	"regexp"
 )
 
+var _ Feed = (*FlatFeed)(nil)
+var _ Feed = (*AggregatedFeed)(nil)
+var _ Feed = (*NotificationFeed)(nil)
+
 // Feed is a generic Stream feed, exporting the generic functions common to any
 // Stream feed.
 type Feed interface {
@@ -13,12 +17,12 @@ type Feed interface {
 	UserID() string
 	AddActivity(Activity) (*AddActivityResponse, error)
 	AddActivities(...Activity) (*AddActivitiesResponse, error)
-	RemoveActivityByID(string) error
-	RemoveActivityByForeignID(string) error
-	Follow(*FlatFeed, ...FollowFeedOption) error
+	RemoveActivityByID(string) (*RemoveActivityResponse, error)
+	RemoveActivityByForeignID(string) (*RemoveActivityResponse, error)
+	Follow(*FlatFeed, ...FollowFeedOption) (*BaseResponse, error)
 	GetFollowing(...FollowingOption) (*FollowingResponse, error)
-	Unfollow(Feed, ...UnfollowOption) error
-	UpdateToTargets(Activity, ...UpdateToTargetsOption) error
+	Unfollow(Feed, ...UnfollowOption) (*BaseResponse, error)
+	UpdateToTargets(Activity, ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error)
 	RealtimeToken(bool) string
 }
 
@@ -71,19 +75,19 @@ func (f *feed) AddActivities(activities ...Activity) (*AddActivitiesResponse, er
 
 // RemoveActivityByID removes an activity from the feed (if present), using the provided
 // id string argument as the ID field of the activity.
-func (f *feed) RemoveActivityByID(id string) error {
+func (f *feed) RemoveActivityByID(id string) (*RemoveActivityResponse, error) {
 	return f.client.removeActivityByID(f, id)
 }
 
 // RemoveActivityByID removes an activity from the feed (if present), using the provided
 // foreignID string argument as the foreign_id field of the activity.
-func (f *feed) RemoveActivityByForeignID(foreignID string) error {
+func (f *feed) RemoveActivityByForeignID(foreignID string) (*RemoveActivityResponse, error) {
 	return f.client.removeActivityByForeignID(f, foreignID)
 }
 
 // Follow follows the provided feed (which must be a FlatFeed), applying the provided FollowFeedOptions,
 // if any.
-func (f *feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) error {
+func (f *feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) (*BaseResponse, error) {
 	followOptions := &followFeedOptions{
 		Target:            fmt.Sprintf("%s:%s", feed.Slug(), feed.UserID()),
 		ActivityCopyLimit: defaultActivityCopyLimit,
@@ -101,13 +105,13 @@ func (f *feed) GetFollowing(opts ...FollowingOption) (*FollowingResponse, error)
 }
 
 // Unfollow unfollows the provided feed, applying the provided UnfollowOptions, if any.
-func (f *feed) Unfollow(target Feed, opts ...UnfollowOption) error {
+func (f *feed) Unfollow(target Feed, opts ...UnfollowOption) (*BaseResponse, error) {
 	return f.client.unfollow(f, target.ID(), opts...)
 }
 
 // UpdateToTargets updates the "to" targets for the provided activity, with the options passed
 // as argument for replacing, adding, or removing to targets.
-func (f *feed) UpdateToTargets(activity Activity, opts ...UpdateToTargetsOption) error {
+func (f *feed) UpdateToTargets(activity Activity, opts ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error) {
 	return f.client.updateToTargets(f, activity, opts...)
 }
 

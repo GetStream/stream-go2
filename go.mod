@@ -1,4 +1,4 @@
-module github.com/GetStream/stream-go2/v4
+module github.com/GetStream/stream-go2/v5
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
