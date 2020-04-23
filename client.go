@@ -49,17 +49,21 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		opt(c)
 	}
 	if c.requester == nil {
-		c.requester = &http.Client{
-			Timeout: c.timeout,
-			Transport: &http.Transport{
-				DialContext: (&net.Dialer{
-					Timeout: 2 * time.Second,
-				}).DialContext,
-			},
-		}
+		c.requester = newRequester(c.timeout)
 	}
 	c.urlBuilder = newAPIURLBuilder(c.region, c.version)
 	return c, nil
+}
+
+func newRequester(timeout time.Duration) Requester {
+	return &http.Client{
+		Timeout: timeout,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: timeout / 2,
+			}).DialContext,
+		},
+	}
 }
 
 // NewClientFromEnv build a new Client using environment variables values, with
@@ -103,6 +107,15 @@ func WithTimeout(dur time.Duration) ClientOption {
 	return func(c *Client) {
 		c.timeout = dur
 	}
+}
+
+// WithTimeout clones the client with the given timeout.
+// If a custom requester was given while initializing, it will be overridden.
+func (c *Client) WithTimeout(timeout time.Duration) *Client {
+	nc := *c
+	nc.timeout = timeout
+	nc.requester = newRequester(timeout)
+	return &nc
 }
 
 // FlatFeed returns a new Flat Feed with the provided slug and userID.
