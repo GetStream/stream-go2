@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -24,6 +26,7 @@ type Client struct {
 	urlBuilder    urlBuilder
 	region        string
 	version       string
+	timeout       time.Duration
 }
 
 // Requester performs HTTP requests.
@@ -38,17 +41,29 @@ func NewClient(key, secret string, opts ...ClientOption) (*Client, error) {
 		return nil, errMissingCredentials
 	}
 	c := &Client{
-		key: key,
-		requester: &http.Client{
-			Transport: &http.Transport{},
-		},
+		key:           key,
+		timeout:       time.Second * 6,
 		authenticator: authenticator{secret: secret},
 	}
 	for _, opt := range opts {
 		opt(c)
 	}
+	if c.requester == nil {
+		c.requester = newRequester(c.timeout)
+	}
 	c.urlBuilder = newAPIURLBuilder(c.region, c.version)
 	return c, nil
+}
+
+func newRequester(timeout time.Duration) Requester {
+	return &http.Client{
+		Timeout: timeout,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: timeout / 2,
+			}).DialContext,
+		},
+	}
 }
 
 // NewClientFromEnv build a new Client using environment variables values, with
@@ -85,6 +100,22 @@ func WithHTTPRequester(requester Requester) ClientOption {
 	return func(c *Client) {
 		c.requester = requester
 	}
+}
+
+// WithTimeout sets the HTTP request timeout
+func WithTimeout(dur time.Duration) ClientOption {
+	return func(c *Client) {
+		c.timeout = dur
+	}
+}
+
+// WithTimeout clones the client with the given timeout.
+// If a custom requester was given while initializing, it will be overridden.
+func (c *Client) WithTimeout(timeout time.Duration) *Client {
+	nc := *c
+	nc.timeout = timeout
+	nc.requester = newRequester(timeout)
+	return &nc
 }
 
 // FlatFeed returns a new Flat Feed with the provided slug and userID.
