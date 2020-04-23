@@ -5,7 +5,7 @@ stream-go2 is a Go client for [Stream](https://getstream.io) API.
 You can sign up for a Stream account at [getstream.io/get_started](https://getstream.io/get_started/).
 
 [![build](https://github.com/GetStream/stream-go2/workflows/build/badge.svg)](https://github.com/GetStream/stream-go2/actions)
-[![godoc](https://godoc.org/github.com/GetStream/stream-go2?status.svg)](https://pkg.go.dev/github.com/GetStream/stream-go2/v4?tab=doc)
+[![godoc](https://godoc.org/github.com/GetStream/stream-go2?status.svg)](https://pkg.go.dev/github.com/GetStream/stream-go2/v5?tab=doc)
 [![codecov](https://codecov.io/gh/GetStream/stream-go2/branch/master/graph/badge.svg)](https://codecov.io/gh/GetStream/stream-go2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GetStream/stream-go2)](https://goreportcard.com/report/github.com/GetStream/stream-go2)
 
@@ -47,18 +47,18 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
 Get the client:
 
 ```bash
-$ go get github.com/GetStream/stream-go2/v4
+$ go get github.com/GetStream/stream-go2/v5
 ```
 
 ### Creating a Client
 
 ```go
-import stream "github.com/GetStream/stream-go2/v4"
+import stream "github.com/GetStream/stream-go2/v5"
 
 key := "YOUR_API_KEY"
 secret := "YOUR_API_SECRET"
 
-client, err := stream.NewClient(key, secret)
+client, err := stream.New(key, secret)
 if err != nil {
     // ...
 }
@@ -70,6 +70,7 @@ You can pass additional options when creating a client using the available `Clie
 client, err := stream.NewClient(key, secret,
     stream.WithAPIRegion("us-east"),
     stream.WithAPIVersion("1.0"),
+    stream.WithTimeout(5 * time.Second),
     ...,
 )
 ```
@@ -77,7 +78,7 @@ client, err := stream.NewClient(key, secret,
 You can also create a client using environment variables:
 
 ```go
-client, err := stream.NewClientFromEnv()
+client, err := stream.NewFromEnv()
 ```
 
 Available environment variables:
@@ -123,6 +124,7 @@ if err != nil {
 }
 
 fmt.Println("Duration:", resp.Duration)
+fmt.Println("Rate:", resp.Rate)
 fmt.Println("Next:", resp.Next)
 fmt.Println("Activities:")
 for _, activity := range resp.Results {
@@ -148,6 +150,7 @@ if err != nil {
 }
 
 fmt.Println("Duration:", resp.Duration)
+fmt.Println("Rate:", resp.Rate)
 fmt.Println("Next:", resp.Next)
 fmt.Println("Groups:")
 for _, group := range resp.Results {
@@ -168,6 +171,7 @@ if err != nil {
 }
 
 fmt.Println("Duration:", resp.Duration)
+fmt.Println("Rate:", resp.Rate)
 fmt.Println("Next:", resp.Next)
 fmt.Println("Unseen:", resp.Unseen, "Unread:", resp.Unread)
 fmt.Println("Groups:")
@@ -205,6 +209,7 @@ if err != nil {
 }
 
 fmt.Println("Duration:", resp.Duration)
+fmt.Println("Rate:", resp.Rate)
 fmt.Println("Activity:", resp.Activity) // resp wraps the stream.Activity type
 ```
 
@@ -221,6 +226,7 @@ if err != nil {
 }
 
 fmt.Println("Duration:", resp.Duration)
+fmt.Println("Rate:", resp.Rate)
 fmt.Println("Activities:")
 for _, activity := range resp.Activities {
     fmt.Println(activity)
@@ -230,7 +236,7 @@ for _, activity := range resp.Activities {
 ### Updating activities
 
 ```go
-err := feed.UpdateActivities(a1, a2, ...)
+_, err := feed.UpdateActivities(a1, a2, ...)
 if err != nil {
     // ...
 }
@@ -264,12 +270,12 @@ if err != nil {
 You can either remove activities by ID or ForeignID:
 
 ```go
-err := feed.RemoveActivityByID("f505b3fb-a212-11e7-...")
+_, err := feed.RemoveActivityByID("f505b3fb-a212-11e7-...")
 if err != nil {
     // ...
 }
 
-err := feed.RemoveActivityByForeignID("bob:123")
+_, err := feed.RemoveActivityByForeignID("bob:123")
 if err != nil {
     // ...
 }
@@ -278,7 +284,7 @@ if err != nil {
 ### Following another feed
 
 ```go
-err := feed.Follow(anotherFeed)
+_, err := feed.Follow(anotherFeed)
 if err != nil {
     // ...
 }
@@ -291,7 +297,7 @@ Beware that it's possible to follow only flat feeds.
 You can pass options to the `Follow` method. For example:
 
 ```go
-err := feed.Follow(anotherFeed,
+_, err := feed.Follow(anotherFeed,
     stream.WithFollowFeedActivityCopyLimit(15),
     ...,
 )
@@ -333,6 +339,7 @@ if err != nil {
 }
 
 fmt.Println("Duration:", resp.Duration)
+fmt.Println("Rate:", resp.Rate)
 for _, follower := range resp.Results {
     fmt.Println(follower.FeedID, follower.TargetID)
 }
@@ -352,7 +359,7 @@ resp, err := feed.GetFollowing(
 ### Unfollowing a feed
 
 ```go
-err := flat.Unfollow(anotherFeed)
+_, err := flat.Unfollow(anotherFeed)
 if err != nil {
     // ...
 }
@@ -361,7 +368,7 @@ if err != nil {
 You can pass options to `Unfollow`:
 
 ```go
-err := flat.Unfollow(anotherFeed,
+_, err := flat.Unfollow(anotherFeed,
     stream.WithUnfollowKeepHistory(true),
     ...,
 )
@@ -374,7 +381,7 @@ Remove all old targets and set new ones (replace):
 ```go
 newTargets := []stream.Feed{f1, f2}
 
-err := feed.UpdateToTargets(activity, stream.WithToTargetsNew(newTargets...))
+_, err := feed.UpdateToTargets(activity, stream.WithToTargetsNew(newTargets...))
 if err != nil {
     // ...
 }
@@ -386,7 +393,7 @@ Add some targets and remove some others:
 add := []stream.Feed{target1, target2}
 remove := []stream.Feed{oldTarget1, oldTarget2}
 
-err := feed.UpdateToTargets(
+_, err := feed.UpdateToTargets(
     activity,
     stream.WithToTargetsAdd(add),
     stream.WithToTargetsRemove(remove),
@@ -403,7 +410,7 @@ Note: you can't mix `stream.WithToTargetsNew` with `stream.WithToTargetsAdd` or 
 You can add the same activities to multiple feeds at once with the `(*Client).AddToMany` method ([docs](https://getstream.io/docs_rest/#add_to_many)):
 
 ```go
-err := client.AddToMany(activity,
+_, err := client.AddToMany(activity,
     feed1, feed2, ...,
 )
 if err != nil {
@@ -421,7 +428,7 @@ relationships := []stream.FollowRelationship{
     ...,
 }
 
-err := client.FollowMany(relationships)
+_, err := client.FollowMany(relationships)
 if err != nil {
     // ...
 }
@@ -473,7 +480,7 @@ event := stream.EngagementEvent{}.
     WithLocation("homepage")
 
 // Track the event(s)
-err := analytics.TrackEngagement(event)
+_, err := analytics.TrackEngagement(event)
 if err != nil {
     // ...
 }
@@ -491,7 +498,7 @@ imp := stream.ImpressionEventData{}.
     WithLocation("storepage")
 
 // Track the events
-err := analytics.TrackImpression(imp)
+_, err := analytics.TrackImpression(imp)
 if err != nil {
     // ...
 }
@@ -576,7 +583,7 @@ object := stream.CollectionObject{
         "location": "North America",
     },
 }
-err = collections.Upsert("picture", object)
+_, err = collections.Upsert("picture", object)
 if err != nil {
     // ...
 }
@@ -588,13 +595,13 @@ if err != nil {
 }
 
 // Delete the data from the "picture" collection for picture with ID "123"
-err = collections.Delete("picture", "123")
+_, err = collections.Delete("picture", "123")
 if err != nil {
     // ...
 }
 
 // Get a single collection object from the "pictures" collection with ID "123"
-err = collections.Delete("pictures", "123")
+_, err = collections.Get("pictures", "123")
 if err != nil {
     // ...
 }
@@ -635,7 +642,7 @@ if err != nil {
     // ...
 }
 
-err = users.Delete("123")
+_, err = users.Delete("123")
 if err != nil {
     // ...
 }
@@ -679,33 +686,36 @@ if err != nil {
     // ...
 }
 
-//If we fetch the "comment" reaction now, it will have the child reaction(s) present.
+// If we fetch the "comment" reaction now, it will have the child reaction(s) present.
 parent, err := reactions.Get(comment.ID)
 if err != nil {
     // ...
 }
 
 for kind, children := range parent.ChildrenReactions {
-    //child reactions are grouped by kind
+    // child reactions are grouped by kind
 }
 
-//update the target feeds for the `comment` reaction
+// update the target feeds for the `comment` reaction
 updatedReaction, err := reactions.Update(comment.ID, nil, []string{"timeline:jeff"})
 if err != nil {
     // ...
 }
 
-//get all reactions for the activity "87a9eec0-fd5f-11e8-8080-80013fed2f5b", paginated 5 at a time, including the activity data
-response, err := reactions.Filter(stream.ByActivityID("87a9eec0-fd5f-11e8-8080-80013fed2f5b"), stream.WithLimit(5), stream.WithActivityData())
+// get all reactions for the activity "87a9eec0-fd5f-11e8-8080-80013fed2f5b",
+// paginated 5 at a time, including the activity data
+response, err := reactions.Filter(stream.ByActivityID("87a9eec0-fd5f-11e8-8080-80013fed2f5b"),
+    stream.WithLimit(5),
+    stream.WithActivityData())
 if err != nil {
     // ...
 }
 
-//since we requested the activity, it will be present in the response
+// since we requested the activity, it will be present in the response
 fmt.Println(response.Activity)
 
 for _, reaction := range response.Results{
-    //do something for each reaction
+    // do something for each reaction
 }
 
 //get the next page of reactions
@@ -730,7 +740,6 @@ See the complete [docs and examples](https://getstream.io/docs/#reactions_introd
 `FlatFeed`, `AggregatedFeed` and `NotificationFeed` each have a `GetEnrichedActivities` function to retrieve enriched activities.
 
 ```go
-
 u := stream.User{
     ID: "123",
     Data: map[string]interface{}{
@@ -738,7 +747,7 @@ u := stream.User{
     },
 }
 
-//We add a user
+// We add a user
 user, err := client.Users().Add(u, true)
 if err != nil {
     // ...
@@ -752,7 +761,7 @@ c := stream.CollectionObject{
     },
 }
 
-//We add a colection object
+// We add a collection object
 collectionObject, err := client.Collections().Add("picture", c)
 if err != nil {
     // ...
@@ -767,7 +776,7 @@ act := stream.Activity{
 }
 
 
-//We add the activity to the user's feed
+// We add the activity to the user's feed
 feed, _ := client.FlatFeed("user", "123")
 _, err = feed.AddActivity(act)
 if err != nil {
