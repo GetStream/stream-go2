@@ -63,7 +63,7 @@ func (d *UserData) value() interface{} {
 	}
 }
 
-// EngagementEvent represent an analytics engagement event. It must be populated
+// EngagementEvent represents an analytics engagement event. It must be populated
 // with the available methods, or custom data can be arbitrarily added to it
 // manually as key(string),value(interface{}) pairs.
 type EngagementEvent map[string]interface{}

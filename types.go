@@ -448,7 +448,7 @@ func (r addCollectionRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
-// GetCollectionResponseObject represent a single response coming from a Collection
+// GetCollectionResponseObject represents a single response coming from a Collection
 // Get request after a CollectionsClient.Get call.
 type GetCollectionResponseObject struct {
 	ForeignID string                 `json:"foreign_id"`
@@ -465,7 +465,7 @@ type getCollectionResponseWrap struct {
 }
 
 // GetCollectionResponse represents a single response coming from a Collection Select
-// request after CollectionsClient.Select call.
+// request after a CollectionsClient.Select call.
 type GetCollectionResponse struct {
 	response
 	Objects []GetCollectionResponseObject
