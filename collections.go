@@ -42,11 +42,14 @@ func (c *CollectionsClient) Select(collection string, ids ...string) (*GetCollec
 	if err != nil {
 		return nil, err
 	}
-	var result GetCollectionResponse
+	var result getCollectionResponseWrap
 	if err := json.Unmarshal(resp, &result); err != nil {
 		return nil, err
 	}
-	return &result, nil
+	return &GetCollectionResponse{
+		response: result.response,
+		Objects:  result.Response.Data,
+	}, nil
 }
 
 // DeleteMany removes from a collection the objects having the given IDs.

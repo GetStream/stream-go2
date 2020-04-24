@@ -459,9 +459,16 @@ type getCollectionResponse struct {
 	Data []GetCollectionResponseObject `json:"data"`
 }
 
-type GetCollectionResponse struct {
+type getCollectionResponseWrap struct {
 	response
 	Response getCollectionResponse `json:"response"`
+}
+
+// GetCollectionResponse represents a single response coming from a Collection Select
+// request after CollectionsClient.Select call.
+type GetCollectionResponse struct {
+	response
+	Objects []GetCollectionResponseObject
 }
 
 // User represents a user
