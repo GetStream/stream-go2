@@ -459,9 +459,14 @@ type getCollectionResponse struct {
 	Data []GetCollectionResponseObject `json:"data"`
 }
 
-type GetCollectionResponse struct {
+type getCollectionResponseWrap struct {
 	response
 	Response getCollectionResponse `json:"response"`
+}
+
+type GetCollectionResponse struct {
+	response
+	Objects []GetCollectionResponseObject
 }
 
 // User represents a user
