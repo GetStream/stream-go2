@@ -102,6 +102,7 @@ func (a *EnrichedActivity) decode(data map[string]interface{}) error {
 type EnrichedActivityGroup struct {
 	baseActivityGroup
 	Activities []EnrichedActivity `json:"activities,omitempty"`
+	Score      float64            `json:"score,omitempty"`
 }
 
 // EnrichedNotificationFeedResult is a notification-feed specific response, containing

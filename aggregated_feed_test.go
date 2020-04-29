@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -38,9 +39,18 @@ func TestAggregatedFeedGetActivities(t *testing.T) {
 		_, err := aggregated.GetActivities(tc.opts...)
 		assert.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.url, "")
+
+		_, err = aggregated.GetActivitiesWithRanking("popularity", tc.opts...)
+		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.url), "")
+		assert.NoError(t, err)
+
 		_, err = aggregated.GetEnrichedActivities(tc.opts...)
 		assert.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.enrichedURL, "")
+
+		_, err = aggregated.GetEnrichedActivitiesWithRanking("popularity", tc.opts...)
+		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.url), "")
+		assert.NoError(t, err)
 	}
 }
 
