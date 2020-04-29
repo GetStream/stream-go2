@@ -49,7 +49,7 @@ func TestAggregatedFeedGetActivities(t *testing.T) {
 		testRequest(t, requester.req, http.MethodGet, tc.enrichedURL, "")
 
 		_, err = aggregated.GetEnrichedActivitiesWithRanking("popularity", tc.opts...)
-		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.url), "")
+		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.enrichedURL), "")
 		assert.NoError(t, err)
 	}
 }
