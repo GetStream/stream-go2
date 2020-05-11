@@ -51,7 +51,7 @@ func testRequest(t *testing.T, req *http.Request, method, url, body string) {
 	if req.Method == http.MethodPost {
 		reqBody, err := ioutil.ReadAll(req.Body)
 		require.NoError(t, err)
-		assert.Equal(t, body, string(reqBody))
+		assert.JSONEq(t, body, string(reqBody))
 	}
 	headers := req.Header
 	if headers.Get("X-API-Key") == "" {
