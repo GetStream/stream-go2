@@ -497,13 +497,14 @@ type ReactionResponse struct {
 
 // AddReactionRequestObject is an object used only when calling the Add* reaction endpoints
 type AddReactionRequestObject struct {
-	ID          string                 `json:"id,omitempty"`
-	Kind        string                 `json:"kind"`
-	ActivityID  string                 `json:"activity_id"`
-	UserID      string                 `json:"user_id"`
-	Data        map[string]interface{} `json:"data,omitempty"`
-	TargetFeeds []string               `json:"target_feeds,omitempty"`
-	ParentID    string                 `json:"parent,omitempty"`
+	ID                   string                 `json:"id,omitempty"`
+	Kind                 string                 `json:"kind"`
+	ActivityID           string                 `json:"activity_id"`
+	UserID               string                 `json:"user_id"`
+	Data                 map[string]interface{} `json:"data,omitempty"`
+	TargetFeeds          []string               `json:"target_feeds,omitempty"`
+	TargetFeedsExtraData map[string]interface{} `json:"target_feeds_extra_data,omitempty"`
+	ParentID             string                 `json:"parent,omitempty"`
 }
 
 // filterResponse is the part of StreamAPI responses common for FilterReactions API requests.

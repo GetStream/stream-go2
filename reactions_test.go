@@ -53,6 +53,23 @@ func TestAddReaction(t *testing.T) {
 			expectedURL:  "https://api.stream-io-api.com/api/v1.0/reaction/?api_key=key",
 			expectedBody: `{"kind":"like","activity_id":"some-act-id","user_id":"user-id","target_feeds":["user:bob"]}`,
 		},
+		{
+			input: stream.AddReactionRequestObject{
+				Kind:                 "like",
+				ActivityID:           "some-act-id",
+				UserID:               "user-id",
+				Data:                 map[string]interface{}{"some_extra": "on reaction"},
+				TargetFeeds:          []string{"user:bob"},
+				TargetFeedsExtraData: map[string]interface{}{"some_extra": "on activity"},
+			},
+			expectedURL: "https://api.stream-io-api.com/api/v1.0/reaction/?api_key=key",
+			expectedBody: `{
+				"kind":"like","activity_id":"some-act-id","user_id":"user-id",
+				"data":{"some_extra":"on reaction"},
+				"target_feeds":["user:bob"],
+				"target_feeds_extra_data":{"some_extra":"on activity"}
+			}`,
+		},
 	}
 	for _, tc := range testCases {
 		_, err := client.Reactions().Add(tc.input)
@@ -71,9 +88,17 @@ func TestAddChildReaction(t *testing.T) {
 		Data: map[string]interface{}{
 			"field": "value",
 		},
+		TargetFeeds: []string{"stalker:timeline"},
+		TargetFeedsExtraData: map[string]interface{}{
+			"activity_field": "activity_value",
+		},
 	}
 	expectedURL := "https://api.stream-io-api.com/api/v1.0/reaction/?api_key=key"
-	expectedBody := `{"kind":"like","activity_id":"some-act-id","user_id":"user-id","data":{"field":"value"},"parent":"pid"}`
+	expectedBody := `{
+		"kind":"like","activity_id":"some-act-id","user_id":"user-id",
+		"data":{"field":"value"},"parent":"pid",
+		"target_feeds": ["stalker:timeline"],"target_feeds_extra_data":{"activity_field":"activity_value"}
+	}`
 
 	_, err := client.Reactions().AddChild("pid", reaction)
 	require.NoError(t, err)
