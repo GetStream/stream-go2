@@ -147,6 +147,16 @@ func (c *Client) NotificationFeed(slug, userID string) (*NotificationFeed, error
 	return &NotificationFeed{*feed}, nil
 }
 
+// GenericFeed returns a standard Feed implementation using the provided target id.
+func (c *Client) GenericFeed(targetID string) (Feed, error) {
+	parts := strings.Split(targetID, ":")
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("invalid target id: %s", targetID)
+	}
+
+	return newFeed(parts[0], parts[1], c)
+}
+
 // AddToMany adds an activity to multiple feeds at once.
 func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 	endpoint := c.makeEndpoint("feed/add_to_many/")
