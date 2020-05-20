@@ -26,9 +26,9 @@ type Feed interface {
 	RealtimeToken(bool) string
 }
 
-var (
-	userIDRegex *regexp.Regexp
-)
+const feedSlugIDSeperator = ":"
+
+var userIDRegex *regexp.Regexp
 
 func init() {
 	userIDRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
@@ -42,7 +42,7 @@ type feed struct {
 
 // ID returns the feed ID, as slug:user_id.
 func (f *feed) ID() string {
-	return fmt.Sprintf("%s:%s", f.slug, f.userID)
+	return fmt.Sprintf("%s%s%s", f.slug, feedSlugIDSeperator, f.userID)
 }
 
 // Slug returns the feed's slug.
@@ -56,7 +56,7 @@ func (f *feed) UserID() string {
 }
 
 func newFeed(slug, userID string, client *Client) (*feed, error) {
-	ok := userIDRegex.Match([]byte(userID))
+	ok := userIDRegex.MatchString(userID)
 	if !ok {
 		return nil, errInvalidUserID
 	}
