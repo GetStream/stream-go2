@@ -95,9 +95,6 @@ func (a EnrichedActivity) MarshalJSON() ([]byte, error) {
 		data[k] = v
 	}
 
-	for k, v := range a.Extra {
-		data[k] = v
-	}
 	if _, ok := data["time"]; ok {
 		data["time"] = a.Time.Format(TimeLayout)
 	}
