@@ -76,15 +76,20 @@ func (a *EnrichedActivity) UnmarshalJSON(b []byte) error {
 // MarshalJSON encodes the EnrichedActivity to a valid JSON bytes slice. It's required because of
 // the custom JSON fields and time formats.
 func (a EnrichedActivity) MarshalJSON() ([]byte, error) {
-	fields := structs.New(a).Fields()
-	data := make(map[string]interface{}, len(fields))
+	s := structs.New(a)
+	fields := s.Fields()
+	data := s.Map()
 	for _, f := range fields {
-		if f.Kind() == reflect.Struct {
-			tag := f.Tag("json")
-			if !strings.HasSuffix(tag, ",omitempty") || !structs.IsZero(f.Value()) {
-				data[strings.TrimSuffix(tag, ",omitempty")] = f.Value()
-			}
+		tag := f.Tag("json")
+		root := strings.TrimSuffix(tag, ",omitempty")
+
+		if f.Kind() != reflect.Struct ||
+			(strings.HasSuffix(tag, ",omitempty") &&
+				structs.IsZero(f.Value())) {
+			continue
 		}
+
+		data[root] = f.Value()
 	}
 	for k, v := range a.Extra {
 		data[k] = v
