@@ -3,6 +3,8 @@ package stream
 import (
 	"encoding/json"
 	"errors"
+	"reflect"
+	"strings"
 
 	"github.com/fatih/structs"
 )
@@ -74,7 +76,20 @@ func (a *EnrichedActivity) UnmarshalJSON(b []byte) error {
 // MarshalJSON encodes the EnrichedActivity to a valid JSON bytes slice. It's required because of
 // the custom JSON fields and time formats.
 func (a EnrichedActivity) MarshalJSON() ([]byte, error) {
-	data := structs.New(a).Map()
+	fields := structs.New(a).Fields()
+	data := make(map[string]interface{}, len(fields))
+	for _, f := range fields {
+		if f.Kind() == reflect.Struct {
+			tag := f.Tag("json")
+			if !strings.HasSuffix(tag, ",omitempty") || !structs.IsZero(f.Value()) {
+				data[strings.TrimSuffix(tag, ",omitempty")] = f.Value()
+			}
+		}
+	}
+	for k, v := range a.Extra {
+		data[k] = v
+	}
+
 	for k, v := range a.Extra {
 		data[k] = v
 	}
