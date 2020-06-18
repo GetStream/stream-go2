@@ -42,9 +42,13 @@ func TestEnrichedActivityMarshal(t *testing.T) {
 			ID:    "my_id",
 			Extra: map[string]interface{}{"a": 1, "b": "c"},
 		},
+		ReactionCounts: map[string]int{
+			"comment": 1,
+		},
+		Score: 100.0,
 	}
 
 	b, err := json.Marshal(e)
 	require.NoError(t, err)
-	require.JSONEq(t, `{"actor": {"id":"my_id","data":{"a":1,"b":"c"}}}`, string(b))
+	require.JSONEq(t, `{"actor": {"id":"my_id","data":{"a":1,"b":"c"}},"reaction_counts":{"comment":1},"score":100.0}`, string(b))
 }
