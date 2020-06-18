@@ -109,6 +109,19 @@ func (a *Data) decode(data map[string]interface{}) error {
 	return nil
 }
 
+// MarshalJSON encodes data into json.
+func (a Data) MarshalJSON() ([]byte, error) {
+	m := make(map[string]interface{}, len(a.Extra))
+	for k, v := range a.Extra {
+		m[k] = v
+	}
+	result := map[string]interface{}{
+		"id":   a.ID,
+		"data": m,
+	}
+	return json.Marshal(result)
+}
+
 // Rate is the information to be filled if a rate limited response
 type Rate struct {
 	// Limit is the existing limit for the resource

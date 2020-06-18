@@ -35,3 +35,16 @@ func TestTimeMarshalUnmarshalJSON(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, st, out)
 }
+
+func TestEnrichedActivityMarshal(t *testing.T) {
+	e := stream.EnrichedActivity{
+		Actor: stream.Data{
+			ID:    "my_id",
+			Extra: map[string]interface{}{"a": 1, "b": "c"},
+		},
+	}
+
+	b, err := json.Marshal(e)
+	require.NoError(t, err)
+	require.JSONEq(t, `{"actor": {"id":"my_id","data":{"a":1,"b":"c"}}}`, string(b))
+}
