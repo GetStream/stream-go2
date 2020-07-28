@@ -422,6 +422,29 @@ type UnfollowRelationship struct {
 	KeepHistory bool   `json:"keep_history"`
 }
 
+// NewUnfollowRelationship is a helper for creating an UnfollowRelationship from the
+// source ("follower") and target ("following") feeds.
+func NewUnfollowRelationship(source, target Feed, opts ...UnfollowRelationshipOption) UnfollowRelationship {
+	r := UnfollowRelationship{
+		Source: source.ID(),
+		Target: target.ID(),
+	}
+	for _, opt := range opts {
+		opt(&r)
+	}
+	return r
+}
+
+// WithUnfollowRelationshipKeepHistory sets the KeepHistory field for a given UnfollowRelationship.
+func WithUnfollowRelationshipKeepHistory() UnfollowRelationshipOption {
+	return func(r *UnfollowRelationship) {
+		r.KeepHistory = true
+	}
+}
+
+// UnfollowRelationshipOption customizes an UnfollowRelationship.
+type UnfollowRelationshipOption func(r *UnfollowRelationship)
+
 // CollectionObject is a collection's object.
 type CollectionObject struct {
 	ID   string                 `json:"id,omitempty"`

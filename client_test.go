@@ -1,7 +1,6 @@
 package stream_test
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"testing"
@@ -91,12 +90,18 @@ func TestUnfollowMany(t *testing.T) {
 		relationships     = make([]stream.UnfollowRelationship, 3)
 	)
 	for i := range relationships {
-		relationships[i] = stream.UnfollowRelationship{
-			Source:      fmt.Sprintf("src:%d", i),
-			Target:      fmt.Sprintf("tgt:%d", i),
-			KeepHistory: i%2 == 0,
+		var options []stream.UnfollowRelationshipOption
+		if i%2 == 0 {
+			options = append(options, stream.WithUnfollowRelationshipKeepHistory())
 		}
+		src, err := client.FlatFeed("src", strconv.Itoa(i))
+		require.NoError(t, err)
+		tgt, err := client.FlatFeed("tgt", strconv.Itoa(i))
+		require.NoError(t, err)
+
+		relationships[i] = stream.NewUnfollowRelationship(src, tgt, options...)
 	}
+
 	err := client.UnfollowMany(relationships)
 	require.NoError(t, err)
 	body := `[{"source":"src:0","target":"tgt:0","keep_history":true},{"source":"src:1","target":"tgt:1","keep_history":false},{"source":"src:2","target":"tgt:2","keep_history":true}]`
