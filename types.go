@@ -442,7 +442,7 @@ func WithUnfollowRelationshipKeepHistory() UnfollowRelationshipOption {
 	}
 }
 
-// FollowRelationshipOption customizes a FollowRelationship.
+// UnfollowRelationshipOption customizes an UnfollowRelationship.
 type UnfollowRelationshipOption func(r *UnfollowRelationship)
 
 // CollectionObject is a collection's object.
