@@ -5,9 +5,11 @@ import (
 	"regexp"
 )
 
-var _ Feed = (*FlatFeed)(nil)
-var _ Feed = (*AggregatedFeed)(nil)
-var _ Feed = (*NotificationFeed)(nil)
+var (
+	_ Feed = (*FlatFeed)(nil)
+	_ Feed = (*AggregatedFeed)(nil)
+	_ Feed = (*NotificationFeed)(nil)
+)
 
 // Feed is a generic Stream feed, exporting the generic functions common to any
 // Stream feed.
