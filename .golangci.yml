@@ -9,10 +9,12 @@ linters:
     - dupl
     - errcheck
     - gas
+    - gci
     - goconst
     - gocritic
     - gocyclo
     - gofmt
+    - gofumpt
     - goimports
     - golint
     - gosimple
@@ -29,6 +31,8 @@ linters-settings:
     min-len: 5
     min-occurrences: 5
   gofmt:
+    simplify: true
+  gofumpt:
     simplify: true
   goimports:
     local-prefixes: github.com/GetStream/stream-go2
