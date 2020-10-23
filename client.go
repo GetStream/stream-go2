@@ -69,12 +69,14 @@ func newRequester(timeout time.Duration) Requester {
 // NewFromEnv build a new Client using environment variables values, with
 // possible values being STREAM_API_KEY, STREAM_API_SECRET, STREAM_API_REGION,
 // and STREAM_API_VERSION.
-func NewFromEnv() (*Client, error) {
+// Additional options can still be provided as parameters.
+func NewFromEnv(extraOptions ...ClientOption) (*Client, error) {
 	key := os.Getenv("STREAM_API_KEY")
 	secret := os.Getenv("STREAM_API_SECRET")
 	region := os.Getenv("STREAM_API_REGION")
 	version := os.Getenv("STREAM_API_VERSION")
-	return New(key, secret, WithAPIRegion(region), WithAPIVersion(version))
+	options := append(extraOptions, WithAPIRegion(region), WithAPIVersion(version))
+	return New(key, secret, options...)
 }
 
 // ClientOption is a function used for adding specific configuration options to
