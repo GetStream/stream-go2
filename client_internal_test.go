@@ -110,10 +110,11 @@ func TestNewFromEnv(t *testing.T) {
 	os.Setenv("STREAM_API_KEY", "foo")
 	os.Setenv("STREAM_API_SECRET", "bar")
 
-	client, err := NewFromEnv()
+	client, err := NewFromEnv(WithTimeout(6 * time.Second))
 	require.NoError(t, err)
 	assert.Equal(t, "foo", client.key)
 	assert.Equal(t, "bar", client.authenticator.secret)
+	assert.Equal(t, 6*time.Second, client.timeout)
 
 	os.Setenv("STREAM_API_REGION", "baz")
 	client, err = NewFromEnv()
