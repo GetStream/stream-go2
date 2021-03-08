@@ -124,14 +124,14 @@ func (a Data) MarshalJSON() ([]byte, error) {
 
 // Rate is the information to be filled if a rate limited response
 type Rate struct {
+	// Reset is the time for limit to reset
+	Reset Time
+
 	// Limit is the existing limit for the resource
 	Limit int
 
 	// Remaining is the remaining possible calls
 	Remaining int
-
-	// Reset is the time for limit to reset
-	Reset Time
 }
 
 func NewRate(headers http.Header) *Rate {
@@ -153,8 +153,8 @@ func NewRate(headers http.Header) *Rate {
 
 // Response is the part of StreamAPI responses common throughout the API.
 type response struct {
-	Duration Duration `json:"duration,omitempty"`
 	Rate     Rate     `json:"ratelimit,omitempty"`
+	Duration Duration `json:"duration,omitempty"`
 }
 
 type BaseResponse struct {

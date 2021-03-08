@@ -62,3 +62,6 @@ issues:
     - path: _feed\.go # should reuse code between aggregated and notification feeds
       linters:
         - dupl
+    - text: 'fieldalignment:'
+      linters:
+        - govet
