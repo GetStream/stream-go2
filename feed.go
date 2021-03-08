@@ -37,9 +37,9 @@ func init() {
 }
 
 type feed struct {
+	client *Client
 	slug   string
 	userID string
-	client *Client
 }
 
 // ID returns the feed ID, as slug:user_id.
