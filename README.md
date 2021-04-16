@@ -812,11 +812,7 @@ See the complete [docs and examples](https://getstream.io/docs/#enrichment_intro
 
 ## License
 
-stream-go2 is licensed under the [BSD 3-Clause](LICENSE).
-
-A permissive license similar to the BSD 2-Clause License, but with a 3rd clause that prohibits others from using the name of the project or its contributors to promote derived products without written consent.
-
-See the [LICENSE](LICENSE) file.
+Project is licensed under the [BSD 3-Clause](LICENSE).
 
 ## We're hiring!
 
