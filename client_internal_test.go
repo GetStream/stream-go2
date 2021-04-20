@@ -97,14 +97,16 @@ func Test_makeEndpoint(t *testing.T) {
 }
 
 func TestNewFromEnv(t *testing.T) {
-	defer func() {
-		os.Setenv("STREAM_API_KEY", "")
-		os.Setenv("STREAM_API_SECRET", "")
-		os.Setenv("STREAM_API_REGION", "")
-		os.Setenv("STREAM_API_VERSION", "")
-	}()
+	reset, err := resetEnv(map[string]string{
+		"STREAM_API_KEY":     "",
+		"STREAM_API_SECRET":  "",
+		"STREAM_API_REGION":  "",
+		"STREAM_API_VERSION": "",
+	})
+	require.NoError(t, err)
+	defer reset()
 
-	_, err := NewFromEnv()
+	_, err = NewFromEnv()
 	require.Error(t, err)
 
 	os.Setenv("STREAM_API_KEY", "foo")

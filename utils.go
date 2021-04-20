@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -87,4 +88,22 @@ func decode(resp []byte, err error) (*BaseResponse, error) {
 		return nil, err
 	}
 	return &result, nil
+}
+
+// set environment values and return a func to reset old values
+func resetEnv(values map[string]string) (func(), error) {
+	old := map[string]string{}
+
+	for k, v := range values {
+		old[k] = os.Getenv(k)
+		if err := os.Setenv(k, v); err != nil {
+			return nil, err
+		}
+	}
+
+	return func() {
+		for k, v := range old {
+			_ = os.Setenv(k, v)
+		}
+	}, nil
 }
