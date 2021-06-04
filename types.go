@@ -737,3 +737,20 @@ type UpdateActivitiesResponse struct {
 	response
 	Activities []*Activity `json:"activities"`
 }
+
+type countResponse struct {
+	Feed  string `json:"feed"`
+	Count int    `json:"count"`
+}
+
+type countResponses struct {
+	Followers countResponse `json:"followers,omitempty"`
+	Following countResponse `json:"following,omitempty"`
+}
+
+// FollowStatResponse is the result of follow stats endpoint.
+type FollowStatResponse struct {
+	response
+
+	countResponses `json:"results,inline"`
+}
