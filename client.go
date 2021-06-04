@@ -613,6 +613,25 @@ func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) (*Ba
 	return decode(c.delete(endpoint, nil, c.authenticator.feedAuth(resFollower, feed)))
 }
 
+func (c *Client) followStats(feed Feed, opts ...FollowStatOption) (*FollowStatResponse, error) {
+	endpoint := c.makeEndpoint("stats/follow/")
+	endpoint.addQueryParam(makeRequestOption("followers", feed.ID()))
+	endpoint.addQueryParam(makeRequestOption("following", feed.ID()))
+	for _, opt := range opts {
+		endpoint.addQueryParam(opt)
+	}
+
+	resp, err := c.get(endpoint, nil, c.authenticator.feedAuth(resFollower, nil))
+	if err != nil {
+		return nil, err
+	}
+	var out FollowStatResponse
+	if err := json.Unmarshal(resp, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error) {
 	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets/", feed.Slug(), feed.UserID())
 

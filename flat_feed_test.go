@@ -104,3 +104,26 @@ func TestFlatFeedGetNextPageActivities(t *testing.T) {
 	_, err = flat.GetNextPageActivities(resp)
 	require.Error(t, err)
 }
+
+func TestFlatFeedFollowStats(t *testing.T) {
+	endpoint := "https://api.stream-io-api.com/api/v1.0/stats/follow/?api_key=key"
+
+	client, requester := newClient(t)
+	flat, _ := newFlatFeedWithUserID(client, "123")
+
+	_, err := flat.FollowStats()
+	testRequest(t, requester.req, http.MethodGet, endpoint+"&followers=flat%3A123&following=flat%3A123", "")
+	assert.NoError(t, err)
+
+	_, err = flat.FollowStats(stream.WithFollowerSlugs("a", "b"))
+	testRequest(t, requester.req, http.MethodGet, endpoint+"&followers=flat%3A123&followers_slugs=a%2Cb&following=flat%3A123", "")
+	assert.NoError(t, err)
+
+	_, err = flat.FollowStats(stream.WithFollowingSlugs("c", "d"))
+	testRequest(t, requester.req, http.MethodGet, endpoint+"&followers=flat%3A123&following=flat%3A123&following_slugs=c%2Cd", "")
+	assert.NoError(t, err)
+
+	_, err = flat.FollowStats(stream.WithFollowingSlugs("c", "d"), stream.WithFollowerSlugs("a", "b"))
+	testRequest(t, requester.req, http.MethodGet, endpoint+"&followers=flat%3A123&followers_slugs=a%2Cb&following=flat%3A123&following_slugs=c%2Cd", "")
+	assert.NoError(t, err)
+}

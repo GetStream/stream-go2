@@ -231,6 +231,21 @@ func WithFollowFeedActivityCopyLimit(activityCopyLimit int) FollowFeedOption {
 	}
 }
 
+// FollowStatOption is an option used to customize FollowStats API calls.
+type FollowStatOption struct {
+	requestOption
+}
+
+// WithFollowerSlugs sets the follower feed slugs for filtering in counting.
+func WithFollowerSlugs(slugs ...string) FollowStatOption {
+	return FollowStatOption{makeRequestOption("followers_slugs", strings.Join(slugs, ","))}
+}
+
+// WithFollowerSlugs sets the following feed slugs for filtering in counting.
+func WithFollowingSlugs(slugs ...string) FollowStatOption {
+	return FollowStatOption{makeRequestOption("following_slugs", strings.Join(slugs, ","))}
+}
+
 // UpdateToTargetsOption determines what operations perform during an UpdateToTargets API call.
 type UpdateToTargetsOption func(*updateToTargetsRequest)
 
