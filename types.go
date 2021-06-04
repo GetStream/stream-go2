@@ -748,13 +748,9 @@ type countResponses struct {
 	Following countResponse `json:"following,omitempty"`
 }
 
-type followStatResponse struct {
+// FollowStatResponse is the result of follow stats endpoint.
+type FollowStatResponse struct {
 	response
 
 	countResponses `json:"results,inline"`
-}
-
-// FollowStatResponse is the result of follow stats endpoint.
-type FollowStatResponse struct {
-	followStatResponse
 }
