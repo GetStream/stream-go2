@@ -15,3 +15,6 @@ coverage.txt
 
 .vscode/
 .envrc
+
+# vendor dependencies generated using go mod
+vendor

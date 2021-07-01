@@ -28,7 +28,7 @@ type Feed interface {
 	RealtimeToken(bool) string
 }
 
-const feedSlugIDSeperator = ":"
+const feedSlugIDSeparator = ":"
 
 var userIDRegex *regexp.Regexp
 
@@ -44,7 +44,7 @@ type feed struct {
 
 // ID returns the feed ID, as slug:user_id.
 func (f *feed) ID() string {
-	return fmt.Sprintf("%s%s%s", f.slug, feedSlugIDSeperator, f.userID)
+	return fmt.Sprintf("%s%s%s", f.slug, feedSlugIDSeparator, f.userID)
 }
 
 // Slug returns the feed's slug.
@@ -81,7 +81,7 @@ func (f *feed) RemoveActivityByID(id string) (*RemoveActivityResponse, error) {
 	return f.client.removeActivityByID(f, id)
 }
 
-// RemoveActivityByID removes an activity from the feed (if present), using the provided
+// RemoveActivityByForeignID removes an activity from the feed (if present), using the provided
 // foreignID string argument as the foreign_id field of the activity.
 func (f *feed) RemoveActivityByForeignID(foreignID string) (*RemoveActivityResponse, error) {
 	return f.client.removeActivityByForeignID(f, foreignID)

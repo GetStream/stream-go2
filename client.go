@@ -151,7 +151,7 @@ func (c *Client) NotificationFeed(slug, userID string) (*NotificationFeed, error
 
 // GenericFeed returns a standard Feed implementation using the provided target id.
 func (c *Client) GenericFeed(targetID string) (Feed, error) {
-	parts := strings.Split(targetID, feedSlugIDSeperator)
+	parts := strings.Split(targetID, feedSlugIDSeparator)
 	if len(parts) != 2 {
 		return nil, fmt.Errorf("invalid target id: %q", targetID)
 	}
