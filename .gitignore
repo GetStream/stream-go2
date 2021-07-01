@@ -17,4 +17,4 @@ coverage.txt
 .envrc
 
 # vendor dependencies generated using go mod
-vendor
+vendor/
