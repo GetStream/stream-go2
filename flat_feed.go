@@ -72,7 +72,7 @@ func (f *FlatFeed) GetEnrichedActivitiesWithRanking(ranking string, opts ...GetA
 	return f.GetEnrichedActivities(append(opts, withActivitiesRanking(ranking))...)
 }
 
-// FollowStates returns the follower/following counts of the feed.
+// FollowStats returns the follower/following counts of the feed.
 // If options are given, counts are filtered for the given slugs.
 // Counts will be capped at 10K, if higher counts are needed and contact to support.
 func (f *FlatFeed) FollowStats(opts ...FollowStatOption) (*FollowStatResponse, error) {
