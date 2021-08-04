@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 // Client is a Stream API client used for retrieving feeds and performing API
