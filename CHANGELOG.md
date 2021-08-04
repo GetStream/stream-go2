@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.7.2] 2021-08-04
 
-- Dependency upgrade for unmaintainde ones (jwt)
+- Dependency upgrade for unmaintained jwt
 
 ## [5.7.1] 2021-07-01
 
