@@ -16,11 +16,11 @@ linters:
     - gofmt
     - gofumpt
     - goimports
-    - golint
     - gosimple
     - govet
     - ineffassign
     - misspell
+    - revive
     - staticcheck
     - unconvert
     - unused

@@ -3,7 +3,6 @@ package stream
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -224,13 +223,13 @@ func Test_requestErrors(t *testing.T) {
 		{
 			data:      42,
 			authFn:    func(*http.Request) error { return nil },
-			requester: &requester{code: 400, body: ioutil.NopCloser(strings.NewReader(`{"detail":"boom"}`))},
+			requester: &requester{code: 400, body: io.NopCloser(strings.NewReader(`{"detail":"boom"}`))},
 			expected:  fmt.Errorf("boom"),
 		},
 		{
 			data:      42,
 			authFn:    func(*http.Request) error { return nil },
-			requester: &requester{code: 200, body: ioutil.NopCloser(badReader{})},
+			requester: &requester{code: 200, body: io.NopCloser(badReader{})},
 			expected:  fmt.Errorf("cannot read response: boom"),
 		},
 	}
