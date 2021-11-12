@@ -1,4 +1,4 @@
-module github.com/GetStream/stream-go2/v5
+module github.com/GetStream/stream-go2/v6
 
 require (
 	github.com/fatih/structs v1.1.0
@@ -7,4 +7,4 @@ require (
 	github.com/stretchr/testify v1.5.1
 )
 
-go 1.13
+go 1.16

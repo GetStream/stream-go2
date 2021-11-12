@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	stream "github.com/GetStream/stream-go2/v5"
+	stream "github.com/GetStream/stream-go2/v6"
 )
 
 func TestGetReaction(t *testing.T) {

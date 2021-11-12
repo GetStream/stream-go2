@@ -5,7 +5,7 @@ stream-go2 is a Go client for [Stream](https://getstream.io) API.
 You can sign up for a Stream account at [getstream.io/get_started](https://getstream.io/get_started/).
 
 [![build](https://github.com/GetStream/stream-go2/workflows/build/badge.svg)](https://github.com/GetStream/stream-go2/actions)
-[![godoc](https://pkg.go.dev/badge/GetStream/stream-go2)](https://pkg.go.dev/github.com/GetStream/stream-go2/v5?tab=doc)
+[![godoc](https://pkg.go.dev/badge/GetStream/stream-go2)](https://pkg.go.dev/github.com/GetStream/stream-go2/v6?tab=doc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GetStream/stream-go2)](https://goreportcard.com/report/github.com/GetStream/stream-go2)
 
 ## Contents
@@ -47,7 +47,7 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
 Get the client:
 
 ```bash
-$ go get github.com/GetStream/stream-go2/v5
+$ go get github.com/GetStream/stream-go2/v6
 ```
 
 > For `v4`, use `github.com/GetStream/stream-go2/v4` but updating to the last version is highly recommended.
@@ -55,7 +55,7 @@ $ go get github.com/GetStream/stream-go2/v5
 ### Creating a Client
 
 ```go
-import stream "github.com/GetStream/stream-go2/v5"
+import stream "github.com/GetStream/stream-go2/v6"
 
 key := "YOUR_API_KEY"
 secret := "YOUR_API_SECRET"
