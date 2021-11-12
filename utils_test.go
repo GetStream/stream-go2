@@ -1,10 +1,10 @@
 package stream_test
 
 import (
-	"bytes"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -32,24 +32,21 @@ type mockRequester struct {
 
 func (m *mockRequester) Do(req *http.Request) (*http.Response, error) {
 	m.req = req
-	var body string
+	body := "{}"
 	if m.resp != "" {
 		body = m.resp
-	} else {
-		body = "{}"
 	}
-	resp := &http.Response{
+	return &http.Response{
 		StatusCode: http.StatusOK,
-		Body:       ioutil.NopCloser(bytes.NewBufferString(body)),
-	}
-	return resp, nil
+		Body:       io.NopCloser(strings.NewReader(body)),
+	}, nil
 }
 
 func testRequest(t *testing.T, req *http.Request, method, url, body string) {
 	assert.Equal(t, url, req.URL.String())
 	assert.Equal(t, method, req.Method)
 	if req.Method == http.MethodPost {
-		reqBody, err := ioutil.ReadAll(req.Body)
+		reqBody, err := io.ReadAll(req.Body)
 		require.NoError(t, err)
 		assert.JSONEq(t, body, string(reqBody))
 	}

@@ -77,7 +77,7 @@ func TestUpdateActivities(t *testing.T) {
 	_, err := client.UpdateActivities(bobActivity)
 	require.NoError(t, err)
 
-	body := fmt.Sprintf(`{"activities":[{"actor":"bob","foreign_id":"bob:123","influence":42,"object":"ice-cream","time":"%s","verb":"like"}]}`, now.Format(stream.TimeLayout))
+	body := fmt.Sprintf(`{"activities":[{"actor":"bob","foreign_id":"bob:123","influence":42,"object":"ice-cream","time":%q,"verb":"like"}]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activities/?api_key=key", body)
 }
 
@@ -210,11 +210,11 @@ func TestUpdateToTargets(t *testing.T) {
 	)
 	_, err := flat.UpdateToTargets(activity, stream.WithToTargetsAdd(f2.ID()), stream.WithToTargetsRemove(f1.ID()))
 	require.NoError(t, err)
-	body := fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","added_targets":["flat:f2"],"removed_targets":["flat:f1"]}`, now.Format(stream.TimeLayout))
+	body := fmt.Sprintf(`{"foreign_id":"bob:123","time":%q,"added_targets":["flat:f2"],"removed_targets":["flat:f1"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
 	_, err = flat.UpdateToTargets(activity, stream.WithToTargetsNew(f3.ID()))
 	require.NoError(t, err)
-	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":"%s","new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
+	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":%q,"new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
 }
 

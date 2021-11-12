@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -75,8 +74,7 @@ func NewFromEnv(extraOptions ...ClientOption) (*Client, error) {
 	secret := os.Getenv("STREAM_API_SECRET")
 	region := os.Getenv("STREAM_API_REGION")
 	version := os.Getenv("STREAM_API_VERSION")
-	options := append(extraOptions, WithAPIRegion(region), WithAPIVersion(version))
-	return New(key, secret, options...)
+	return New(key, secret, append(extraOptions, WithAPIRegion(region), WithAPIVersion(version))...)
 }
 
 // ClientOption is a function used for adding specific configuration options to
@@ -267,28 +265,31 @@ func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, err
 }
 
 // GetEnrichedActivitiesByID returns enriched activities for the current app having the given IDs.
-func (c *Client) GetEnrichedActivitiesByID(ids ...string) (*GetEnrichedActivitiesResponse, error) {
-	return c.getAppEnrichedActivities(makeRequestOption("ids", strings.Join(ids, ",")))
+func (c *Client) GetEnrichedActivitiesByID(ids []string, opts ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
+	options := []GetActivitiesOption{{makeRequestOption("ids", strings.Join(ids, ","))}}
+	return c.getAppEnrichedActivities(append(options, opts...)...)
 }
 
 // GetEnrichedActivitiesByForeignID returns enriched activities for the current app having the given foreign IDs and timestamps.
-func (c *Client) GetEnrichedActivitiesByForeignID(values ...ForeignIDTimePair) (*GetEnrichedActivitiesResponse, error) {
+func (c *Client) GetEnrichedActivitiesByForeignID(values []ForeignIDTimePair, opts ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
 	foreignIDs := make([]string, len(values))
 	timestamps := make([]string, len(values))
 	for i, v := range values {
 		foreignIDs[i] = v.ForeignID
 		timestamps[i] = v.Timestamp.Format(TimeLayout)
 	}
-	return c.getAppEnrichedActivities(
-		makeRequestOption("foreign_ids", strings.Join(foreignIDs, ",")),
-		makeRequestOption("timestamps", strings.Join(timestamps, ",")),
-	)
+	options := []GetActivitiesOption{
+		{makeRequestOption("foreign_ids", strings.Join(foreignIDs, ","))},
+		{makeRequestOption("timestamps", strings.Join(timestamps, ","))},
+	}
+
+	return c.getAppEnrichedActivities(append(options, opts...)...)
 }
 
-func (c *Client) getAppEnrichedActivities(values ...valuer) (*GetEnrichedActivitiesResponse, error) {
+func (c *Client) getAppEnrichedActivities(options ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
 	endpoint := c.makeEndpoint("enrich/activities/")
-	for _, v := range values {
-		endpoint.addQueryParam(v)
+	for _, v := range options {
+		endpoint.addQueryParam(v.requestOption)
 	}
 	data, err := c.get(endpoint, nil, c.authenticator.feedAuth(resActivities, nil))
 	if err != nil {
@@ -371,7 +372,7 @@ func (c *Client) makeStreamError(statusCode int, rate *Rate, body io.Reader) err
 	if body == nil {
 		return errors.New("invalid body")
 	}
-	errBody, err := ioutil.ReadAll(body)
+	errBody, err := io.ReadAll(body)
 	if err != nil {
 		return err
 	}
@@ -471,7 +472,7 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 		return nil, c.makeStreamError(resp.StatusCode, rate, resp.Body)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read response: %w", err)
 	}

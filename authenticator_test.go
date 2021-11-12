@@ -10,7 +10,7 @@ import (
 
 func TestFeedAuth(t *testing.T) {
 	a := authenticator{secret: "something very secret"}
-	req, err := http.NewRequest(http.MethodPost, "", nil)
+	req, err := http.NewRequest(http.MethodPost, "", http.NoBody)
 	require.NoError(t, err)
 
 	err = a.feedAuth(resFeed, nil)(req)
