@@ -264,6 +264,8 @@ type baseNotificationFeedResult struct {
 	IsRead        bool   `json:"is_read"`
 	IsSeen        bool   `json:"is_seen"`
 	Verb          string `json:"verb"`
+	CreatedAt     Time   `json:"created_at"`
+	UpdatedAt     Time   `json:"updated_at"`
 }
 
 // FlatFeedResponse is the API response obtained when retrieving activities from

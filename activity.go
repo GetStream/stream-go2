@@ -85,6 +85,8 @@ type baseActivityGroup struct {
 	Group         string `json:"group,omitempty"`
 	ID            string `json:"id,omitempty"`
 	Verb          string `json:"verb,omitempty"`
+	CreatedAt     Time   `json:"created_at,omitempty"`
+	UpdatedAt     Time   `json:"updated_at,omitempty"`
 }
 
 // ActivityGroup is a group of Activity obtained from aggregated feeds.
