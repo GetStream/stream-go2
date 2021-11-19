@@ -327,6 +327,12 @@ func WithOwnChildren() FilterReactionsOption {
 	return FilterReactionsOption{makeRequestOption("with_own_children", true)}
 }
 
+// WithOwnUserID will enable further filtering own children by the given user id.
+// It's different than FilterReactionsAttribute user id.
+func WithOwnUserID(userID string) FilterReactionsOption {
+	return FilterReactionsOption{makeRequestOption("user_id", userID)}
+}
+
 // FilterReactionsAttribute specifies the filtering method of Reactions.Filter()
 type FilterReactionsAttribute func() string
 
