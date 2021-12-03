@@ -76,6 +76,17 @@ func TestReadResponse_parseNext(t *testing.T) {
 				WithEnrichReactionKindsFilter("like", "comment", "upvote"),
 			},
 		},
+		{
+			next:        "/test?withOwnChildren=true&withOwnChildrenKinds=like&withFirstReactions=true&reaction_limit=12&reactionKindsFilter=like,comment,upvote",
+			shouldError: false,
+			expected: []GetActivitiesOption{
+				WithEnrichFirstReactions(),
+				WithEnrichOwnChildren(),
+				WithEnrichReactionsLimit(12),
+				WithEnrichReactionKindsFilter("like", "comment", "upvote"),
+				WithEnrichOwnChildrenKindsFilter("like"),
+			},
+		},
 	}
 
 	for _, tc := range testCases {
