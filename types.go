@@ -220,6 +220,10 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 		opts = append(opts, WithEnrichOwnReactions())
 	}
 
+	if enrichOpt := values.Get("withFirstReactions"); parseBool(enrichOpt) {
+		opts = append(opts, WithEnrichFirstReactions())
+	}
+
 	if enrichOpt := values.Get("withRecentReactions"); parseBool(enrichOpt) {
 		opts = append(opts, WithEnrichRecentReactions())
 	}
@@ -235,14 +239,25 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 	reactionsLimit, ok, err := parseIntValue(values, "recentReactionsLimit")
 	if err != nil {
 		return nil, err
-	}
-	if ok {
+	} else if ok {
 		opts = append(opts, WithEnrichRecentReactionsLimit(reactionsLimit))
+	}
+
+	reactionsLimit, ok, err = parseIntValue(values, "reaction_limit")
+	if err != nil {
+		return nil, err
+	} else if ok {
+		opts = append(opts, WithEnrichReactionsLimit(reactionsLimit))
 	}
 
 	if enrichOpt := values.Get("reactionKindsFilter"); enrichOpt != "" {
 		kinds := strings.Split(enrichOpt, ",")
 		opts = append(opts, WithEnrichReactionKindsFilter(kinds...))
+	}
+
+	if enrichOpt := values.Get("withOwnChildrenKinds"); enrichOpt != "" {
+		kinds := strings.Split(enrichOpt, ",")
+		opts = append(opts, WithEnrichOwnChildrenKindsFilter(kinds...))
 	}
 
 	return opts, nil

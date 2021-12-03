@@ -129,6 +129,11 @@ func WithEnrichOwnReactions() GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("withOwnReactions", true)}
 }
 
+// WithEnrichRecentReactions enriches the activities with the first reactions to them.
+func WithEnrichFirstReactions() GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("withFirstReactions", true)}
+}
+
 // WithEnrichRecentReactions enriches the activities with the recent reactions to them.
 func WithEnrichRecentReactions() GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("withRecentReactions", true)}
@@ -149,9 +154,19 @@ func WithEnrichRecentReactionsLimit(limit int) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("recentReactionsLimit", limit)}
 }
 
-// WithEnrichmReactionKindsFilter filters the reactions by the specified kinds
+// WithEnrichReactionsLimit specifies how many reactions to include in the enrichment.
+func WithEnrichReactionsLimit(limit int) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("reaction_limit", limit)}
+}
+
+// WithEnrichReactionKindsFilter filters the reactions by the specified kinds
 func WithEnrichReactionKindsFilter(kinds ...string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("reactionKindsFilter", strings.Join(kinds, ","))}
+}
+
+// WithEnrichOwnChildrenKindsFilter filters the reactions by the specified kinds for own children
+func WithEnrichOwnChildrenKindsFilter(kinds ...string) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("withOwnChildrenKinds", strings.Join(kinds, ","))}
 }
 
 // FollowingOption is an option usable by following feed methods.
