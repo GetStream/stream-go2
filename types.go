@@ -610,6 +610,18 @@ func (r filterResponse) parseNext() ([]FilterReactionsOption, error) {
 		}
 	}
 
+	if userID := values.Get("user_id"); userID != "" {
+		opts = append(opts, WithOwnUserID(userID))
+	}
+
+	if userID := values.Get("children_user_id"); userID != "" {
+		opts = append(opts, WithChildrenUserID(userID))
+	}
+
+	if childrenKinds := values.Get("with_own_children_kinds"); childrenKinds != "" {
+		opts = append(opts, FilterReactionsOption(WithEnrichOwnChildrenKindsFilter(strings.Split(childrenKinds, ",")...)))
+	}
+
 	return opts, nil
 }
 
