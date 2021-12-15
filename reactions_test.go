@@ -191,7 +191,22 @@ func TestGetNextPageReactions(t *testing.T) {
 	require.NoError(t, err)
 
 	requester.resp = `{"next":"/api/v1.0/reaction/user_id/uid/upvote/?api_key=key&id_gt=uid1&limit=100&with_own_children=true"}`
-	resp, err = client.Reactions().Filter(stream.ByUserID("uid").ByKind("like"), stream.WithLimit(10), stream.WithActivityData(), stream.WithIDGT("id1"))
+	resp, err = client.Reactions().Filter(
+		stream.ByUserID("uid").ByKind("like"),
+		stream.WithLimit(10),
+		stream.WithOwnChildren(),
+		stream.WithIDGT("id1"),
+	)
+	require.NoError(t, err)
+
+	requester.resp = `{"next":"/api/v1.0/reaction/user_id/uid/upvote/?api_key=key&id_gt=uid1&limit=100&with_own_children=true&with_own_children_kinds=comment,like&user_id=something&children_user_id=child_user_id"}`
+	_, err = client.Reactions().Filter(
+		stream.ByUserID("uid").ByKind("like"),
+		stream.WithLimit(10),
+		stream.WithIDGT("id1"),
+		stream.WithOwnChildren(),
+		stream.FilterReactionsOption(stream.WithEnrichOwnChildrenKindsFilter("comment", "like")),
+	)
 	require.NoError(t, err)
 
 	_, err = client.Reactions().GetNextPageFilteredReactions(resp)
