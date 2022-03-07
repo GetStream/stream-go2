@@ -18,3 +18,4 @@ coverage.txt
 
 # vendor dependencies generated using go mod
 vendor/
+test/
