@@ -3,6 +3,7 @@ package stream
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -68,6 +69,17 @@ func (a *EnrichedActivity) UnmarshalJSON(b []byte) error {
 			}
 		}
 		data["to"] = simpleTos
+	}
+
+	if v, ok := data["foreign_id"]; ok { // handle activity reference in foreign id
+		if val, ok := v.(map[string]interface{}); ok {
+			id, ok := val["id"].(string)
+			if !ok {
+				return fmt.Errorf("invalid format for enriched referenced activity id: %v", val["id"])
+			}
+			data["foreign_id_ref"] = data["foreign_id"]
+			data["foreign_id"] = "SA:" + id
+		}
 	}
 
 	return a.decode(data)

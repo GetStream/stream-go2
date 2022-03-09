@@ -37,6 +37,18 @@ func TestEnrichedActivityUnmarshalJSON(t *testing.T) {
 			activity: stream.EnrichedActivity{To: []string{"abcd", "efgh"}},
 			data:     []byte(`{"to":["abcd","efgh"]}`),
 		},
+		{
+			activity: stream.EnrichedActivity{
+				ForeignID: "SA:123",
+				Extra: map[string]interface{}{
+					"foreign_id_ref": map[string]interface{}{
+						"id":         "123",
+						"extra_prop": true,
+					},
+				},
+			},
+			data: []byte(`{"foreign_id":{"id":"123","extra_prop":true}}`),
+		},
 	}
 	for _, tc := range testCases {
 		var out stream.EnrichedActivity
