@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -55,13 +54,14 @@ func New(key, secret string, opts ...ClientOption) (*Client, error) {
 }
 
 func newRequester(timeout time.Duration) Requester {
+	tr := http.DefaultTransport.(*http.Transport).Clone()
+	tr.MaxIdleConnsPerHost = 5
+	tr.IdleConnTimeout = 59 * time.Second
+	tr.ExpectContinueTimeout = 2 * time.Second
+
 	return &http.Client{
-		Timeout: timeout,
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout: timeout / 2,
-			}).DialContext,
-		},
+		Timeout:   timeout,
+		Transport: tr,
 	}
 }
 
