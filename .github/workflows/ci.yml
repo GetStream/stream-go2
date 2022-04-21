@@ -34,5 +34,4 @@ jobs:
           STREAM_API_VERSION: ${{ secrets.STREAM_API_VERSION }}
         run: |
           go mod tidy -v && git diff --no-patch --exit-code
-          ./run-lint.sh
           go test -v -race ./...

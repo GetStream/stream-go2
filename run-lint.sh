@@ -13,4 +13,4 @@ if ! [[ -x "$gopath/bin/golangci-lint" ]]; then
 fi
 
 # configured by .golangci.yml
-"$gopath/bin/golangci-lint" run
+"$gopath/bin/golangci-lint" run --out-format line-number
