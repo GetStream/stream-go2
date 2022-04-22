@@ -9,8 +9,8 @@ gopath="$(go env GOPATH)"
 if ! [[ -x "$gopath/bin/golangci-lint" ]]; then
 	echo >&2 'Installing golangci-lint'
 	curl --silent --fail --location \
-		https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$gopath/bin" v1.43.0
+		https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$gopath/bin" v1.45.2
 fi
 
 # configured by .golangci.yml
-"$gopath/bin/golangci-lint" run
+"$gopath/bin/golangci-lint" run --out-format line-number

@@ -1,8 +1,27 @@
-# stream-go2
+# Official Go SDK for [Stream Feeds](https://getstream.io/activity-feeds/) <!-- omit in toc -->
 
-stream-go2 is a Go client for [Stream](https://getstream.io) API.
+<p align="center">
+    <img src="./assets/logo.svg" width="50%" height="50%">
+</p>
+<p align="center">
+    Official Go API client for Stream Feeds, a service for building applications with activity feeds.
+    <br />
+    <a href="https://getstream.io/activity-feeds/docs/"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/GetStream/stream-go2/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/GetStream/stream-go2/issues">Request Feature</a>
+</p>
 
-You can sign up for a Stream account at [getstream.io/get_started](https://getstream.io/get_started/).
+## About Stream
+stream-go2 is a Go client for [Stream](https://getstream.io) Feeds API.
+
+You can sign up for a Stream account at our [Get Started](https://getstream.io/chat/get_started/) page.
+
+You can use this library to access chat API endpoints server-side.
+
+For the client-side integrations (web and mobile) have a look at the JavaScript, iOS and Android SDK libraries ([docs](https://getstream.io/activity-feeds/)).
 
 [![build](https://github.com/GetStream/stream-go2/workflows/build/badge.svg)](https://github.com/GetStream/stream-go2/actions)
 [![godoc](https://pkg.go.dev/badge/GetStream/stream-go2)](https://pkg.go.dev/github.com/GetStream/stream-go2/v6?tab=doc)
@@ -10,39 +29,45 @@ You can sign up for a Stream account at [getstream.io/get_started](https://getst
 
 ## Contents
 
-* [Getting started](#usage)
-* [Creating a Client](#creating-a-client)
-* [Rate Limits](#rate-limits)
-* [Creating a Feed](#creating-a-feed)
-* [Retrieving Activities](#retrieving-activities)
-  * [Flat feeds](#flat-feeds)
-  * [Aggregated feeds](#aggregated-feeds)
-  * [Notification feeds](#notification-feeds)
-  * [Options](#options)
-* [Adding activities](#adding-activities)
-* [Updating activities](#updating-activities)
-* [Partially updating activities](#partially-updating-activities)
-* [Removing activities](#removing-activities)
-* [Retrieving follows](#retrieving-followers-and-followings)
-  * [Following](#following)
-  * [Followers](#followers)
-* [Unfollow](#unfollowing-a-feed)
-* [Update `to` targets](#updating-an-activitys-to-targets)
-* [Batch activities](#batch-adding-activities)
-* [Batch follows](#batch-creating-follows)
-* [Realtime tokens](#realtime-tokens)
-* [Analytics](#analytics)
-  * [Tracking engagement](#tracking-engagement)
-  * [Tracking impressions](#tracking-impressions)
-  * [Email tracking](#email-tracking)
-* [Personalization](#personalization)
-* [Collections](#collections)
-* [Users](#users)
-* [Reactions](#reactions)
-* [Enrichment](#enrichment)
-* [License](#license)
+- [About Stream](#about-stream)
+- [Contents](#contents)
+- [Installation](#installation)
+  - [Creating a Client](#creating-a-client)
+  - [Rate Limits](#rate-limits)
+  - [Creating a Feed](#creating-a-feed)
+  - [Retrieving activities](#retrieving-activities)
+    - [Flat feeds](#flat-feeds)
+    - [Aggregated feeds](#aggregated-feeds)
+    - [Notification feeds](#notification-feeds)
+    - [Options](#options)
+  - [Adding activities](#adding-activities)
+  - [Updating activities](#updating-activities)
+  - [Partially updating activities](#partially-updating-activities)
+  - [Removing activities](#removing-activities)
+  - [Following another feed](#following-another-feed)
+    - [Options](#options-1)
+  - [Retrieving followers and followings](#retrieving-followers-and-followings)
+    - [Following](#following)
+    - [Followers](#followers)
+  - [Unfollowing a feed](#unfollowing-a-feed)
+  - [Updating an activity's `to` targets](#updating-an-activitys-to-targets)
+  - [Batch adding activities](#batch-adding-activities)
+  - [Batch creating follows](#batch-creating-follows)
+  - [Realtime tokens](#realtime-tokens)
+- [Analytics](#analytics)
+  - [Obtaining an Analytics client](#obtaining-an-analytics-client)
+  - [Tracking engagement](#tracking-engagement)
+  - [Tracking impressions](#tracking-impressions)
+  - [Email tracking](#email-tracking)
+- [Personalization](#personalization)
+- [Collections](#collections)
+- [Users](#users)
+- [Reactions](#reactions)
+- [Enrichment](#enrichment)
+- [License](#license)
+- [We are hiring!](#we-are-hiring)
 
-## Usage
+## Installation
 
 Get the client:
 
