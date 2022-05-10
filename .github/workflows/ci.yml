@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goVer: [1.16, 1.17, 1.18]
+        goVer: [1.17, 1.18]
     steps:
       - name: Set up Go ${{ matrix.goVer }}
         uses: actions/setup-go@v3
@@ -23,7 +23,7 @@ jobs:
           go-version: ${{ matrix.goVer }}
         id: go
 
-      - name: Check out code into the Go module directory
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Lint and Test via ${{ matrix.goVer }}
