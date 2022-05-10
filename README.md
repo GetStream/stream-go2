@@ -14,6 +14,10 @@
     <a href="https://github.com/GetStream/stream-go2/issues">Request Feature</a>
 </p>
 
+---
+> ## 🚨 Breaking change in v7.0 <
+> From version 7.0.0, all methods' first argument is `context.Context`. The reason is that we internally changed `http.NewRequest()` to `http.NewRequestWithContext()` so that it's easier to handle cancellations, timeouts and deadlines for our users.
+
 ## About Stream
 stream-go2 is a Go client for [Stream](https://getstream.io) Feeds API.
 
@@ -170,7 +174,7 @@ for _, activity := range resp.Results {
 You can retrieve flat feeds with [custom ranking](https://getstream.io/docs/#custom_ranking), using the dedicated method:
 
 ```go
-resp, err := flat.GetActivitiesWithRanking("popularity")
+resp, err := flat.GetActivitiesWithRanking(ctx, "popularity")
 if err != nil {
     // ...
 }
@@ -179,7 +183,7 @@ if err != nil {
 #### Aggregated feeds
 
 ```go
-resp, err := aggregated.GetActivities()
+resp, err := aggregated.GetActivities(ctx)
 if err != nil {
     // ...
 }
@@ -200,7 +204,7 @@ for _, group := range resp.Results {
 #### Notification feeds
 
 ```go
-resp, err := notification.GetActivities()
+resp, err := notification.GetActivities(ctx)
 if err != nil {
     // ...
 }
@@ -227,6 +231,7 @@ You can pass supported options and filters when retrieving activities:
 
 ```go
 resp, err := flat.GetActivities(
+    ctx,
     stream.WithActivitiesIDGTE("f505b3fb-a212-11e7-..."),
     stream.WithActivitiesLimit(5),
     ...,
@@ -238,7 +243,7 @@ resp, err := flat.GetActivities(
 Add a single activity:
 
 ```go
-resp, err := feed.AddActivity(stream.Activity{Actor: "bob", ...})
+resp, err := feed.AddActivity(ctx, stream.Activity{Actor: "bob", ...})
 if err != nil {
     // ...
 }
@@ -255,7 +260,7 @@ a1 := stream.Activity{Actor: "bob", ...}
 a2 := stream.Activity{Actor: "john", ...}
 a3 := stream.Activity{Actor: "alice", ...}
 
-resp, err := feed.AddActivities(a1, a2, a3)
+resp, err := feed.AddActivities(ctx, a1, a2, a3)
 if err != nil {
     // ...
 }
@@ -271,7 +276,7 @@ for _, activity := range resp.Activities {
 ### Updating activities
 
 ```go
-_, err := feed.UpdateActivities(a1, a2, ...)
+_, err := feed.UpdateActivities(ctx, a1, a2, ...)
 if err != nil {
     // ...
 }
@@ -284,7 +289,7 @@ You can partial update activities identified either by ID:
 ``` go
 changesetA := stream.NewUpdateActivityRequestByID("f505b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
 changesetB := stream.NewUpdateActivityRequestByID("f707b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
-resp, err := client.PartialUpdateActivities(changesetA, changesetB)
+resp, err := client.PartialUpdateActivities(ctx, changesetA, changesetB)
 if err != nil {
     // ...
 }
@@ -294,7 +299,7 @@ or by a ForeignID and timestamp pair:
 ``` go
 changesetA := stream.NewUpdateActivityRequestByForeignID("dothings:1", stream.Time{...}, map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
 changesetB := stream.NewUpdateActivityRequestByForeignID("dothings:2", stream.Time{...}, map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
-resp, err := client.PartialUpdateActivities(changesetA, changesetB)
+resp, err := client.PartialUpdateActivities(ctx, changesetA, changesetB)
 if err != nil {
     // ...
 }
@@ -305,12 +310,12 @@ if err != nil {
 You can either remove activities by ID or ForeignID:
 
 ```go
-_, err := feed.RemoveActivityByID("f505b3fb-a212-11e7-...")
+_, err := feed.RemoveActivityByID(ctx, "f505b3fb-a212-11e7-...")
 if err != nil {
     // ...
 }
 
-_, err := feed.RemoveActivityByForeignID("bob:123")
+_, err := feed.RemoveActivityByForeignID(ctx, "bob:123")
 if err != nil {
     // ...
 }
@@ -319,7 +324,7 @@ if err != nil {
 ### Following another feed
 
 ```go
-_, err := feed.Follow(anotherFeed)
+_, err := feed.Follow(ctx, anotherFeed)
 if err != nil {
     // ...
 }
@@ -332,7 +337,8 @@ Beware that it's possible to follow only flat feeds.
 You can pass options to the `Follow` method. For example:
 
 ```go
-_, err := feed.Follow(anotherFeed,
+_, err := feed.Follow(ctx,
+    anotherFeed,
     stream.WithFollowFeedActivityCopyLimit(15),
     ...,
 )
@@ -345,7 +351,7 @@ _, err := feed.Follow(anotherFeed,
 Get the feeds that a feed is following:
 
 ```go
-resp, err := feed.GetFollowing()
+resp, err := feed.GetFollowing(ctx)
 if err != nil {
     // ...
 }
@@ -360,6 +366,7 @@ You can pass options to `GetFollowing`:
 
 ```go
 resp, err := feed.GetFollowing(
+    ctx,
     stream.WithFollowingLimit(5),
     ...,
 )
@@ -368,7 +375,7 @@ resp, err := feed.GetFollowing(
 #### Followers
 
 ```go
-resp, err := flat.GetFollowers()
+resp, err := flat.GetFollowers(ctx)
 if err != nil {
     // ...
 }
@@ -386,6 +393,7 @@ You can pass options to `GetFollowers`:
 
 ```go
 resp, err := feed.GetFollowing(
+    ctx,
     stream.WithFollowersLimit(5),
     ...,
 )
@@ -394,7 +402,7 @@ resp, err := feed.GetFollowing(
 ### Unfollowing a feed
 
 ```go
-_, err := flat.Unfollow(anotherFeed)
+_, err := flat.Unfollow(ctx, anotherFeed)
 if err != nil {
     // ...
 }
@@ -403,7 +411,8 @@ if err != nil {
 You can pass options to `Unfollow`:
 
 ```go
-_, err := flat.Unfollow(anotherFeed,
+_, err := flat.Unfollow(ctx,
+    anotherFeed,
     stream.WithUnfollowKeepHistory(true),
     ...,
 )
@@ -416,7 +425,7 @@ Remove all old targets and set new ones (replace):
 ```go
 newTargets := []stream.Feed{f1, f2}
 
-_, err := feed.UpdateToTargets(activity, stream.WithToTargetsNew(newTargets...))
+_, err := feed.UpdateToTargets(ctx, activity, stream.WithToTargetsNew(newTargets...))
 if err != nil {
     // ...
 }
@@ -429,6 +438,7 @@ add := []stream.Feed{target1, target2}
 remove := []stream.Feed{oldTarget1, oldTarget2}
 
 _, err := feed.UpdateToTargets(
+    ctx,
     activity,
     stream.WithToTargetsAdd(add),
     stream.WithToTargetsRemove(remove),
@@ -445,8 +455,8 @@ Note: you can't mix `stream.WithToTargetsNew` with `stream.WithToTargetsAdd` or 
 You can add the same activities to multiple feeds at once with the `(*Client).AddToMany` method ([docs](https://getstream.io/docs_rest/#add_to_many)):
 
 ```go
-_, err := client.AddToMany(activity,
-    feed1, feed2, ...,
+_, err := client.AddToMany(ctx,
+    activity, feed1, feed2, ...,
 )
 if err != nil {
     // ...
@@ -463,7 +473,7 @@ relationships := []stream.FollowRelationship{
     ...,
 }
 
-_, err := client.FollowMany(relationships)
+_, err := client.FollowMany(ctx, relationships)
 if err != nil {
     // ...
 }
@@ -515,7 +525,7 @@ event := stream.EngagementEvent{}.
     WithLocation("homepage")
 
 // Track the event(s)
-_, err := analytics.TrackEngagement(event)
+_, err := analytics.TrackEngagement(ctx, event)
 if err != nil {
     // ...
 }
@@ -533,7 +543,7 @@ imp := stream.ImpressionEventData{}.
     WithLocation("storepage")
 
 // Track the events
-_, err := analytics.TrackImpression(imp)
+_, err := analytics.TrackImpression(ctx, imp)
 if err != nil {
     // ...
 }
@@ -590,7 +600,7 @@ data := map[string]interface{}{
     "source_feed_slug": "timeline",
     "target_feed_slug": "user",
 }
-resp, err = personalization.Get("follow_recommendations", data)
+resp, err = personalization.Get(ctx, "follow_recommendations", data)
 if err != nil {
     // ...
 }
@@ -618,25 +628,25 @@ object := stream.CollectionObject{
         "location": "North America",
     },
 }
-_, err = collections.Upsert("picture", object)
+_, err = collections.Upsert(ctx, "picture", object)
 if err != nil {
     // ...
 }
 
 // Get the data from the "picture" collection for ID "123" and "456"
-objects, err := collections.Select("picture", "123", "456")
+objects, err := collections.Select(ctx, "picture", "123", "456")
 if err != nil {
     // ...
 }
 
 // Delete the data from the "picture" collection for picture with ID "123"
-_, err = collections.Delete("picture", "123")
+_, err = collections.Delete(ctx, "picture", "123")
 if err != nil {
     // ...
 }
 
 // Get a single collection object from the "pictures" collection with ID "123"
-_, err = collections.Get("pictures", "123")
+_, err = collections.Get(ctx, "pictures", "123")
 if err != nil {
     // ...
 }
@@ -662,7 +672,7 @@ user := stream.User{
     },
 }
 
-insertedUser, err := users.Add(user, false)
+insertedUser, err := users.Add(ctx, user, false)
 if err != nil {
     // ...
 }
@@ -672,12 +682,12 @@ newUserData :=map[string]interface{}{
     "age": 7,
 }
 
-updatedUser, err := users.Update("123", newUserData)
+updatedUser, err := users.Update(ctx, "123", newUserData)
 if err != nil {
     // ...
 }
 
-_, err = users.Delete("123")
+_, err = users.Delete(ctx, "123")
 if err != nil {
     // ...
 }
@@ -706,7 +716,7 @@ r := stream.AddReactionRequestObject{
     TargetFeeds: []string{"user:bob", "timeline:alice"},
 }
 
-comment, err := reactions.Add(r)
+comment, err := reactions.Add(ctx, r)
 if err != nil {
     // ...
 }
@@ -716,13 +726,13 @@ like := stream.AddReactionRequestObject{
     UserID: "456",
 }
 
-childReaction, err := reactions.AddChild(comment.ID, like)
+childReaction, err := reactions.AddChild(ctx, comment.ID, like)
 if err != nil {
     // ...
 }
 
 // If we fetch the "comment" reaction now, it will have the child reaction(s) present.
-parent, err := reactions.Get(comment.ID)
+parent, err := reactions.Get(ctx, comment.ID)
 if err != nil {
     // ...
 }
@@ -732,14 +742,15 @@ for kind, children := range parent.ChildrenReactions {
 }
 
 // update the target feeds for the `comment` reaction
-updatedReaction, err := reactions.Update(comment.ID, nil, []string{"timeline:jeff"})
+updatedReaction, err := reactions.Update(ctx, comment.ID, nil, []string{"timeline:jeff"})
 if err != nil {
     // ...
 }
 
 // get all reactions for the activity "87a9eec0-fd5f-11e8-8080-80013fed2f5b",
 // paginated 5 at a time, including the activity data
-response, err := reactions.Filter(stream.ByActivityID("87a9eec0-fd5f-11e8-8080-80013fed2f5b"),
+response, err := reactions.Filter(ctx,
+    stream.ByActivityID("87a9eec0-fd5f-11e8-8080-80013fed2f5b"),
     stream.WithLimit(5),
     stream.WithActivityData())
 if err != nil {
@@ -754,13 +765,13 @@ for _, reaction := range response.Results{
 }
 
 //get the next page of reactions
-response, err = reactions.GetNextPageFilteredReactions(response)
+response, err = reactions.GetNextPageFilteredReactions(ctx, response)
 if err != nil {
     // ...
 }
 
 // get all likes by user "123"
-response, err = reactions.Filter(stream.ByUserID("123").ByKind("like"))
+response, err = reactions.Filter(ctx, stream.ByUserID("123").ByKind("like"))
 if err != nil {
     // ...
 }
@@ -783,7 +794,7 @@ u := stream.User{
 }
 
 // We add a user
-user, err := client.Users().Add(u, true)
+user, err := client.Users().Add(ctx, u, true)
 if err != nil {
     // ...
 }
@@ -797,7 +808,7 @@ c := stream.CollectionObject{
 }
 
 // We add a collection object
-collectionObject, err := client.Collections().Add("picture", c)
+collectionObject, err := client.Collections().Add(ctx, "picture", c)
 if err != nil {
     // ...
 }
@@ -813,19 +824,19 @@ act := stream.Activity{
 
 // We add the activity to the user's feed
 feed, _ := client.FlatFeed("user", "123")
-_, err = feed.AddActivity(act)
+_, err = feed.AddActivity(ctx, act)
 if err != nil {
     // ...
 }
 
-result, err := feed.GetActivities()
+result, err := feed.GetActivities(ctx)
 if err != nil {
     // ...
 }
 fmt.Println(result.Results[0].Actor) // Will output the user reference
 fmt.Println(result.Results[0].Object) // Will output the collection reference
 
-enrichedResult, err := feed.GetEnrichedActivities()
+enrichedResult, err := feed.GetEnrichedActivities(ctx)
 if err != nil {
     // ...
 }

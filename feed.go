@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 )
@@ -17,14 +18,14 @@ type Feed interface {
 	ID() string
 	Slug() string
 	UserID() string
-	AddActivity(Activity) (*AddActivityResponse, error)
-	AddActivities(...Activity) (*AddActivitiesResponse, error)
-	RemoveActivityByID(string) (*RemoveActivityResponse, error)
-	RemoveActivityByForeignID(string) (*RemoveActivityResponse, error)
-	Follow(*FlatFeed, ...FollowFeedOption) (*BaseResponse, error)
-	GetFollowing(...FollowingOption) (*FollowingResponse, error)
-	Unfollow(Feed, ...UnfollowOption) (*BaseResponse, error)
-	UpdateToTargets(Activity, ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error)
+	AddActivity(context.Context, Activity) (*AddActivityResponse, error)
+	AddActivities(context.Context, ...Activity) (*AddActivitiesResponse, error)
+	RemoveActivityByID(context.Context, string) (*RemoveActivityResponse, error)
+	RemoveActivityByForeignID(context.Context, string) (*RemoveActivityResponse, error)
+	Follow(context.Context, *FlatFeed, ...FollowFeedOption) (*BaseResponse, error)
+	GetFollowing(context.Context, ...FollowingOption) (*FollowingResponse, error)
+	Unfollow(context.Context, Feed, ...UnfollowOption) (*BaseResponse, error)
+	UpdateToTargets(context.Context, Activity, ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error)
 	RealtimeToken(bool) string
 }
 
@@ -66,30 +67,30 @@ func newFeed(slug, userID string, client *Client) (*feed, error) {
 }
 
 // AddActivity adds a new Activity to the feed.
-func (f *feed) AddActivity(activity Activity) (*AddActivityResponse, error) {
-	return f.client.addActivity(f, activity)
+func (f *feed) AddActivity(ctx context.Context, activity Activity) (*AddActivityResponse, error) {
+	return f.client.addActivity(ctx, f, activity)
 }
 
 // AddActivities adds multiple activities to the feed.
-func (f *feed) AddActivities(activities ...Activity) (*AddActivitiesResponse, error) {
-	return f.client.addActivities(f, activities...)
+func (f *feed) AddActivities(ctx context.Context, activities ...Activity) (*AddActivitiesResponse, error) {
+	return f.client.addActivities(ctx, f, activities...)
 }
 
 // RemoveActivityByID removes an activity from the feed (if present), using the provided
 // id string argument as the ID field of the activity.
-func (f *feed) RemoveActivityByID(id string) (*RemoveActivityResponse, error) {
-	return f.client.removeActivityByID(f, id)
+func (f *feed) RemoveActivityByID(ctx context.Context, id string) (*RemoveActivityResponse, error) {
+	return f.client.removeActivityByID(ctx, f, id)
 }
 
 // RemoveActivityByForeignID removes an activity from the feed (if present), using the provided
 // foreignID string argument as the foreign_id field of the activity.
-func (f *feed) RemoveActivityByForeignID(foreignID string) (*RemoveActivityResponse, error) {
-	return f.client.removeActivityByForeignID(f, foreignID)
+func (f *feed) RemoveActivityByForeignID(ctx context.Context, foreignID string) (*RemoveActivityResponse, error) {
+	return f.client.removeActivityByForeignID(ctx, f, foreignID)
 }
 
 // Follow follows the provided feed (which must be a FlatFeed), applying the provided FollowFeedOptions,
 // if any.
-func (f *feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) (*BaseResponse, error) {
+func (f *feed) Follow(ctx context.Context, feed *FlatFeed, opts ...FollowFeedOption) (*BaseResponse, error) {
 	followOptions := &followFeedOptions{
 		Target:            fmt.Sprintf("%s:%s", feed.Slug(), feed.UserID()),
 		ActivityCopyLimit: defaultActivityCopyLimit,
@@ -97,24 +98,24 @@ func (f *feed) Follow(feed *FlatFeed, opts ...FollowFeedOption) (*BaseResponse, 
 	for _, opt := range opts {
 		opt(followOptions)
 	}
-	return f.client.follow(f, followOptions)
+	return f.client.follow(ctx, f, followOptions)
 }
 
 // GetFollowing returns the list of the feeds following the feed, applying the provided FollowingOptions,
 // if any.
-func (f *feed) GetFollowing(opts ...FollowingOption) (*FollowingResponse, error) {
-	return f.client.getFollowing(f, opts...)
+func (f *feed) GetFollowing(ctx context.Context, opts ...FollowingOption) (*FollowingResponse, error) {
+	return f.client.getFollowing(ctx, f, opts...)
 }
 
 // Unfollow unfollows the provided feed, applying the provided UnfollowOptions, if any.
-func (f *feed) Unfollow(target Feed, opts ...UnfollowOption) (*BaseResponse, error) {
-	return f.client.unfollow(f, target.ID(), opts...)
+func (f *feed) Unfollow(ctx context.Context, target Feed, opts ...UnfollowOption) (*BaseResponse, error) {
+	return f.client.unfollow(ctx, f, target.ID(), opts...)
 }
 
 // UpdateToTargets updates the "to" targets for the provided activity, with the options passed
 // as argument for replacing, adding, or removing to targets.
-func (f *feed) UpdateToTargets(activity Activity, opts ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error) {
-	return f.client.updateToTargets(f, activity, opts...)
+func (f *feed) UpdateToTargets(ctx context.Context, activity Activity, opts ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error) {
+	return f.client.updateToTargets(ctx, f, activity, opts...)
 }
 
 // RealtimeToken returns a token that can be used client-side to listen in real-time to feed changes.

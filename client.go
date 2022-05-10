@@ -2,6 +2,7 @@ package stream
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -158,7 +159,7 @@ func (c *Client) GenericFeed(targetID string) (Feed, error) {
 }
 
 // AddToMany adds an activity to multiple feeds at once.
-func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
+func (c *Client) AddToMany(ctx context.Context, activity Activity, feeds ...Feed) error {
 	endpoint := c.makeEndpoint("feed/add_to_many/")
 	ids := make([]string, len(feeds))
 	for i := range feeds {
@@ -168,24 +169,24 @@ func (c *Client) AddToMany(activity Activity, feeds ...Feed) error {
 		Activity: activity,
 		FeedIDs:  ids,
 	}
-	_, err := c.post(endpoint, req, c.authenticator.feedAuth(resFeed, nil))
+	_, err := c.post(ctx, endpoint, req, c.authenticator.feedAuth(resFeed, nil))
 	return err
 }
 
 // FollowMany creates multiple follows at once.
-func (c *Client) FollowMany(relationships []FollowRelationship, opts ...FollowManyOption) error {
+func (c *Client) FollowMany(ctx context.Context, relationships []FollowRelationship, opts ...FollowManyOption) error {
 	endpoint := c.makeEndpoint("follow_many/")
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
-	_, err := c.post(endpoint, relationships, c.authenticator.feedAuth(resFollower, nil))
+	_, err := c.post(ctx, endpoint, relationships, c.authenticator.feedAuth(resFollower, nil))
 	return err
 }
 
 // UnfollowMany removes multiple follow relationships at once.
-func (c *Client) UnfollowMany(relationships []UnfollowRelationship) error {
+func (c *Client) UnfollowMany(ctx context.Context, relationships []UnfollowRelationship) error {
 	endpoint := c.makeEndpoint("unfollow_many/")
-	_, err := c.post(endpoint, relationships, c.authenticator.feedAuth(resFollower, nil))
+	_, err := c.post(ctx, endpoint, relationships, c.authenticator.feedAuth(resFollower, nil))
 	return err
 }
 
@@ -229,30 +230,30 @@ func (c *Client) Personalization() *PersonalizationClient {
 }
 
 // GetActivitiesByID returns activities for the current app having the given IDs.
-func (c *Client) GetActivitiesByID(ids ...string) (*GetActivitiesResponse, error) {
-	return c.getAppActivities(makeRequestOption("ids", strings.Join(ids, ",")))
+func (c *Client) GetActivitiesByID(ctx context.Context, ids ...string) (*GetActivitiesResponse, error) {
+	return c.getAppActivities(ctx, makeRequestOption("ids", strings.Join(ids, ",")))
 }
 
 // GetActivitiesByForeignID returns activities for the current app having the given foreign IDs and timestamps.
-func (c *Client) GetActivitiesByForeignID(values ...ForeignIDTimePair) (*GetActivitiesResponse, error) {
+func (c *Client) GetActivitiesByForeignID(ctx context.Context, values ...ForeignIDTimePair) (*GetActivitiesResponse, error) {
 	foreignIDs := make([]string, len(values))
 	timestamps := make([]string, len(values))
 	for i, v := range values {
 		foreignIDs[i] = v.ForeignID
 		timestamps[i] = v.Timestamp.Format(TimeLayout)
 	}
-	return c.getAppActivities(
+	return c.getAppActivities(ctx,
 		makeRequestOption("foreign_ids", strings.Join(foreignIDs, ",")),
 		makeRequestOption("timestamps", strings.Join(timestamps, ",")),
 	)
 }
 
-func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, error) {
+func (c *Client) getAppActivities(ctx context.Context, values ...valuer) (*GetActivitiesResponse, error) {
 	endpoint := c.makeEndpoint("activities/")
 	for _, v := range values {
 		endpoint.addQueryParam(v)
 	}
-	data, err := c.get(endpoint, nil, c.authenticator.feedAuth(resActivities, nil))
+	data, err := c.get(ctx, endpoint, nil, c.authenticator.feedAuth(resActivities, nil))
 	if err != nil {
 		return nil, err
 	}
@@ -265,13 +266,13 @@ func (c *Client) getAppActivities(values ...valuer) (*GetActivitiesResponse, err
 }
 
 // GetEnrichedActivitiesByID returns enriched activities for the current app having the given IDs.
-func (c *Client) GetEnrichedActivitiesByID(ids []string, opts ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
+func (c *Client) GetEnrichedActivitiesByID(ctx context.Context, ids []string, opts ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
 	options := []GetActivitiesOption{{makeRequestOption("ids", strings.Join(ids, ","))}}
-	return c.getAppEnrichedActivities(append(options, opts...)...)
+	return c.getAppEnrichedActivities(ctx, append(options, opts...)...)
 }
 
 // GetEnrichedActivitiesByForeignID returns enriched activities for the current app having the given foreign IDs and timestamps.
-func (c *Client) GetEnrichedActivitiesByForeignID(values []ForeignIDTimePair, opts ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
+func (c *Client) GetEnrichedActivitiesByForeignID(ctx context.Context, values []ForeignIDTimePair, opts ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
 	foreignIDs := make([]string, len(values))
 	timestamps := make([]string, len(values))
 	for i, v := range values {
@@ -283,15 +284,15 @@ func (c *Client) GetEnrichedActivitiesByForeignID(values []ForeignIDTimePair, op
 		{makeRequestOption("timestamps", strings.Join(timestamps, ","))},
 	}
 
-	return c.getAppEnrichedActivities(append(options, opts...)...)
+	return c.getAppEnrichedActivities(ctx, append(options, opts...)...)
 }
 
-func (c *Client) getAppEnrichedActivities(options ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
+func (c *Client) getAppEnrichedActivities(ctx context.Context, options ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
 	endpoint := c.makeEndpoint("enrich/activities/")
 	for _, v := range options {
 		endpoint.addQueryParam(v.requestOption)
 	}
-	data, err := c.get(endpoint, nil, c.authenticator.feedAuth(resActivities, nil))
+	data, err := c.get(ctx, endpoint, nil, c.authenticator.feedAuth(resActivities, nil))
 	if err != nil {
 		return nil, err
 	}
@@ -304,26 +305,26 @@ func (c *Client) getAppEnrichedActivities(options ...GetActivitiesOption) (*GetE
 }
 
 // UpdateActivities updates existing activities.
-func (c *Client) UpdateActivities(activities ...Activity) (*BaseResponse, error) {
+func (c *Client) UpdateActivities(ctx context.Context, activities ...Activity) (*BaseResponse, error) {
 	req := struct {
 		Activities []Activity `json:"activities,omitempty"`
 	}{
 		Activities: activities,
 	}
 	endpoint := c.makeEndpoint("activities/")
-	return decode(c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil)))
+	return decode(c.post(ctx, endpoint, req, c.authenticator.feedAuth(resActivities, nil)))
 }
 
 // PartialUpdateActivities performs a partial update on multiple activities with the given set and unset operations
 // specified by each changeset. This returns the affected activities.
-func (c *Client) PartialUpdateActivities(changesets ...UpdateActivityRequest) (*UpdateActivitiesResponse, error) {
+func (c *Client) PartialUpdateActivities(ctx context.Context, changesets ...UpdateActivityRequest) (*UpdateActivitiesResponse, error) {
 	req := struct {
 		Activities []UpdateActivityRequest `json:"changes,omitempty"`
 	}{
 		Activities: changesets,
 	}
 	endpoint := c.makeEndpoint("activity/")
-	data, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
+	data, err := c.post(ctx, endpoint, req, c.authenticator.feedAuth(resActivities, nil))
 	if err != nil {
 		return nil, err
 	}
@@ -336,8 +337,8 @@ func (c *Client) PartialUpdateActivities(changesets ...UpdateActivityRequest) (*
 
 // UpdateActivityByID performs a partial activity update with the given set and unset operations, returning the
 // affected activity, on the activity with the given ID.
-func (c *Client) UpdateActivityByID(id string, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
-	return c.updateActivity(UpdateActivityRequest{
+func (c *Client) UpdateActivityByID(ctx context.Context, id string, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
+	return c.updateActivity(ctx, UpdateActivityRequest{
 		ID:    &id,
 		Set:   set,
 		Unset: unset,
@@ -346,8 +347,8 @@ func (c *Client) UpdateActivityByID(id string, set map[string]interface{}, unset
 
 // UpdateActivityByForeignID performs a partial activity update with the given set and unset operations, returning the
 // affected activity, on the activity with the given foreign ID and timestamp.
-func (c *Client) UpdateActivityByForeignID(foreignID string, timestamp Time, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
-	return c.updateActivity(UpdateActivityRequest{
+func (c *Client) UpdateActivityByForeignID(ctx context.Context, foreignID string, timestamp Time, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
+	return c.updateActivity(ctx, UpdateActivityRequest{
 		ForeignID: &foreignID,
 		Time:      &timestamp,
 		Set:       set,
@@ -355,9 +356,9 @@ func (c *Client) UpdateActivityByForeignID(foreignID string, timestamp Time, set
 	})
 }
 
-func (c *Client) updateActivity(req UpdateActivityRequest) (*UpdateActivityResponse, error) {
+func (c *Client) updateActivity(ctx context.Context, req UpdateActivityRequest) (*UpdateActivityResponse, error) {
 	endpoint := c.makeEndpoint("activity/")
-	data, err := c.post(endpoint, req, c.authenticator.feedAuth(resActivities, nil))
+	data, err := c.post(ctx, endpoint, req, c.authenticator.feedAuth(resActivities, nil))
 	if err != nil {
 		return nil, err
 	}
@@ -417,20 +418,20 @@ func (c *Client) makeEndpoint(format string, a ...interface{}) endpoint {
 	}
 }
 
-func (c *Client) get(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
-	return c.request(http.MethodGet, endpoint, data, authFn)
+func (c *Client) get(ctx context.Context, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+	return c.request(ctx, http.MethodGet, endpoint, data, authFn)
 }
 
-func (c *Client) post(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
-	return c.request(http.MethodPost, endpoint, data, authFn)
+func (c *Client) post(ctx context.Context, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+	return c.request(ctx, http.MethodPost, endpoint, data, authFn)
 }
 
-func (c *Client) put(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
-	return c.request(http.MethodPut, endpoint, data, authFn)
+func (c *Client) put(ctx context.Context, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+	return c.request(ctx, http.MethodPut, endpoint, data, authFn)
 }
 
-func (c *Client) delete(endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
-	return c.request(http.MethodDelete, endpoint, data, authFn)
+func (c *Client) delete(ctx context.Context, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+	return c.request(ctx, http.MethodDelete, endpoint, data, authFn)
 }
 
 func (c *Client) setBaseHeaders(r *http.Request) {
@@ -438,7 +439,7 @@ func (c *Client) setBaseHeaders(r *http.Request) {
 	r.Header.Set("X-Stream-Client", fmt.Sprintf("stream-go2-client-%s", Version))
 }
 
-func (c *Client) request(method string, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) request(ctx context.Context, method string, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
 	var reader io.Reader
 	if data != nil {
 		payload, err := json.Marshal(data)
@@ -448,7 +449,7 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 		reader = bytes.NewReader(payload)
 	}
 
-	req, err := http.NewRequest(method, endpoint.String(), reader)
+	req, err := http.NewRequestWithContext(ctx, method, endpoint.String(), reader)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create request: %w", err)
 	}
@@ -491,9 +492,9 @@ func (c *Client) request(method string, endpoint endpoint, data interface{}, aut
 	return body, nil
 }
 
-func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse, error) {
+func (c *Client) addActivity(ctx context.Context, feed Feed, activity Activity) (*AddActivityResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
-	resp, err := c.post(endpoint, activity, c.authenticator.feedAuth(resFeed, feed))
+	resp, err := c.post(ctx, endpoint, activity, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
 		return nil, err
 	}
@@ -504,14 +505,14 @@ func (c *Client) addActivity(feed Feed, activity Activity) (*AddActivityResponse
 	return &out, nil
 }
 
-func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitiesResponse, error) {
+func (c *Client) addActivities(ctx context.Context, feed Feed, activities ...Activity) (*AddActivitiesResponse, error) {
 	reqBody := struct {
 		Activities []Activity `json:"activities,omitempty"`
 	}{
 		Activities: activities,
 	}
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
-	resp, err := c.post(endpoint, reqBody, c.authenticator.feedAuth(resFeed, feed))
+	resp, err := c.post(ctx, endpoint, reqBody, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
 		return nil, err
 	}
@@ -522,9 +523,9 @@ func (c *Client) addActivities(feed Feed, activities ...Activity) (*AddActivitie
 	return &out, nil
 }
 
-func (c *Client) removeActivityByID(feed Feed, activityID string) (*RemoveActivityResponse, error) {
+func (c *Client) removeActivityByID(ctx context.Context, feed Feed, activityID string) (*RemoveActivityResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/%s/", feed.Slug(), feed.UserID(), activityID)
-	resp, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
+	resp, err := c.delete(ctx, endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
 		return nil, err
 	}
@@ -535,10 +536,10 @@ func (c *Client) removeActivityByID(feed Feed, activityID string) (*RemoveActivi
 	return &out, nil
 }
 
-func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) (*RemoveActivityResponse, error) {
+func (c *Client) removeActivityByForeignID(ctx context.Context, feed Feed, foreignID string) (*RemoveActivityResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/%s/", feed.Slug(), feed.UserID(), foreignID)
 	endpoint.addQueryParam(makeRequestOption("foreign_id", 1))
-	resp, err := c.delete(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
+	resp, err := c.delete(ctx, endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
 		return nil, err
 	}
@@ -549,35 +550,35 @@ func (c *Client) removeActivityByForeignID(feed Feed, foreignID string) (*Remove
 	return &out, nil
 }
 
-func (c *Client) getActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
+func (c *Client) getActivities(ctx context.Context, feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/", feed.Slug(), feed.UserID())
-	return c.getActivitiesInternal(endpoint, feed, opts...)
+	return c.getActivitiesInternal(ctx, endpoint, feed, opts...)
 }
 
-func (c *Client) getEnrichedActivities(feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
+func (c *Client) getEnrichedActivities(ctx context.Context, feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
 	endpoint := c.makeEndpoint("enrich/feed/%s/%s/", feed.Slug(), feed.UserID())
-	return c.getActivitiesInternal(endpoint, feed, opts...)
+	return c.getActivitiesInternal(ctx, endpoint, feed, opts...)
 }
 
-func (c *Client) getActivitiesInternal(endpoint endpoint, feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
+func (c *Client) getActivitiesInternal(ctx context.Context, endpoint endpoint, feed Feed, opts ...GetActivitiesOption) ([]byte, error) {
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
-	return c.get(endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
+	return c.get(ctx, endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
 }
 
-func (c *Client) follow(feed Feed, opts *followFeedOptions) (*BaseResponse, error) {
+func (c *Client) follow(ctx context.Context, feed Feed, opts *followFeedOptions) (*BaseResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/follows/", feed.Slug(), feed.UserID())
-	return decode(c.post(endpoint, opts, c.authenticator.feedAuth(resFollower, feed)))
+	return decode(c.post(ctx, endpoint, opts, c.authenticator.feedAuth(resFollower, feed)))
 }
 
-func (c *Client) getFollowers(feed Feed, opts ...FollowersOption) (*FollowersResponse, error) {
+func (c *Client) getFollowers(ctx context.Context, feed Feed, opts ...FollowersOption) (*FollowersResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/followers/", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
 
-	resp, err := c.get(endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
+	resp, err := c.get(ctx, endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
 	if err != nil {
 		return nil, err
 	}
@@ -588,13 +589,13 @@ func (c *Client) getFollowers(feed Feed, opts ...FollowersOption) (*FollowersRes
 	return &out, nil
 }
 
-func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingResponse, error) {
+func (c *Client) getFollowing(ctx context.Context, feed Feed, opts ...FollowingOption) (*FollowingResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/follows/", feed.Slug(), feed.UserID())
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
 
-	resp, err := c.get(endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
+	resp, err := c.get(ctx, endpoint, nil, c.authenticator.feedAuth(resFollower, feed))
 	if err != nil {
 		return nil, err
 	}
@@ -605,16 +606,16 @@ func (c *Client) getFollowing(feed Feed, opts ...FollowingOption) (*FollowingRes
 	return &out, nil
 }
 
-func (c *Client) unfollow(feed Feed, target string, opts ...UnfollowOption) (*BaseResponse, error) {
+func (c *Client) unfollow(ctx context.Context, feed Feed, target string, opts ...UnfollowOption) (*BaseResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/follows/%s/", feed.Slug(), feed.UserID(), target)
 	for _, opt := range opts {
 		endpoint.addQueryParam(opt)
 	}
 
-	return decode(c.delete(endpoint, nil, c.authenticator.feedAuth(resFollower, feed)))
+	return decode(c.delete(ctx, endpoint, nil, c.authenticator.feedAuth(resFollower, feed)))
 }
 
-func (c *Client) followStats(feed Feed, opts ...FollowStatOption) (*FollowStatResponse, error) {
+func (c *Client) followStats(ctx context.Context, feed Feed, opts ...FollowStatOption) (*FollowStatResponse, error) {
 	endpoint := c.makeEndpoint("stats/follow/")
 	endpoint.addQueryParam(makeRequestOption("followers", feed.ID()))
 	endpoint.addQueryParam(makeRequestOption("following", feed.ID()))
@@ -622,7 +623,7 @@ func (c *Client) followStats(feed Feed, opts ...FollowStatOption) (*FollowStatRe
 		endpoint.addQueryParam(opt)
 	}
 
-	resp, err := c.get(endpoint, nil, c.authenticator.feedAuth(resFollower, nil))
+	resp, err := c.get(ctx, endpoint, nil, c.authenticator.feedAuth(resFollower, nil))
 	if err != nil {
 		return nil, err
 	}
@@ -633,7 +634,7 @@ func (c *Client) followStats(feed Feed, opts ...FollowStatOption) (*FollowStatRe
 	return &out, nil
 }
 
-func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error) {
+func (c *Client) updateToTargets(ctx context.Context, feed Feed, activity Activity, opts ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error) {
 	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets/", feed.Slug(), feed.UserID())
 
 	req := &updateToTargetsRequest{
@@ -644,7 +645,7 @@ func (c *Client) updateToTargets(feed Feed, activity Activity, opts ...UpdateToT
 		opt(req)
 	}
 
-	resp, err := c.post(endpoint, req, c.authenticator.feedAuth(resFeedTargets, feed))
+	resp, err := c.post(ctx, endpoint, req, c.authenticator.feedAuth(resFeedTargets, feed))
 	if err != nil {
 		return nil, err
 	}

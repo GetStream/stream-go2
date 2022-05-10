@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,22 +13,22 @@ type ReactionsClient struct {
 }
 
 // Add adds a reaction.
-func (c *ReactionsClient) Add(r AddReactionRequestObject) (*ReactionResponse, error) {
+func (c *ReactionsClient) Add(ctx context.Context, r AddReactionRequestObject) (*ReactionResponse, error) {
 	if r.ParentID != "" {
 		return nil, errors.New("`Parent` not empty. For adding child reactions use `AddChild`")
 	}
-	return c.addReaction(r)
+	return c.addReaction(ctx, r)
 }
 
 // AddChild adds a child reaction to the provided parent.
-func (c *ReactionsClient) AddChild(parentID string, r AddReactionRequestObject) (*ReactionResponse, error) {
+func (c *ReactionsClient) AddChild(ctx context.Context, parentID string, r AddReactionRequestObject) (*ReactionResponse, error) {
 	r.ParentID = parentID
-	return c.addReaction(r)
+	return c.addReaction(ctx, r)
 }
 
-func (c *ReactionsClient) addReaction(r AddReactionRequestObject) (*ReactionResponse, error) {
+func (c *ReactionsClient) addReaction(ctx context.Context, r AddReactionRequestObject) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/")
-	return c.decode(c.client.post(endpoint, r, c.client.authenticator.reactionsAuth))
+	return c.decode(c.client.post(ctx, endpoint, r, c.client.authenticator.reactionsAuth))
 }
 
 func (c *ReactionsClient) decode(resp []byte, err error) (*ReactionResponse, error) {
@@ -43,32 +44,32 @@ func (c *ReactionsClient) decode(resp []byte, err error) (*ReactionResponse, err
 }
 
 // Update updates the reaction's data and/or target feeds.
-func (c *ReactionsClient) Update(id string, data map[string]interface{}, targetFeeds []string) (*ReactionResponse, error) {
+func (c *ReactionsClient) Update(ctx context.Context, id string, data map[string]interface{}, targetFeeds []string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
 	reqData := map[string]interface{}{
 		"data":         data,
 		"target_feeds": targetFeeds,
 	}
-	return c.decode(c.client.put(endpoint, reqData, c.client.authenticator.reactionsAuth))
+	return c.decode(c.client.put(ctx, endpoint, reqData, c.client.authenticator.reactionsAuth))
 }
 
 // Get retrieves a reaction having the given id.
-func (c *ReactionsClient) Get(id string) (*ReactionResponse, error) {
+func (c *ReactionsClient) Get(ctx context.Context, id string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
-	return c.decode(c.client.get(endpoint, nil, c.client.authenticator.reactionsAuth))
+	return c.decode(c.client.get(ctx, endpoint, nil, c.client.authenticator.reactionsAuth))
 }
 
 // Delete deletes a reaction having the given id.
-func (c *ReactionsClient) Delete(id string) (*ReactionResponse, error) {
+func (c *ReactionsClient) Delete(ctx context.Context, id string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
-	return c.decode(c.client.delete(endpoint, nil, c.client.authenticator.reactionsAuth))
+	return c.decode(c.client.delete(ctx, endpoint, nil, c.client.authenticator.reactionsAuth))
 }
 
 // Filter lists reactions based on the provided criteria and with the specified pagination.
-func (c *ReactionsClient) Filter(attr FilterReactionsAttribute, opts ...FilterReactionsOption) (*FilterReactionResponse, error) {
+func (c *ReactionsClient) Filter(ctx context.Context, attr FilterReactionsAttribute, opts ...FilterReactionsOption) (*FilterReactionResponse, error) {
 	endpointURI := fmt.Sprintf("reaction/%s/", attr())
 
 	endpoint := c.client.makeEndpoint(endpointURI)
@@ -76,7 +77,7 @@ func (c *ReactionsClient) Filter(attr FilterReactionsAttribute, opts ...FilterRe
 		endpoint.addQueryParam(opt)
 	}
 
-	resp, err := c.client.get(endpoint, nil, c.client.authenticator.reactionsAuth)
+	resp, err := c.client.get(ctx, endpoint, nil, c.client.authenticator.reactionsAuth)
 	if err != nil {
 		return nil, err
 	}
@@ -89,10 +90,10 @@ func (c *ReactionsClient) Filter(attr FilterReactionsAttribute, opts ...FilterRe
 }
 
 // GetNextPageFilteredReactions returns the reactions at the "next" page of a previous *FilterReactionResponse response, if any.
-func (c *ReactionsClient) GetNextPageFilteredReactions(resp *FilterReactionResponse) (*FilterReactionResponse, error) {
+func (c *ReactionsClient) GetNextPageFilteredReactions(ctx context.Context, resp *FilterReactionResponse) (*FilterReactionResponse, error) {
 	opts, err := resp.parseNext()
 	if err != nil {
 		return nil, err
 	}
-	return c.Filter(resp.meta.attr, opts...)
+	return c.Filter(ctx, resp.meta.attr, opts...)
 }

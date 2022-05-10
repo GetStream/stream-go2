@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
@@ -12,6 +13,7 @@ import (
 )
 
 func TestAnalyticsTrackEngagement(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	analytics := client.Analytics()
 	event1 := stream.EngagementEvent{}.
@@ -33,7 +35,7 @@ func TestAnalyticsTrackEngagement(t *testing.T) {
 			stream.NewEventFeature("size", "xxl"),
 		)
 
-	_, err := analytics.TrackEngagement(event1, event2)
+	_, err := analytics.TrackEngagement(ctx, event1, event2)
 	require.NoError(t, err)
 	expectedURL := "https://analytics.stream-io-api.com/analytics/v1.0/engagement/?api_key=key"
 	expectedBody := `{"content_list":[{"boost":10,"content":"abcdef","feed_id":"timeline:123","label":"click","location":"hawaii","position":42,"user_data":{"alias":"John Doe","id":12345}},{"content":"aabbccdd","features":[{"group":"color","value":"red"},{"group":"size","value":"xxl"}],"feed_id":"timeline:123","label":"share","user_data":"bob"}]}`
@@ -41,6 +43,7 @@ func TestAnalyticsTrackEngagement(t *testing.T) {
 }
 
 func TestAnalyticsTrackImpression(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	analytics := client.Analytics()
 	imp := stream.ImpressionEventsData{}.
@@ -54,7 +57,7 @@ func TestAnalyticsTrackImpression(t *testing.T) {
 		WithLocation("hawaii").
 		WithPosition(42)
 
-	_, err := analytics.TrackImpression(imp)
+	_, err := analytics.TrackImpression(ctx, imp)
 	require.NoError(t, err)
 	expectedURL := "https://analytics.stream-io-api.com/analytics/v1.0/impression/?api_key=key"
 	expectedBody := `{"content_list":["a","b","c","d"],"features":[{"group":"color","value":"red"},{"group":"size","value":"xxl"}],"feed_id":"timeline:123","location":"hawaii","position":42,"user_data":123}`

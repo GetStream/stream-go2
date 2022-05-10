@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -17,22 +18,25 @@ func TestUserRefHelpers(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
-	_, err := client.Users().Get("id1")
+	_, err := client.Users().Get(ctx, "id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/user/id1/?api_key=key", "")
 }
 
 func TestDeleteUser(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
-	_, err := client.Users().Delete("id1")
+	_, err := client.Users().Delete(ctx, "id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/user/id1/?api_key=key", "")
 }
 
 func TestAddUser(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	testCases := []struct {
 		object       stream.User
@@ -66,19 +70,20 @@ func TestAddUser(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		_, err := client.Users().Add(tc.object, tc.getOrCreate)
+		_, err := client.Users().Add(ctx, tc.object, tc.getOrCreate)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
 	}
 }
 
 func TestUpdateUser(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
 	data := map[string]interface{}{
 		"name": "Jane",
 	}
-	_, err := client.Users().Update("123", data)
+	_, err := client.Users().Update(ctx, "123", data)
 	require.NoError(t, err)
 	expectedBody := `{"data":{"name":"Jane"}}`
 	testRequest(t, requester.req, http.MethodPut, "https://api.stream-io-api.com/api/v1.0/user/123/?api_key=key", expectedBody)
