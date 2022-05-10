@@ -53,7 +53,14 @@ linters-settings:
         skipTestFuncs: true
   govet:
     enable-all: true
-    disable: shadow
+    disable: 
+      - shadow
+  gci:
+    sections:
+      - Standard
+      - Default
+      - Prefix(github.com/GetStream/stream-go2)
+
 issues:
   exclude-rules:
     - path: _test\.go
