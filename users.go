@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 )
@@ -22,35 +23,35 @@ func (c *UsersClient) decode(resp []byte, err error) (*UserResponse, error) {
 }
 
 // Add adds a new user with the specified id and optional extra data.
-func (c *UsersClient) Add(user User, getOrCreate bool) (*UserResponse, error) {
+func (c *UsersClient) Add(ctx context.Context, user User, getOrCreate bool) (*UserResponse, error) {
 	endpoint := c.client.makeEndpoint("user/")
 	endpoint.addQueryParam(makeRequestOption("get_or_create", getOrCreate))
 
-	return c.decode(c.client.post(endpoint, user, c.client.authenticator.usersAuth))
+	return c.decode(c.client.post(ctx, endpoint, user, c.client.authenticator.usersAuth))
 }
 
 // Update updates the user's data.
-func (c *UsersClient) Update(id string, data map[string]interface{}) (*UserResponse, error) {
+func (c *UsersClient) Update(ctx context.Context, id string, data map[string]interface{}) (*UserResponse, error) {
 	endpoint := c.client.makeEndpoint("user/%s/", id)
 
 	reqData := map[string]interface{}{
 		"data": data,
 	}
-	return c.decode(c.client.put(endpoint, reqData, c.client.authenticator.usersAuth))
+	return c.decode(c.client.put(ctx, endpoint, reqData, c.client.authenticator.usersAuth))
 }
 
 // Get retrieves a user having the given id.
-func (c *UsersClient) Get(id string) (*UserResponse, error) {
+func (c *UsersClient) Get(ctx context.Context, id string) (*UserResponse, error) {
 	endpoint := c.client.makeEndpoint("user/%s/", id)
 
-	return c.decode(c.client.get(endpoint, nil, c.client.authenticator.usersAuth))
+	return c.decode(c.client.get(ctx, endpoint, nil, c.client.authenticator.usersAuth))
 }
 
 // Delete deletes a user having the given id.
-func (c *UsersClient) Delete(id string) (*BaseResponse, error) {
+func (c *UsersClient) Delete(ctx context.Context, id string) (*BaseResponse, error) {
 	endpoint := c.client.makeEndpoint("user/%s/", id)
 
-	return decode(c.client.delete(endpoint, nil, c.client.authenticator.usersAuth))
+	return decode(c.client.delete(ctx, endpoint, nil, c.client.authenticator.usersAuth))
 }
 
 // CreateReference returns a new reference string in the form SU:<id>.

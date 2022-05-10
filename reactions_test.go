@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -10,20 +11,23 @@ import (
 )
 
 func TestGetReaction(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
-	_, err := client.Reactions().Get("id1")
+	_, err := client.Reactions().Get(ctx, "id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/reaction/id1/?api_key=key", "")
 }
 
 func TestDeleteReaction(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
-	_, err := client.Reactions().Delete("id1")
+	_, err := client.Reactions().Delete(ctx, "id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/reaction/id1/?api_key=key", "")
 }
 
 func TestAddReaction(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
 	testCases := []struct {
@@ -72,13 +76,14 @@ func TestAddReaction(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := client.Reactions().Add(tc.input)
+		_, err := client.Reactions().Add(ctx, tc.input)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
 	}
 }
 
 func TestAddChildReaction(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
 	reaction := stream.AddReactionRequestObject{
@@ -100,12 +105,13 @@ func TestAddChildReaction(t *testing.T) {
 		"target_feeds": ["stalker:timeline"],"target_feeds_extra_data":{"activity_field":"activity_value"}
 	}`
 
-	_, err := client.Reactions().AddChild("pid", reaction)
+	_, err := client.Reactions().AddChild(ctx, "pid", reaction)
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodPost, expectedURL, expectedBody)
 }
 
 func TestUpdateReaction(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
 	testCases := []struct {
@@ -131,13 +137,14 @@ func TestUpdateReaction(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := client.Reactions().Update(tc.id, tc.data, tc.targetFeeds)
+		_, err := client.Reactions().Update(ctx, tc.id, tc.data, tc.targetFeeds)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPut, tc.expectedURL, tc.expectedBody)
 	}
 }
 
 func TestFilterReactions(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	testCases := []struct {
 		attr        stream.FilterReactionsAttribute
@@ -173,25 +180,27 @@ func TestFilterReactions(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		_, err := client.Reactions().Filter(tc.attr, tc.opts...)
+		_, err := client.Reactions().Filter(ctx, tc.attr, tc.opts...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.expectedURL, "")
 	}
 }
 
 func TestGetNextPageReactions(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
 	requester.resp = `{"next":"/api/v1.0/reaction/user_id/uid/upvote/?api_key=key&id_gt=uid1&limit=100&with_activity_data=true"}`
-	resp, err := client.Reactions().Filter(stream.ByUserID("uid").ByKind("like"), stream.WithLimit(10), stream.WithActivityData(), stream.WithIDGT("id1"))
+	resp, err := client.Reactions().Filter(ctx, stream.ByUserID("uid").ByKind("like"), stream.WithLimit(10), stream.WithActivityData(), stream.WithIDGT("id1"))
 	require.NoError(t, err)
 
-	_, err = client.Reactions().GetNextPageFilteredReactions(resp)
+	_, err = client.Reactions().GetNextPageFilteredReactions(ctx, resp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/reaction/user_id/uid/like/?api_key=key&id_gt=uid1&limit=100&with_activity_data=true", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":"/api/v1.0/reaction/user_id/uid/upvote/?api_key=key&id_gt=uid1&limit=100&with_own_children=true"}`
 	resp, err = client.Reactions().Filter(
+		ctx,
 		stream.ByUserID("uid").ByKind("like"),
 		stream.WithLimit(10),
 		stream.WithOwnChildren(),
@@ -201,6 +210,7 @@ func TestGetNextPageReactions(t *testing.T) {
 
 	requester.resp = `{"next":"/api/v1.0/reaction/user_id/uid/upvote/?api_key=key&id_gt=uid1&limit=100&with_own_children=true&with_own_children_kinds=comment,like&user_id=something&children_user_id=child_user_id"}`
 	_, err = client.Reactions().Filter(
+		ctx,
 		stream.ByUserID("uid").ByKind("like"),
 		stream.WithLimit(10),
 		stream.WithIDGT("id1"),
@@ -209,27 +219,27 @@ func TestGetNextPageReactions(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	_, err = client.Reactions().GetNextPageFilteredReactions(resp)
+	_, err = client.Reactions().GetNextPageFilteredReactions(ctx, resp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/reaction/user_id/uid/like/?api_key=key&id_gt=uid1&limit=100&with_own_children=true", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":"/api/v1.0/reaction/user_id/uid/upvote/?api_key=key&id_gt=uid1&limit=100&with_activity_data=false"}`
-	resp, err = client.Reactions().Filter(stream.ByUserID("uid").ByKind("like"), stream.WithLimit(10), stream.WithActivityData(), stream.WithIDGT("id1"))
+	resp, err = client.Reactions().Filter(ctx, stream.ByUserID("uid").ByKind("like"), stream.WithLimit(10), stream.WithActivityData(), stream.WithIDGT("id1"))
 	require.NoError(t, err)
 
-	_, err = client.Reactions().GetNextPageFilteredReactions(resp)
+	_, err = client.Reactions().GetNextPageFilteredReactions(ctx, resp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/reaction/user_id/uid/like/?api_key=key&id_gt=uid1&limit=100", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":"123"}`
-	resp, err = client.Reactions().Filter(stream.ByActivityID("aid"))
+	resp, err = client.Reactions().Filter(ctx, stream.ByActivityID("aid"))
 	require.NoError(t, err)
-	_, err = client.Reactions().GetNextPageFilteredReactions(resp)
+	_, err = client.Reactions().GetNextPageFilteredReactions(ctx, resp)
 	require.Error(t, err)
 
 	requester.resp = `{"next":"?q=a%"}`
-	resp, err = client.Reactions().Filter(stream.ByActivityID("aid"))
+	resp, err = client.Reactions().Filter(ctx, stream.ByActivityID("aid"))
 	require.NoError(t, err)
-	_, err = client.Reactions().GetNextPageFilteredReactions(resp)
+	_, err = client.Reactions().GetNextPageFilteredReactions(ctx, resp)
 	require.Error(t, err)
 }

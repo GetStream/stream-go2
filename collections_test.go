@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
@@ -18,6 +19,7 @@ func TestCollectionRefHelpers(t *testing.T) {
 }
 
 func TestUpsertCollectionObjects(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	testCases := []struct {
 		objects      []stream.CollectionObject
@@ -62,13 +64,14 @@ func TestUpsertCollectionObjects(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := client.Collections().Upsert(tc.collection, tc.objects...)
+		_, err := client.Collections().Upsert(ctx, tc.collection, tc.objects...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
 	}
 }
 
 func TestSelectCollectionObjects(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	testCases := []struct {
 		ids          []string
@@ -88,13 +91,14 @@ func TestSelectCollectionObjects(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := client.Collections().Select(tc.collection, tc.ids...)
+		_, err := client.Collections().Select(ctx, tc.collection, tc.ids...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.expectedURL, tc.expectedBody)
 	}
 }
 
 func TestDeleteManyCollectionObjects(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	testCases := []struct {
 		ids         []string
@@ -113,29 +117,32 @@ func TestDeleteManyCollectionObjects(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := client.Collections().DeleteMany(tc.collection, tc.ids...)
+		_, err := client.Collections().DeleteMany(ctx, tc.collection, tc.ids...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodDelete, tc.expectedURL, "")
 	}
 }
 
 func TestGetCollectionObject(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
-	_, err := client.Collections().Get("test-get-one", "id1")
+	_, err := client.Collections().Get(ctx, "test-get-one", "id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/collections/test-get-one/id1/?api_key=key", "")
 }
 
 func TestDeleteCollectionObject(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
-	_, err := client.Collections().Delete("test-get-one", "id1")
+	_, err := client.Collections().Delete(ctx, "test-get-one", "id1")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/collections/test-get-one/id1/?api_key=key", "")
 }
 
 func TestAddCollectionObject(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	testCases := []struct {
 		object       stream.CollectionObject
@@ -171,19 +178,20 @@ func TestAddCollectionObject(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := client.Collections().Add(tc.collection, tc.object, tc.opts...)
+		_, err := client.Collections().Add(ctx, tc.collection, tc.object, tc.opts...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
 	}
 }
 
 func TestUpdateCollectionObject(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 
 	data := map[string]interface{}{
 		"name": "Jane",
 	}
-	_, err := client.Collections().Update("test-collection", "123", data)
+	_, err := client.Collections().Update(ctx, "test-collection", "123", data)
 	require.NoError(t, err)
 	expectedBody := `{"data":{"name":"Jane"}}`
 	testRequest(t, requester.req, http.MethodPut, "https://api.stream-io-api.com/api/v1.0/collections/test-collection/123/?api_key=key", expectedBody)

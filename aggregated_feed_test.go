@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -12,6 +13,7 @@ import (
 )
 
 func TestAggregatedFeedGetActivities(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	aggregated, _ := newAggregatedFeedWithUserID(client, "123")
 	testCases := []struct {
@@ -36,55 +38,56 @@ func TestAggregatedFeedGetActivities(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		_, err := aggregated.GetActivities(tc.opts...)
+		_, err := aggregated.GetActivities(ctx, tc.opts...)
 		assert.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.url, "")
 
-		_, err = aggregated.GetActivitiesWithRanking("popularity", tc.opts...)
+		_, err = aggregated.GetActivitiesWithRanking(ctx, "popularity", tc.opts...)
 		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.url), "")
 		assert.NoError(t, err)
 
-		_, err = aggregated.GetEnrichedActivities(tc.opts...)
+		_, err = aggregated.GetEnrichedActivities(ctx, tc.opts...)
 		assert.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.enrichedURL, "")
 
-		_, err = aggregated.GetEnrichedActivitiesWithRanking("popularity", tc.opts...)
+		_, err = aggregated.GetEnrichedActivitiesWithRanking(ctx, "popularity", tc.opts...)
 		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.enrichedURL), "")
 		assert.NoError(t, err)
 	}
 }
 
 func TestAggregatedFeedGetNextPageActivities(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	aggregated, _ := newAggregatedFeedWithUserID(client, "123")
 
 	requester.resp = `{"next":"/api/v1.0/feed/aggregated/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
-	resp, err := aggregated.GetActivities()
+	resp, err := aggregated.GetActivities(ctx)
 	require.NoError(t, err)
-	_, err = aggregated.GetNextPageActivities(resp)
+	_, err = aggregated.GetNextPageActivities(ctx, resp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/feed/aggregated/123/?api_key=key&id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":"/api/v1.0/enrich/feed/aggregated/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
-	enrichedResp, err := aggregated.GetEnrichedActivities()
+	enrichedResp, err := aggregated.GetEnrichedActivities(ctx)
 	require.NoError(t, err)
-	_, err = aggregated.GetNextPageEnrichedActivities(enrichedResp)
+	_, err = aggregated.GetNextPageEnrichedActivities(ctx, enrichedResp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/enrich/feed/aggregated/123/?api_key=key&id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":123}`
-	_, err = aggregated.GetActivities()
+	_, err = aggregated.GetActivities(ctx)
 	require.Error(t, err)
 
 	requester.resp = `{"next":"123"}`
-	resp, err = aggregated.GetActivities()
+	resp, err = aggregated.GetActivities(ctx)
 	require.NoError(t, err)
-	_, err = aggregated.GetNextPageActivities(resp)
+	_, err = aggregated.GetNextPageActivities(ctx, resp)
 	require.Error(t, err)
 
 	requester.resp = `{"next":"?q=a%"}`
-	resp, err = aggregated.GetActivities()
+	resp, err = aggregated.GetActivities(ctx)
 	require.NoError(t, err)
-	_, err = aggregated.GetNextPageActivities(resp)
+	_, err = aggregated.GetNextPageActivities(ctx, resp)
 	require.Error(t, err)
 }

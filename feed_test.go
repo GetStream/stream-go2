@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -35,27 +36,29 @@ func TestInvalidFeedUserID(t *testing.T) {
 func TestAddActivity(t *testing.T) {
 	var (
 		client, requester = newClient(t)
+		ctx               = context.Background()
 		flat, _           = newFlatFeedWithUserID(client, "123")
 		bobActivity       = stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{"flat:456"}}
 	)
-	_, err := flat.AddActivity(bobActivity)
+	_, err := flat.AddActivity(ctx, bobActivity)
 	require.NoError(t, err)
 	body := `{"actor":"bob","object":"ice-cream","to":["flat:456"],"verb":"like"}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key", body)
 
 	requester.resp = `{"duration": "1ms"}`
-	_, err = flat.AddActivity(bobActivity)
+	_, err = flat.AddActivity(ctx, bobActivity)
 	require.NoError(t, err)
 }
 
 func TestAddActivities(t *testing.T) {
 	var (
 		client, requester = newClient(t)
+		ctx               = context.Background()
 		flat, _           = newFlatFeedWithUserID(client, "123")
 		bobActivity       = stream.Activity{Actor: "bob", Verb: "like", Object: "ice-cream"}
 		aliceActivity     = stream.Activity{Actor: "alice", Verb: "dislike", Object: "ice-cream", To: []string{"flat:456"}}
 	)
-	_, err := flat.AddActivities(bobActivity, aliceActivity)
+	_, err := flat.AddActivities(ctx, bobActivity, aliceActivity)
 	require.NoError(t, err)
 	body := `{"activities":[{"actor":"bob","object":"ice-cream","verb":"like"},{"actor":"alice","object":"ice-cream","to":["flat:456"],"verb":"dislike"}]}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key", body)
@@ -64,6 +67,7 @@ func TestAddActivities(t *testing.T) {
 func TestUpdateActivities(t *testing.T) {
 	var (
 		client, requester = newClient(t)
+		ctx               = context.Background()
 		now               = getTime(time.Now())
 		bobActivity       = stream.Activity{
 			Actor:     "bob",
@@ -74,7 +78,7 @@ func TestUpdateActivities(t *testing.T) {
 			Extra:     map[string]interface{}{"influence": 42},
 		}
 	)
-	_, err := client.UpdateActivities(bobActivity)
+	_, err := client.UpdateActivities(ctx, bobActivity)
 	require.NoError(t, err)
 
 	body := fmt.Sprintf(`{"activities":[{"actor":"bob","foreign_id":"bob:123","influence":42,"object":"ice-cream","time":%q,"verb":"like"}]}`, now.Format(stream.TimeLayout))
@@ -84,6 +88,7 @@ func TestUpdateActivities(t *testing.T) {
 func TestFollow(t *testing.T) {
 	var (
 		client, requester = newClient(t)
+		ctx               = context.Background()
 		f1, _             = newFlatFeedWithUserID(client, "f1")
 		f2, _             = newFlatFeedWithUserID(client, "f2")
 	)
@@ -103,7 +108,7 @@ func TestFollow(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := f1.Follow(f2, tc.opts...)
+		_, err := f1.Follow(ctx, f2, tc.opts...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodPost, tc.expectedURL, tc.expectedBody)
 	}
@@ -112,6 +117,7 @@ func TestFollow(t *testing.T) {
 func TestGetFollowing(t *testing.T) {
 	var (
 		client, requester = newClient(t)
+		ctx               = context.Background()
 		f1, _             = newFlatFeedWithUserID(client, "f1")
 	)
 	testCases := []struct {
@@ -127,7 +133,7 @@ func TestGetFollowing(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := f1.GetFollowing(tc.opts...)
+		_, err := f1.GetFollowing(ctx, tc.opts...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.expected, "")
 	}
@@ -136,6 +142,7 @@ func TestGetFollowing(t *testing.T) {
 func TestGetFollowers(t *testing.T) {
 	var (
 		client, requester = newClient(t)
+		ctx               = context.Background()
 		f1, _             = newFlatFeedWithUserID(client, "f1")
 	)
 	testCases := []struct {
@@ -151,7 +158,7 @@ func TestGetFollowers(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		_, err := f1.GetFollowers(tc.opts...)
+		_, err := f1.GetFollowers(ctx, tc.opts...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodGet, tc.expected, "")
 	}
@@ -160,6 +167,7 @@ func TestGetFollowers(t *testing.T) {
 func TestUnfollow(t *testing.T) {
 	var (
 		client, requester = newClient(t)
+		ctx               = context.Background()
 		f1, _             = newFlatFeedWithUserID(client, "f1")
 		f2, _             = newFlatFeedWithUserID(client, "f2")
 	)
@@ -181,19 +189,20 @@ func TestUnfollow(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		_, err := f1.Unfollow(f2, tc.opts...)
+		_, err := f1.Unfollow(ctx, f2, tc.opts...)
 		require.NoError(t, err)
 		testRequest(t, requester.req, http.MethodDelete, tc.expected, "")
 	}
 }
 
 func TestRemoveActivities(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	flat, _ := newFlatFeedWithUserID(client, "123")
-	_, err := flat.RemoveActivityByID("id-to-remove")
+	_, err := flat.RemoveActivityByID(ctx, "id-to-remove")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/id-to-remove/?api_key=key", "")
-	_, err = flat.RemoveActivityByForeignID("bob:123")
+	_, err = flat.RemoveActivityByForeignID(ctx, "bob:123")
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/bob:123/?api_key=key&foreign_id=1", "")
 }
@@ -201,6 +210,7 @@ func TestRemoveActivities(t *testing.T) {
 func TestUpdateToTargets(t *testing.T) {
 	var (
 		client, requester = newClient(t)
+		ctx               = context.Background()
 		flat, _           = newFlatFeedWithUserID(client, "123")
 		f1, _             = newFlatFeedWithUserID(client, "f1")
 		f2, _             = newFlatFeedWithUserID(client, "f2")
@@ -208,11 +218,11 @@ func TestUpdateToTargets(t *testing.T) {
 		now               = getTime(time.Now())
 		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}, Extra: map[string]interface{}{"popularity": 9000}}
 	)
-	_, err := flat.UpdateToTargets(activity, stream.WithToTargetsAdd(f2.ID()), stream.WithToTargetsRemove(f1.ID()))
+	_, err := flat.UpdateToTargets(ctx, activity, stream.WithToTargetsAdd(f2.ID()), stream.WithToTargetsRemove(f1.ID()))
 	require.NoError(t, err)
 	body := fmt.Sprintf(`{"foreign_id":"bob:123","time":%q,"added_targets":["flat:f2"],"removed_targets":["flat:f1"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
-	_, err = flat.UpdateToTargets(activity, stream.WithToTargetsNew(f3.ID()))
+	_, err = flat.UpdateToTargets(ctx, activity, stream.WithToTargetsNew(f3.ID()))
 	require.NoError(t, err)
 	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":%q,"new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)

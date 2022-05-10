@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,7 +24,7 @@ func (c *PersonalizationClient) decode(resp []byte, err error) (*Personalization
 }
 
 // Get obtains a PersonalizationResponse for the given resource and params.
-func (c *PersonalizationClient) Get(resource string, params map[string]interface{}) (*PersonalizationResponse, error) {
+func (c *PersonalizationClient) Get(ctx context.Context, resource string, params map[string]interface{}) (*PersonalizationResponse, error) {
 	if resource == "" {
 		return nil, errors.New("missing resource")
 	}
@@ -31,11 +32,11 @@ func (c *PersonalizationClient) Get(resource string, params map[string]interface
 	for k, v := range params {
 		endpoint.addQueryParam(makeRequestOption(k, v))
 	}
-	return c.decode(c.client.get(endpoint, nil, c.client.authenticator.personalizationAuth))
+	return c.decode(c.client.get(ctx, endpoint, nil, c.client.authenticator.personalizationAuth))
 }
 
 // Post sends data to the given resource, adding the given params to the request.
-func (c *PersonalizationClient) Post(resource string, params, data map[string]interface{}) (*PersonalizationResponse, error) {
+func (c *PersonalizationClient) Post(ctx context.Context, resource string, params, data map[string]interface{}) (*PersonalizationResponse, error) {
 	if resource == "" {
 		return nil, errors.New("missing resource")
 	}
@@ -48,11 +49,11 @@ func (c *PersonalizationClient) Post(resource string, params, data map[string]in
 			"data": data,
 		}
 	}
-	return c.decode(c.client.post(endpoint, data, c.client.authenticator.personalizationAuth))
+	return c.decode(c.client.post(ctx, endpoint, data, c.client.authenticator.personalizationAuth))
 }
 
 // Delete removes data from the given resource, adding the given params to the request.
-func (c *PersonalizationClient) Delete(resource string, params map[string]interface{}) (*PersonalizationResponse, error) {
+func (c *PersonalizationClient) Delete(ctx context.Context, resource string, params map[string]interface{}) (*PersonalizationResponse, error) {
 	if resource == "" {
 		return nil, errors.New("missing resource")
 	}
@@ -60,5 +61,5 @@ func (c *PersonalizationClient) Delete(resource string, params map[string]interf
 	for k, v := range params {
 		endpoint.addQueryParam(makeRequestOption(k, v))
 	}
-	return c.decode(c.client.delete(endpoint, nil, c.client.authenticator.personalizationAuth))
+	return c.decode(c.client.delete(ctx, endpoint, nil, c.client.authenticator.personalizationAuth))
 }

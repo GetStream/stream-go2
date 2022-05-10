@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 )
 
 func TestGetNotificationActivities(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	notification, _ := newNotificationFeedWithUserID(client, "123")
 	testCases := []struct {
@@ -55,49 +57,50 @@ func TestGetNotificationActivities(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		_, err := notification.GetActivities(tc.opts...)
+		_, err := notification.GetActivities(ctx, tc.opts...)
 		testRequest(t, requester.req, http.MethodGet, tc.url, "")
 		assert.NoError(t, err)
 
-		_, err = notification.GetEnrichedActivities(tc.opts...)
+		_, err = notification.GetEnrichedActivities(ctx, tc.opts...)
 		testRequest(t, requester.req, http.MethodGet, tc.enrichedURL, "")
 		assert.NoError(t, err)
 	}
 }
 
 func TestNotificationFeedGetNextPageActivities(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	notification, _ := newNotificationFeedWithUserID(client, "123")
 
 	requester.resp = `{"next":"/api/v1.0/feed/notification/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
-	resp, err := notification.GetActivities()
+	resp, err := notification.GetActivities(ctx)
 	require.NoError(t, err)
 
-	_, err = notification.GetNextPageActivities(resp)
+	_, err = notification.GetNextPageActivities(ctx, resp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/feed/notification/123/?api_key=key&id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":"/api/v1.0/enrich/feed/notification/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
-	enrichedResp, err := notification.GetEnrichedActivities()
+	enrichedResp, err := notification.GetEnrichedActivities(ctx)
 	require.NoError(t, err)
 
-	_, err = notification.GetNextPageEnrichedActivities(enrichedResp)
+	_, err = notification.GetNextPageEnrichedActivities(ctx, enrichedResp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/enrich/feed/notification/123/?api_key=key&id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":123}`
-	_, err = notification.GetActivities()
+	_, err = notification.GetActivities(ctx)
 	require.Error(t, err)
 
 	requester.resp = `{"next":"123"}`
-	resp, err = notification.GetActivities()
+	resp, err = notification.GetActivities(ctx)
 	require.NoError(t, err)
-	_, err = notification.GetNextPageActivities(resp)
+	_, err = notification.GetNextPageActivities(ctx, resp)
 	require.Error(t, err)
 
 	requester.resp = `{"next":"?q=a%"}`
-	resp, err = notification.GetActivities()
+	resp, err = notification.GetActivities(ctx)
 	require.NoError(t, err)
-	_, err = notification.GetNextPageActivities(resp)
+	_, err = notification.GetNextPageActivities(ctx, resp)
 	require.Error(t, err)
 }

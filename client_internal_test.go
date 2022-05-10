@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -193,6 +194,7 @@ func (r requester) Do(*http.Request) (*http.Response, error) {
 }
 
 func Test_requestErrors(t *testing.T) {
+	ctx := context.Background()
 	testCases := []struct {
 		data      interface{}
 		method    string
@@ -236,7 +238,7 @@ func Test_requestErrors(t *testing.T) {
 
 	for _, tc := range testCases {
 		c := &Client{requester: tc.requester}
-		_, err := c.request(tc.method, endpoint{url: &url.URL{}, query: url.Values{}}, tc.data, tc.authFn)
+		_, err := c.request(ctx, tc.method, endpoint{url: &url.URL{}, query: url.Values{}}, tc.data, tc.authFn)
 		require.Error(t, err)
 		assert.Equal(t, tc.expected.Error(), err.Error())
 	}

@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -12,6 +13,7 @@ import (
 )
 
 func TestFlatFeedGetActivities(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	flat, _ := newFlatFeedWithUserID(client, "123")
 	testCases := []struct {
@@ -50,80 +52,82 @@ func TestFlatFeedGetActivities(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		_, err := flat.GetActivities(tc.opts...)
+		_, err := flat.GetActivities(ctx, tc.opts...)
 		testRequest(t, requester.req, http.MethodGet, tc.url, "")
 		assert.NoError(t, err)
 
-		_, err = flat.GetActivitiesWithRanking("popularity", tc.opts...)
+		_, err = flat.GetActivitiesWithRanking(ctx, "popularity", tc.opts...)
 		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.url), "")
 		assert.NoError(t, err)
 
-		_, err = flat.GetEnrichedActivities(tc.opts...)
+		_, err = flat.GetEnrichedActivities(ctx, tc.opts...)
 		testRequest(t, requester.req, http.MethodGet, tc.enrichedURL, "")
 		assert.NoError(t, err)
 
-		_, err = flat.GetEnrichedActivitiesWithRanking("popularity", tc.opts...)
+		_, err = flat.GetEnrichedActivitiesWithRanking(ctx, "popularity", tc.opts...)
 		testRequest(t, requester.req, http.MethodGet, fmt.Sprintf("%s&ranking=popularity", tc.enrichedURL), "")
 		assert.NoError(t, err)
 	}
 }
 
 func TestFlatFeedGetNextPageActivities(t *testing.T) {
+	ctx := context.Background()
 	client, requester := newClient(t)
 	flat, _ := newFlatFeedWithUserID(client, "123")
 
 	requester.resp = `{"next":"/api/v1.0/feed/flat/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
-	resp, err := flat.GetActivities()
+	resp, err := flat.GetActivities(ctx)
 	require.NoError(t, err)
 
-	_, err = flat.GetNextPageActivities(resp)
+	_, err = flat.GetNextPageActivities(ctx, resp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":"/api/v1.0/enrich/feed/flat/123/?id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25"}`
-	enrichedResp, err := flat.GetEnrichedActivities()
+	enrichedResp, err := flat.GetEnrichedActivities(ctx)
 	require.NoError(t, err)
 
-	_, err = flat.GetNextPageEnrichedActivities(enrichedResp)
+	_, err = flat.GetNextPageEnrichedActivities(ctx, enrichedResp)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/enrich/feed/flat/123/?api_key=key&id_lt=78c1a709-aff2-11e7-b3a7-a45e60be7d3b&limit=25", "")
 	require.NoError(t, err)
 
 	requester.resp = `{"next":123}`
-	_, err = flat.GetActivities()
+	_, err = flat.GetActivities(ctx)
 	require.Error(t, err)
 
 	requester.resp = `{"next":"123"}`
-	resp, err = flat.GetActivities()
+	resp, err = flat.GetActivities(ctx)
 	require.NoError(t, err)
-	_, err = flat.GetNextPageActivities(resp)
+	_, err = flat.GetNextPageActivities(ctx, resp)
 	require.Error(t, err)
 
 	requester.resp = `{"next":"?q=a%"}`
-	resp, err = flat.GetActivities()
+	resp, err = flat.GetActivities(ctx)
 	require.NoError(t, err)
-	_, err = flat.GetNextPageActivities(resp)
+	_, err = flat.GetNextPageActivities(ctx, resp)
 	require.Error(t, err)
 }
 
 func TestFlatFeedFollowStats(t *testing.T) {
+	ctx := context.Background()
 	endpoint := "https://api.stream-io-api.com/api/v1.0/stats/follow/?api_key=key"
 
 	client, requester := newClient(t)
 	flat, _ := newFlatFeedWithUserID(client, "123")
 
-	_, err := flat.FollowStats()
+	_, err := flat.FollowStats(ctx)
 	testRequest(t, requester.req, http.MethodGet, endpoint+"&followers=flat%3A123&following=flat%3A123", "")
 	assert.NoError(t, err)
 
-	_, err = flat.FollowStats(stream.WithFollowerSlugs("a", "b"))
+	_, err = flat.FollowStats(ctx, stream.WithFollowerSlugs("a", "b"))
 	testRequest(t, requester.req, http.MethodGet, endpoint+"&followers=flat%3A123&followers_slugs=a%2Cb&following=flat%3A123", "")
 	assert.NoError(t, err)
 
-	_, err = flat.FollowStats(stream.WithFollowingSlugs("c", "d"))
+	_, err = flat.FollowStats(ctx, stream.WithFollowingSlugs("c", "d"))
 	testRequest(t, requester.req, http.MethodGet, endpoint+"&followers=flat%3A123&following=flat%3A123&following_slugs=c%2Cd", "")
 	assert.NoError(t, err)
 
-	_, err = flat.FollowStats(stream.WithFollowingSlugs("c", "d"), stream.WithFollowerSlugs("a", "b"))
+	_, err = flat.FollowStats(ctx, stream.WithFollowingSlugs("c", "d"), stream.WithFollowerSlugs("a", "b"))
 	testRequest(t, requester.req, http.MethodGet, endpoint+"&followers=flat%3A123&followers_slugs=a%2Cb&following=flat%3A123&following_slugs=c%2Cd", "")
 	assert.NoError(t, err)
 }
