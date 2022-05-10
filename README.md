@@ -28,7 +28,7 @@ You can use this library to access chat API endpoints server-side.
 For the client-side integrations (web and mobile) have a look at the JavaScript, iOS and Android SDK libraries ([docs](https://getstream.io/activity-feeds/)).
 
 [![build](https://github.com/GetStream/stream-go2/workflows/build/badge.svg)](https://github.com/GetStream/stream-go2/actions)
-[![godoc](https://pkg.go.dev/badge/GetStream/stream-go2)](https://pkg.go.dev/github.com/GetStream/stream-go2/v6?tab=doc)
+[![godoc](https://pkg.go.dev/badge/GetStream/stream-go2)](https://pkg.go.dev/github.com/GetStream/stream-go2/v7?tab=doc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GetStream/stream-go2)](https://goreportcard.com/report/github.com/GetStream/stream-go2)
 
 ## Contents
@@ -76,7 +76,7 @@ For the client-side integrations (web and mobile) have a look at the JavaScript,
 Get the client:
 
 ```bash
-$ go get github.com/GetStream/stream-go2/v6
+$ go get github.com/GetStream/stream-go2/v7
 ```
 
 > For `v4`, use `github.com/GetStream/stream-go2/v4` but updating to the last version is highly recommended.
@@ -84,7 +84,7 @@ $ go get github.com/GetStream/stream-go2/v6
 ### Creating a Client
 
 ```go
-import stream "github.com/GetStream/stream-go2/v6"
+import stream "github.com/GetStream/stream-go2/v7"
 
 key := "YOUR_API_KEY"
 secret := "YOUR_API_SECRET"

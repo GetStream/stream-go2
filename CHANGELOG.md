@@ -1,9 +1,13 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [7.0.0](https://github.com/GetStream/stream-go2/compare/v6.4.2...v7.0.0) (2022-05-10)
+
+
+### Features
+
+* **context:** add context as first argument ([#123](https://github.com/GetStream/stream-go2/issues/123)) ([9612a24](https://github.com/GetStream/stream-go2/commit/9612a24b921d4aeb8ab4b22e8c5ddd93e84ecf9e))
 
 ## [6.4.2] 2022-03-10
 
