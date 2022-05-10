@@ -1,4 +1,4 @@
-module github.com/GetStream/stream-go2/v6
+module github.com/GetStream/stream-go2/v7
 
 require (
 	github.com/fatih/structs v1.1.0
