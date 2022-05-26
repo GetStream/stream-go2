@@ -656,14 +656,14 @@ func (c *Client) updateToTargets(ctx context.Context, feed Feed, activity Activi
 	return &out, nil
 }
 
-func (c *Client) GetUserSessionToken(userID string) (string, error) {
+func (c *Client) CreateUserToken(userID string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 	}
 	return c.authenticator.jwtSignatureFromClaims(claims)
 }
 
-func (c *Client) GetUserSessionTokenWithClaims(userID string, claims map[string]interface{}) (string, error) {
+func (c *Client) CreateUserTokenWithClaims(userID string, claims map[string]interface{}) (string, error) {
 	claims["user_id"] = userID
 	jwtclaims := jwt.MapClaims{}
 	for k, v := range claims {

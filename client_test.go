@@ -233,7 +233,7 @@ func TestUpdateActivityByForeignID(t *testing.T) {
 
 func TestUserSessionToken(t *testing.T) {
 	client, _ := newClient(t)
-	tokenString, err := client.GetUserSessionToken("user")
+	tokenString, err := client.CreateUserToken("user")
 	require.NoError(t, err)
 	assert.Equal(t, tokenString, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidXNlciJ9.0Kiui6HUywyU-C-00E68n1iq_3o7Eh0aE5VGSOc3pU4")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) { return []byte("secret"), nil })
@@ -244,7 +244,7 @@ func TestUserSessionToken(t *testing.T) {
 
 func TestUserSessionTokenWithClaims(t *testing.T) {
 	client, _ := newClient(t)
-	tokenString, err := client.GetUserSessionTokenWithClaims("user", map[string]interface{}{"client": "go"})
+	tokenString, err := client.CreateUserTokenWithClaims("user", map[string]interface{}{"client": "go"})
 	require.NoError(t, err)
 	assert.Equal(t, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJnbyIsInVzZXJfaWQiOiJ1c2VyIn0.Us6UIuH83dJe1cXQIiudseFz9-1kVMr6-SL6-idzIB0", tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) { return []byte("secret"), nil })
