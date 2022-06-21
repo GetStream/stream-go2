@@ -20,6 +20,7 @@ var regionOverrides = map[string]string{
 
 var personalizationOverrides = map[string]string{
 	"eu-west": "dublin",
+	"dublin":  "dublin",
 }
 
 type regionalURLBuilder struct {
