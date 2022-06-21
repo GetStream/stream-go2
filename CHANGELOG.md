@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.0.1](https://github.com/GetStream/stream-go2/compare/v7.0.0...v7.0.1) (2022-06-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename session token methods (#126)
+
+### Features
+
+* **go_version:** bump to v1.17 ([#125](https://github.com/GetStream/stream-go2/issues/125)) ([0c1e87c](https://github.com/GetStream/stream-go2/commit/0c1e87c0451859787d95de11a955253d8ee00b49))
+
+
+* rename session token methods ([#126](https://github.com/GetStream/stream-go2/issues/126)) ([39fbcf7](https://github.com/GetStream/stream-go2/commit/39fbcf75c16aa26c70c12afbd5d4d9faab8d5a4e))
+
 ## [7.0.0](https://github.com/GetStream/stream-go2/compare/v6.4.2...v7.0.0) (2022-05-10)
 
 
