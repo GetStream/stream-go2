@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	stream "github.com/GetStream/stream-go2/v7"
+	stream "github.com/flockfw64/stream-go2/v7"
 )
 
 func init() {
