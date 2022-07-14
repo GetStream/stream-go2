@@ -355,8 +355,10 @@ type AddActivitiesResponse struct {
 
 // Follower is the representation of a feed following another feed.
 type Follower struct {
-	FeedID   string `json:"feed_id,omitempty"`
-	TargetID string `json:"target_id,omitempty"`
+	FeedID    string `json:"feed_id,omitempty"`
+	TargetID  string `json:"target_id,omitempty"`
+	CreatedAt string `json:"created_at,omitempty"`
+	UpdatedAt string `json:"updated_at,omitempty"`
 }
 
 // followResponse is the API response obtained when retrieving follow graph
