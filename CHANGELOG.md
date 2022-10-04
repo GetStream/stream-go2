@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.1.0](https://github.com/GetStream/stream-go2/compare/v7.0.1...v7.1.0) (2022-10-04)
+
+
+### Features
+
+* add time fields to reactions ([#134](https://github.com/GetStream/stream-go2/issues/134)) ([bd5966c](https://github.com/GetStream/stream-go2/commit/bd5966c3eb5930cd050844412fe093060ad64222))
+
 ### [7.0.1](https://github.com/GetStream/stream-go2/compare/v7.0.0...v7.0.1) (2022-06-21)
 
 
