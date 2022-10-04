@@ -541,6 +541,8 @@ type Reaction struct {
 	ChildrenReactions map[string][]*Reaction `json:"latest_children,omitempty"`
 	OwnChildren       map[string][]*Reaction `json:"own_children,omitempty"`
 	ChildrenCounters  map[string]interface{} `json:"children_counts,omitempty"`
+	CreatedAt         time.Time              `json:"created_at"`
+	UpdatedAt         time.Time              `json:"updated_at"`
 }
 
 type ReactionResponse struct {
