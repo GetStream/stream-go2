@@ -14,7 +14,7 @@ type AnalyticsClient struct {
 // TrackEngagement is used to send and track analytics EngagementEvents.
 func (c *AnalyticsClient) TrackEngagement(ctx context.Context, events ...EngagementEvent) (*BaseResponse, error) {
 	endpoint := c.client.makeEndpoint("engagement/")
-	data := map[string]interface{}{
+	data := map[string]any{
 		"content_list": events,
 	}
 	return decode(c.client.post(ctx, endpoint, data, c.client.authenticator.analyticsAuth))
@@ -29,7 +29,7 @@ func (c *AnalyticsClient) TrackImpression(ctx context.Context, eventsData Impres
 // RedirectAndTrack is used to send and track analytics ImpressionEvents. It tracks
 // the events data (either EngagementEvents or ImpressionEvents) and redirects to the provided
 // URL string.
-func (c *AnalyticsClient) RedirectAndTrack(url string, events ...map[string]interface{}) (string, error) {
+func (c *AnalyticsClient) RedirectAndTrack(url string, events ...map[string]any) (string, error) {
 	endpoint := c.client.makeEndpoint("redirect/")
 	eventsData, err := json.Marshal(events)
 	if err != nil {

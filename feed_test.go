@@ -75,7 +75,7 @@ func TestUpdateActivities(t *testing.T) {
 			Object:    "ice-cream",
 			ForeignID: "bob:123",
 			Time:      now,
-			Extra:     map[string]interface{}{"influence": 42},
+			Extra:     map[string]any{"influence": 42},
 		}
 	)
 	_, err := client.UpdateActivities(ctx, bobActivity)
@@ -216,7 +216,7 @@ func TestUpdateToTargets(t *testing.T) {
 		f2, _             = newFlatFeedWithUserID(client, "f2")
 		f3, _             = newFlatFeedWithUserID(client, "f3")
 		now               = getTime(time.Now())
-		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}, Extra: map[string]interface{}{"popularity": 9000}}
+		activity          = stream.Activity{Time: now, ForeignID: "bob:123", Actor: "bob", Verb: "like", Object: "ice-cream", To: []string{f1.ID()}, Extra: map[string]any{"popularity": 9000}}
 	)
 	_, err := flat.UpdateToTargets(ctx, activity, stream.WithToTargetsAdd(f2.ID()), stream.WithToTargetsRemove(f1.ID()))
 	require.NoError(t, err)

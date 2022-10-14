@@ -47,7 +47,7 @@ func TestAddUser(t *testing.T) {
 		{
 			object: stream.User{
 				ID: "user-test",
-				Data: map[string]interface{}{
+				Data: map[string]any{
 					"is_admin": true,
 					"name":     "Johnny",
 				},
@@ -58,7 +58,7 @@ func TestAddUser(t *testing.T) {
 		{
 			object: stream.User{
 				ID: "user-test",
-				Data: map[string]interface{}{
+				Data: map[string]any{
 					"is_admin": true,
 					"name":     "Jane",
 				},
@@ -80,7 +80,7 @@ func TestUpdateUser(t *testing.T) {
 	ctx := context.Background()
 	client, requester := newClient(t)
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"name": "Jane",
 	}
 	_, err := client.Users().Update(ctx, "123", data)

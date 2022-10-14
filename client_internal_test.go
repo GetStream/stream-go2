@@ -71,20 +71,20 @@ func Test_makeEndpoint(t *testing.T) {
 		urlBuilder apiURLBuilder
 		format     string
 		env        string
-		args       []interface{}
+		args       []any
 		expected   string
 	}{
 		{
 			urlBuilder: apiURLBuilder{},
 			format:     "test-%d-%s",
-			args:       []interface{}{42, "asd"},
+			args:       []any{42, "asd"},
 			expected:   "https://api.stream-io-api.com/api/v1.0/test-42-asd?api_key=test",
 		},
 		{
 			urlBuilder: apiURLBuilder{},
 			env:        "http://localhost:8000",
 			format:     "test-%d-%s",
-			args:       []interface{}{42, "asd"},
+			args:       []any{42, "asd"},
 			expected:   "http://localhost:8000/api/v1.0/test-42-asd?api_key=test",
 		},
 	}
@@ -164,7 +164,7 @@ func Test_makeStreamError(t *testing.T) {
 				Duration:   Duration{time.Minute + time.Second*2},
 				Exception:  "boom",
 				StatusCode: 123,
-				ExceptionFields: map[string][]interface{}{
+				ExceptionFields: map[string][]any{
 					"foo": {"bar"},
 				},
 			},
@@ -196,7 +196,7 @@ func (r requester) Do(*http.Request) (*http.Response, error) {
 func Test_requestErrors(t *testing.T) {
 	ctx := context.Background()
 	testCases := []struct {
-		data      interface{}
+		data      any
 		method    string
 		authFn    authFunc
 		expected  error

@@ -19,7 +19,7 @@ func (c *CollectionsClient) Upsert(ctx context.Context, collection string, objec
 		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/")
-	data := map[string]interface{}{
+	data := map[string]any{
 		"data": map[string][]CollectionObject{
 			collection: objects,
 		},
@@ -105,12 +105,12 @@ func (c *CollectionsClient) Get(ctx context.Context, collection, id string) (*Co
 }
 
 // Update updates the given collection object's data.
-func (c *CollectionsClient) Update(ctx context.Context, collection, id string, data map[string]interface{}) (*CollectionObjectResponse, error) {
+func (c *CollectionsClient) Update(ctx context.Context, collection, id string, data map[string]any) (*CollectionObjectResponse, error) {
 	if collection == "" {
 		return nil, errors.New("collection name required")
 	}
 	endpoint := c.client.makeEndpoint("collections/%s/%s/", collection, id)
-	reqData := map[string]interface{}{
+	reqData := map[string]any{
 		"data": data,
 	}
 

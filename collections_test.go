@@ -32,7 +32,7 @@ func TestUpsertCollectionObjects(t *testing.T) {
 			objects: []stream.CollectionObject{
 				{
 					ID: "1",
-					Data: map[string]interface{}{
+					Data: map[string]any{
 						"name":    "Juniper",
 						"hobbies": []string{"playing", "sleeping", "eating"},
 					},
@@ -46,14 +46,14 @@ func TestUpsertCollectionObjects(t *testing.T) {
 			objects: []stream.CollectionObject{
 				{
 					ID: "1",
-					Data: map[string]interface{}{
+					Data: map[string]any{
 						"name":    "Juniper",
 						"hobbies": []string{"playing", "sleeping", "eating"},
 					},
 				},
 				{
 					ID: "2",
-					Data: map[string]interface{}{
+					Data: map[string]any{
 						"name":      "Ruby",
 						"interests": []string{"sunbeams", "surprise attacks"},
 					},
@@ -155,7 +155,7 @@ func TestAddCollectionObject(t *testing.T) {
 			collection: "no_user_id",
 			object: stream.CollectionObject{
 				ID: "1",
-				Data: map[string]interface{}{
+				Data: map[string]any{
 					"name":    "Juniper",
 					"hobbies": []string{"playing", "sleeping", "eating"},
 				},
@@ -167,7 +167,7 @@ func TestAddCollectionObject(t *testing.T) {
 			collection: "with_user_id",
 			object: stream.CollectionObject{
 				ID: "1",
-				Data: map[string]interface{}{
+				Data: map[string]any{
 					"name":    "Juniper",
 					"hobbies": []string{"playing", "sleeping", "eating"},
 				},
@@ -188,7 +188,7 @@ func TestUpdateCollectionObject(t *testing.T) {
 	ctx := context.Background()
 	client, requester := newClient(t)
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"name": "Jane",
 	}
 	_, err := client.Collections().Update(ctx, "test-collection", "123", data)

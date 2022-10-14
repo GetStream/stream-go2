@@ -24,7 +24,7 @@ func (c *PersonalizationClient) decode(resp []byte, err error) (*Personalization
 }
 
 // Get obtains a PersonalizationResponse for the given resource and params.
-func (c *PersonalizationClient) Get(ctx context.Context, resource string, params map[string]interface{}) (*PersonalizationResponse, error) {
+func (c *PersonalizationClient) Get(ctx context.Context, resource string, params map[string]any) (*PersonalizationResponse, error) {
 	if resource == "" {
 		return nil, errors.New("missing resource")
 	}
@@ -36,7 +36,7 @@ func (c *PersonalizationClient) Get(ctx context.Context, resource string, params
 }
 
 // Post sends data to the given resource, adding the given params to the request.
-func (c *PersonalizationClient) Post(ctx context.Context, resource string, params, data map[string]interface{}) (*PersonalizationResponse, error) {
+func (c *PersonalizationClient) Post(ctx context.Context, resource string, params, data map[string]any) (*PersonalizationResponse, error) {
 	if resource == "" {
 		return nil, errors.New("missing resource")
 	}
@@ -45,7 +45,7 @@ func (c *PersonalizationClient) Post(ctx context.Context, resource string, param
 		endpoint.addQueryParam(makeRequestOption(k, v))
 	}
 	if data != nil {
-		data = map[string]interface{}{
+		data = map[string]any{
 			"data": data,
 		}
 	}
@@ -53,7 +53,7 @@ func (c *PersonalizationClient) Post(ctx context.Context, resource string, param
 }
 
 // Delete removes data from the given resource, adding the given params to the request.
-func (c *PersonalizationClient) Delete(ctx context.Context, resource string, params map[string]interface{}) (*PersonalizationResponse, error) {
+func (c *PersonalizationClient) Delete(ctx context.Context, resource string, params map[string]any) (*PersonalizationResponse, error) {
 	if resource == "" {
 		return nil, errors.New("missing resource")
 	}

@@ -15,8 +15,8 @@ func Test_decodeJSONHook(t *testing.T) {
 	testCases := []struct {
 		f           reflect.Type
 		typ         reflect.Type
-		data        interface{}
-		expected    interface{}
+		data        any
+		expected    any
 		shouldError bool
 	}{
 		{
@@ -69,14 +69,14 @@ func Test_decodeJSONHook(t *testing.T) {
 			expected:    Data{ID: "test"},
 		},
 		{
-			f:   reflect.TypeOf(map[string]interface{}{}),
+			f:   reflect.TypeOf(map[string]any{}),
 			typ: reflect.TypeOf(Data{}),
-			data: map[string]interface{}{
+			data: map[string]any{
 				"id":    "test",
 				"extra": "data",
 			},
 			shouldError: false,
-			expected:    Data{ID: "test", Extra: map[string]interface{}{"extra": "data"}},
+			expected:    Data{ID: "test", Extra: map[string]any{"extra": "data"}},
 		},
 		{
 			f:           reflect.TypeOf(float64(0)),

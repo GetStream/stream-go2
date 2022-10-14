@@ -151,12 +151,12 @@ func TestUpdateActivityByID(t *testing.T) {
 	ctx := context.Background()
 	client, requester := newClient(t)
 
-	_, err := client.UpdateActivityByID(ctx, "abcdef", map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, []string{"a", "b", "c"})
+	_, err := client.UpdateActivityByID(ctx, "abcdef", map[string]any{"foo.bar": "baz", "popularity": 42, "color": map[string]any{"hex": "FF0000", "rgb": "255,0,0"}}, []string{"a", "b", "c"})
 	require.NoError(t, err)
 	body := `{"id":"abcdef","set":{"color":{"hex":"FF0000","rgb":"255,0,0"},"foo.bar":"baz","popularity":42},"unset":["a","b","c"]}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
 
-	_, err = client.UpdateActivityByID(ctx, "abcdef", map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, nil)
+	_, err = client.UpdateActivityByID(ctx, "abcdef", map[string]any{"foo.bar": "baz", "popularity": 42, "color": map[string]any{"hex": "FF0000", "rgb": "255,0,0"}}, nil)
 	require.NoError(t, err)
 	body = `{"id":"abcdef","set":{"color":{"hex":"FF0000","rgb":"255,0,0"},"foo.bar":"baz","popularity":42}}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
@@ -175,12 +175,12 @@ func TestPartialUpdateActivities(t *testing.T) {
 		ctx,
 		stream.NewUpdateActivityRequestByID(
 			"abcdef",
-			map[string]interface{}{"foo.bar": "baz"},
+			map[string]any{"foo.bar": "baz"},
 			[]string{"qux", "tty"},
 		),
 		stream.NewUpdateActivityRequestByID(
 			"ghijkl",
-			map[string]interface{}{"foo.bar": "baz"},
+			map[string]any{"foo.bar": "baz"},
 			[]string{"quux", "ttl"},
 		),
 	)
@@ -194,7 +194,7 @@ func TestPartialUpdateActivities(t *testing.T) {
 		stream.NewUpdateActivityRequestByForeignID(
 			"abcdef:123",
 			stream.Time{Time: tt},
-			map[string]interface{}{"foo.bar": "baz"},
+			map[string]any{"foo.bar": "baz"},
 			nil,
 		),
 		stream.NewUpdateActivityRequestByForeignID(
@@ -215,12 +215,12 @@ func TestUpdateActivityByForeignID(t *testing.T) {
 
 	tt := stream.Time{Time: time.Date(2018, 6, 24, 11, 28, 0, 0, time.UTC)}
 
-	_, err := client.UpdateActivityByForeignID(ctx, "fid:123", tt, map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, []string{"a", "b", "c"})
+	_, err := client.UpdateActivityByForeignID(ctx, "fid:123", tt, map[string]any{"foo.bar": "baz", "popularity": 42, "color": map[string]any{"hex": "FF0000", "rgb": "255,0,0"}}, []string{"a", "b", "c"})
 	require.NoError(t, err)
 	body := `{"foreign_id":"fid:123","time":"2018-06-24T11:28:00","set":{"color":{"hex":"FF0000","rgb":"255,0,0"},"foo.bar":"baz","popularity":42},"unset":["a","b","c"]}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
 
-	_, err = client.UpdateActivityByForeignID(ctx, "fid:123", tt, map[string]interface{}{"foo.bar": "baz", "popularity": 42, "color": map[string]interface{}{"hex": "FF0000", "rgb": "255,0,0"}}, nil)
+	_, err = client.UpdateActivityByForeignID(ctx, "fid:123", tt, map[string]any{"foo.bar": "baz", "popularity": 42, "color": map[string]any{"hex": "FF0000", "rgb": "255,0,0"}}, nil)
 	require.NoError(t, err)
 	body = `{"foreign_id":"fid:123","time":"2018-06-24T11:28:00","set":{"color":{"hex":"FF0000","rgb":"255,0,0"},"foo.bar":"baz","popularity":42}}`
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/activity/?api_key=key", body)
@@ -236,7 +236,7 @@ func TestUserSessionToken(t *testing.T) {
 	tokenString, err := client.CreateUserToken("user")
 	require.NoError(t, err)
 	assert.Equal(t, tokenString, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidXNlciJ9.0Kiui6HUywyU-C-00E68n1iq_3o7Eh0aE5VGSOc3pU4")
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) { return []byte("secret"), nil })
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) { return []byte("secret"), nil })
 	require.NoError(t, err)
 	assert.Equal(t, true, token.Valid)
 	assert.Equal(t, token.Claims, jwt.MapClaims{"user_id": "user"})
@@ -244,10 +244,10 @@ func TestUserSessionToken(t *testing.T) {
 
 func TestUserSessionTokenWithClaims(t *testing.T) {
 	client, _ := newClient(t)
-	tokenString, err := client.CreateUserTokenWithClaims("user", map[string]interface{}{"client": "go"})
+	tokenString, err := client.CreateUserTokenWithClaims("user", map[string]any{"client": "go"})
 	require.NoError(t, err)
 	assert.Equal(t, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnQiOiJnbyIsInVzZXJfaWQiOiJ1c2VyIn0.Us6UIuH83dJe1cXQIiudseFz9-1kVMr6-SL6-idzIB0", tokenString)
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) { return []byte("secret"), nil })
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) { return []byte("secret"), nil })
 	require.NoError(t, err)
 	assert.Equal(t, true, token.Valid)
 	assert.Equal(t, token.Claims, jwt.MapClaims{"user_id": "user", "client": "go"})

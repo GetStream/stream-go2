@@ -40,7 +40,7 @@ func TestEnrichedActivityMarshal(t *testing.T) {
 	e := stream.EnrichedActivity{
 		Actor: stream.Data{
 			ID:    "my_id",
-			Extra: map[string]interface{}{"a": 1, "b": "c"},
+			Extra: map[string]any{"a": 1, "b": "c"},
 		},
 		ReactionCounts: map[string]int{
 			"comment": 1,

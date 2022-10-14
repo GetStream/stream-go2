@@ -9,35 +9,35 @@ import (
 
 // Activity is a Stream activity entity.
 type Activity struct {
-	ID        string                 `json:"id,omitempty"`
-	Actor     string                 `json:"actor,omitempty"`
-	Verb      string                 `json:"verb,omitempty"`
-	Object    string                 `json:"object,omitempty"`
-	ForeignID string                 `json:"foreign_id,omitempty"`
-	Target    string                 `json:"target,omitempty"`
-	Time      Time                   `json:"time,omitempty"`
-	Origin    string                 `json:"origin,omitempty"`
-	To        []string               `json:"to,omitempty"`
-	Score     float64                `json:"score,omitempty"`
-	Extra     map[string]interface{} `json:"-"`
+	ID        string         `json:"id,omitempty"`
+	Actor     string         `json:"actor,omitempty"`
+	Verb      string         `json:"verb,omitempty"`
+	Object    string         `json:"object,omitempty"`
+	ForeignID string         `json:"foreign_id,omitempty"`
+	Target    string         `json:"target,omitempty"`
+	Time      Time           `json:"time,omitempty"`
+	Origin    string         `json:"origin,omitempty"`
+	To        []string       `json:"to,omitempty"`
+	Score     float64        `json:"score,omitempty"`
+	Extra     map[string]any `json:"-"`
 }
 
 // UnmarshalJSON decodes the provided JSON payload into the Activity. It's required
 // because of the custom JSON fields and time formats.
 func (a *Activity) UnmarshalJSON(b []byte) error {
-	var data map[string]interface{}
+	var data map[string]any
 	if err := json.Unmarshal(b, &data); err != nil {
 		return err
 	}
 
 	if _, ok := data["to"]; ok {
-		tos := data["to"].([]interface{})
+		tos := data["to"].([]any)
 		simpleTos := make([]string, len(tos))
 		for i := range tos {
 			switch to := tos[i].(type) {
 			case string:
 				simpleTos[i] = to
-			case []interface{}:
+			case []any:
 				tos, ok := to[0].(string)
 				if !ok {
 					return errors.New("invalid format for to targets")
@@ -64,13 +64,13 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 	return json.Marshal(data)
 }
 
-func (a *Activity) decode(data map[string]interface{}) error {
+func (a *Activity) decode(data map[string]any) error {
 	meta, err := decodeData(data, a)
 	if err != nil {
 		return err
 	}
 	if len(meta.Unused) > 0 {
-		a.Extra = make(map[string]interface{})
+		a.Extra = make(map[string]any)
 		for _, k := range meta.Unused {
 			a.Extra[k] = data[k]
 		}
