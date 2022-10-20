@@ -538,6 +538,7 @@ type UserResponse struct {
 // Reaction is a reaction retrieved from the API.
 type Reaction struct {
 	AddReactionRequestObject
+	User              User                   `json:"user,omitempty"`
 	ChildrenReactions map[string][]*Reaction `json:"latest_children,omitempty"`
 	OwnChildren       map[string][]*Reaction `json:"own_children,omitempty"`
 	ChildrenCounters  map[string]any         `json:"children_counts,omitempty"`
