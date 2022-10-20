@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.0.0](https://github.com/GetStream/stream-go2/compare/v7.1.0...v8.0.0) (2022-10-20)
+
+
+### Features
+
+* add user enrichment for reactions ([#137](https://github.com/GetStream/stream-go2/issues/137)) ([d88c659](https://github.com/GetStream/stream-go2/commit/d88c659dd5520cdd9bc8388912857834f0b4086b))
+
 ## [7.1.0](https://github.com/GetStream/stream-go2/compare/v7.0.1...v7.1.0) (2022-10-04)
 
 
