@@ -25,7 +25,7 @@ func NewEventFeature(group, value string) EventFeature {
 // like {"user_data":{"id": 123, "alias": "john"}}, while NewUserData().String("bob") will
 // result in {"user_data": "bob"}.
 type UserData struct {
-	id    interface{}
+	id    any
 	alias string
 }
 
@@ -53,11 +53,11 @@ func (d *UserData) Alias(alias string) *UserData {
 	return d
 }
 
-func (d *UserData) value() interface{} {
+func (d *UserData) value() any {
 	if d.alias == "" {
 		return d.id
 	}
-	return map[string]interface{}{
+	return map[string]any{
 		"id":    d.id,
 		"alias": d.alias,
 	}
@@ -65,8 +65,8 @@ func (d *UserData) value() interface{} {
 
 // EngagementEvent represents an analytics engagement event. It must be populated
 // with the available methods, or custom data can be arbitrarily added to it
-// manually as key(string),value(interface{}) pairs.
-type EngagementEvent map[string]interface{}
+// manually as key(string),value(any) pairs.
+type EngagementEvent map[string]any
 
 // WithLabel sets the event's label field to the given string.
 func (e EngagementEvent) WithLabel(label string) EngagementEvent {
@@ -90,7 +90,7 @@ func (e EngagementEvent) WithForeignID(foreignID string) EngagementEvent {
 // WithContent sets the event's content field to the given content map, and also
 // sets the foreign_id field of such object to the given foreign ID string.
 // If just the foreign ID is required to be sent, use the WithForeignID method.
-func (e EngagementEvent) WithContent(foreignID string, content map[string]interface{}) EngagementEvent {
+func (e EngagementEvent) WithContent(foreignID string, content map[string]any) EngagementEvent {
 	if content != nil {
 		content["foreign_id"] = foreignID
 	}
@@ -136,8 +136,8 @@ func (e EngagementEvent) WithTrackedAt(trackedAt time.Time) EngagementEvent {
 
 // ImpressionEventsData represents the payload of an arbitrary number of impression events.
 // It must be populated with the available methods, or custom data can be arbitrarily
-// added to it manually as key(string),value(interface{}) pairs.
-type ImpressionEventsData map[string]interface{}
+// added to it manually as key(string),value(any) pairs.
+type ImpressionEventsData map[string]any
 
 // WithForeignIDs sets the content_list field to the given list of strings.
 func (d ImpressionEventsData) WithForeignIDs(foreignIDs ...string) ImpressionEventsData {

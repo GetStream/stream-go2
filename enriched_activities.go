@@ -25,7 +25,7 @@ type EnrichedActivity struct {
 	ReactionCounts  map[string]int                 `json:"reaction_counts,omitempty"`
 	OwnReactions    map[string][]*EnrichedReaction `json:"own_reactions,omitempty"`
 	LatestReactions map[string][]*EnrichedReaction `json:"latest_reactions,omitempty"`
-	Extra           map[string]interface{}         `json:"-"`
+	Extra           map[string]any                 `json:"-"`
 }
 
 // EnrichedReaction is an enriched Stream reaction entity.
@@ -34,7 +34,7 @@ type EnrichedReaction struct {
 	Kind              string                         `json:"kind"`
 	ActivityID        string                         `json:"activity_id"`
 	UserID            string                         `json:"user_id"`
-	Data              map[string]interface{}         `json:"data,omitempty"`
+	Data              map[string]any                 `json:"data,omitempty"`
 	TargetFeeds       []string                       `json:"target_feeds,omitempty"`
 	ParentID          string                         `json:"parent,omitempty"`
 	ChildrenReactions map[string][]*EnrichedReaction `json:"latest_children,omitempty"`
@@ -48,19 +48,19 @@ type EnrichedReaction struct {
 // UnmarshalJSON decodes the provided JSON payload into the EnrichedActivity. It's required
 // because of the custom JSON fields and time formats.
 func (a *EnrichedActivity) UnmarshalJSON(b []byte) error {
-	var data map[string]interface{}
+	var data map[string]any
 	if err := json.Unmarshal(b, &data); err != nil {
 		return err
 	}
 
 	if _, ok := data["to"]; ok {
-		tos := data["to"].([]interface{})
+		tos := data["to"].([]any)
 		simpleTos := make([]string, len(tos))
 		for i := range tos {
 			switch to := tos[i].(type) {
 			case string:
 				simpleTos[i] = to
-			case []interface{}:
+			case []any:
 				tos, ok := to[0].(string)
 				if !ok {
 					return errors.New("invalid format for to targets")
@@ -72,7 +72,7 @@ func (a *EnrichedActivity) UnmarshalJSON(b []byte) error {
 	}
 
 	if v, ok := data["foreign_id"]; ok { // handle activity reference in foreign id
-		if val, ok := v.(map[string]interface{}); ok {
+		if val, ok := v.(map[string]any); ok {
 			id, ok := val["id"].(string)
 			if !ok {
 				return fmt.Errorf("invalid format for enriched referenced activity id: %v", val["id"])
@@ -113,13 +113,13 @@ func (a EnrichedActivity) MarshalJSON() ([]byte, error) {
 	return json.Marshal(data)
 }
 
-func (a *EnrichedActivity) decode(data map[string]interface{}) error {
+func (a *EnrichedActivity) decode(data map[string]any) error {
 	meta, err := decodeData(data, a)
 	if err != nil {
 		return err
 	}
 	if len(meta.Unused) > 0 {
-		a.Extra = make(map[string]interface{})
+		a.Extra = make(map[string]any)
 		for _, k := range meta.Unused {
 			a.Extra[k] = data[k]
 		}

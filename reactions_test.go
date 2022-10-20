@@ -40,7 +40,7 @@ func TestAddReaction(t *testing.T) {
 				Kind:       "like",
 				ActivityID: "some-act-id",
 				UserID:     "user-id",
-				Data: map[string]interface{}{
+				Data: map[string]any{
 					"field": "value",
 				},
 			},
@@ -62,9 +62,9 @@ func TestAddReaction(t *testing.T) {
 				Kind:                 "like",
 				ActivityID:           "some-act-id",
 				UserID:               "user-id",
-				Data:                 map[string]interface{}{"some_extra": "on reaction"},
+				Data:                 map[string]any{"some_extra": "on reaction"},
 				TargetFeeds:          []string{"user:bob"},
-				TargetFeedsExtraData: map[string]interface{}{"some_extra": "on activity"},
+				TargetFeedsExtraData: map[string]any{"some_extra": "on activity"},
 			},
 			expectedURL: "https://api.stream-io-api.com/api/v1.0/reaction/?api_key=key",
 			expectedBody: `{
@@ -90,11 +90,11 @@ func TestAddChildReaction(t *testing.T) {
 		Kind:       "like",
 		ActivityID: "some-act-id",
 		UserID:     "user-id",
-		Data: map[string]interface{}{
+		Data: map[string]any{
 			"field": "value",
 		},
 		TargetFeeds: []string{"stalker:timeline"},
-		TargetFeedsExtraData: map[string]interface{}{
+		TargetFeedsExtraData: map[string]any{
 			"activity_field": "activity_value",
 		},
 	}
@@ -116,14 +116,14 @@ func TestUpdateReaction(t *testing.T) {
 
 	testCases := []struct {
 		id           string
-		data         map[string]interface{}
+		data         map[string]any
 		targetFeeds  []string
 		expectedURL  string
 		expectedBody string
 	}{
 		{
 			id: "r-id",
-			data: map[string]interface{}{
+			data: map[string]any{
 				"field": "value",
 			},
 			expectedURL:  "https://api.stream-io-api.com/api/v1.0/reaction/r-id/?api_key=key",

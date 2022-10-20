@@ -289,8 +289,8 @@ if err != nil {
 You can partial update activities identified either by ID:
 
 ``` go
-changesetA := stream.NewUpdateActivityRequestByID("f505b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
-changesetB := stream.NewUpdateActivityRequestByID("f707b3fb-a212-11e7-...", map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
+changesetA := stream.NewUpdateActivityRequestByID("f505b3fb-a212-11e7-...", map[string]any{"key": "new-value"}, []string{"removed", "keys"})
+changesetB := stream.NewUpdateActivityRequestByID("f707b3fb-a212-11e7-...", map[string]any{"key": "new-value"}, []string{"removed", "keys"})
 resp, err := client.PartialUpdateActivities(ctx, changesetA, changesetB)
 if err != nil {
     // ...
@@ -299,8 +299,8 @@ if err != nil {
 
 or by a ForeignID and timestamp pair:
 ``` go
-changesetA := stream.NewUpdateActivityRequestByForeignID("dothings:1", stream.Time{...}, map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
-changesetB := stream.NewUpdateActivityRequestByForeignID("dothings:2", stream.Time{...}, map[string]interface{}{"key": "new-value"}, []string{"removed", "keys"})
+changesetA := stream.NewUpdateActivityRequestByForeignID("dothings:1", stream.Time{...}, map[string]any{"key": "new-value"}, []string{"removed", "keys"})
+changesetB := stream.NewUpdateActivityRequestByForeignID("dothings:2", stream.Time{...}, map[string]any{"key": "new-value"}, []string{"removed", "keys"})
 resp, err := client.PartialUpdateActivities(ctx, changesetA, changesetB)
 if err != nil {
     // ...
@@ -597,7 +597,7 @@ For example, to retrieve follow recommendations:
 
 ```go
 // Get follow recommendations
-data := map[string]interface{}{
+data := map[string]any{
     "user_id":          123,
     "source_feed_slug": "timeline",
     "target_feed_slug": "user",
@@ -625,7 +625,7 @@ collections := client.Collections()
 // Upsert the "picture" collection
 object := stream.CollectionObject{
     ID:   "123",
-    Data: map[string]interface{}{
+    Data: map[string]any{
         "name": "Rocky Mountains",
         "location": "North America",
     },
@@ -669,7 +669,7 @@ users := client.Users()
 ```go
 user := stream.User{
     ID: "123",
-    Data: map[string]interface{}{
+    Data: map[string]any{
         "name": "Bobby Tables",
     },
 }
@@ -679,7 +679,7 @@ if err != nil {
     // ...
 }
 
-newUserData :=map[string]interface{}{
+newUserData :=map[string]any{
     "name": "Bobby Tables",
     "age": 7,
 }
@@ -712,7 +712,7 @@ r := stream.AddReactionRequestObject{
     Kind: "comment",
     UserID: "123",
     ActivityID: "87a9eec0-fd5f-11e8-8080-80013fed2f5b",
-    Data: map[string]interface{}{
+    Data: map[string]any{
         "text": "Nice post!!",
     },
     TargetFeeds: []string{"user:bob", "timeline:alice"},
@@ -790,7 +790,7 @@ See the complete [docs and examples](https://getstream.io/docs/#reactions_introd
 ```go
 u := stream.User{
     ID: "123",
-    Data: map[string]interface{}{
+    Data: map[string]any{
         "name": "Bobby Tables",
     },
 }
@@ -803,7 +803,7 @@ if err != nil {
 
 c := stream.CollectionObject{
     ID: "123",
-    Data: map[string]interface{}{
+    Data: map[string]any{
         "name":     "Rocky Mountains",
         "location": "North America",
     },
@@ -842,8 +842,8 @@ enrichedResult, err := feed.GetEnrichedActivities(ctx)
 if err != nil {
     // ...
 }
-fmt.Println(enrichedResult.Results[0]["actor"].(map[string]interface{})) // Will output the user object
-fmt.Println(enrichedResult.Results[0]["object"].(map[string]interface{})) // Will output the collection object
+fmt.Println(enrichedResult.Results[0]["actor"].(map[string]any)) // Will output the user object
+fmt.Println(enrichedResult.Results[0]["object"].(map[string]any)) // Will output the collection object
 ```
 
 See the complete [docs and examples](https://getstream.io/docs/#enrichment_introduction) about enrichment on Stream's documentation pages.

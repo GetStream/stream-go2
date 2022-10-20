@@ -31,10 +31,10 @@ func (c *UsersClient) Add(ctx context.Context, user User, getOrCreate bool) (*Us
 }
 
 // Update updates the user's data.
-func (c *UsersClient) Update(ctx context.Context, id string, data map[string]interface{}) (*UserResponse, error) {
+func (c *UsersClient) Update(ctx context.Context, id string, data map[string]any) (*UserResponse, error) {
 	endpoint := c.client.makeEndpoint("user/%s/", id)
 
-	reqData := map[string]interface{}{
+	reqData := map[string]any{
 		"data": data,
 	}
 	return c.decode(c.client.put(ctx, endpoint, reqData, c.client.authenticator.usersAuth))

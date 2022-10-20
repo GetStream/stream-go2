@@ -25,7 +25,7 @@ type baseRequestOption struct {
 	value string
 }
 
-func makeRequestOption(key string, value interface{}) requestOption {
+func makeRequestOption(key string, value any) requestOption {
 	return baseRequestOption{
 		key:   key,
 		value: fmt.Sprintf("%v", value),

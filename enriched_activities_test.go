@@ -26,11 +26,11 @@ func TestEnrichedActivityUnmarshalJSON(t *testing.T) {
 			data:     []byte(`{"actor":"actor","object":"object","time":"` + now.Format(stream.TimeLayout) + `","verb":"verb"}`),
 		},
 		{
-			activity: stream.EnrichedActivity{Actor: stream.Data{ID: "actor"}, Verb: "verb", Object: stream.Data{ID: "object"}, Time: now, Extra: map[string]interface{}{"popularity": 42.0, "size": map[string]interface{}{"width": 800.0, "height": 600.0}}},
+			activity: stream.EnrichedActivity{Actor: stream.Data{ID: "actor"}, Verb: "verb", Object: stream.Data{ID: "object"}, Time: now, Extra: map[string]any{"popularity": 42.0, "size": map[string]any{"width": 800.0, "height": 600.0}}},
 			data:     []byte(`{"actor":"actor","object":"object","popularity":42,"size":{"height":600,"width":800},"time":"` + now.Format(stream.TimeLayout) + `","verb":"verb"}`),
 		},
 		{
-			activity: stream.EnrichedActivity{Actor: stream.Data{ID: "actor"}, Verb: "verb", Object: stream.Data{ID: "object"}, Time: now, Extra: map[string]interface{}{"popularity": 42.0, "size": map[string]interface{}{"width": 800.0, "height": 600.0}}},
+			activity: stream.EnrichedActivity{Actor: stream.Data{ID: "actor"}, Verb: "verb", Object: stream.Data{ID: "object"}, Time: now, Extra: map[string]any{"popularity": 42.0, "size": map[string]any{"width": 800.0, "height": 600.0}}},
 			data:     []byte(`{"actor":"actor","object":"object","popularity":42,"size":{"height":600,"width":800},"time":"` + now.Format(stream.TimeLayout) + `","verb":"verb"}`),
 		},
 		{
@@ -40,8 +40,8 @@ func TestEnrichedActivityUnmarshalJSON(t *testing.T) {
 		{
 			activity: stream.EnrichedActivity{
 				ForeignID: "SA:123",
-				Extra: map[string]interface{}{
-					"foreign_id_ref": map[string]interface{}{
+				Extra: map[string]any{
+					"foreign_id_ref": map[string]any{
 						"id":         "123",
 						"extra_prop": true,
 					},

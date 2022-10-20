@@ -44,10 +44,10 @@ func (c *ReactionsClient) decode(resp []byte, err error) (*ReactionResponse, err
 }
 
 // Update updates the reaction's data and/or target feeds.
-func (c *ReactionsClient) Update(ctx context.Context, id string, data map[string]interface{}, targetFeeds []string) (*ReactionResponse, error) {
+func (c *ReactionsClient) Update(ctx context.Context, id string, data map[string]any, targetFeeds []string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
-	reqData := map[string]interface{}{
+	reqData := map[string]any{
 		"data":         data,
 		"target_feeds": targetFeeds,
 	}

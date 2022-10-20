@@ -21,7 +21,7 @@ type Duration struct {
 
 // UnmarshalJSON for Duration is required because of the incoming duration string.
 func (d *Duration) UnmarshalJSON(b []byte) error {
-	var tmp interface{}
+	var tmp any
 	err := json.Unmarshal(b, &tmp)
 	if err != nil {
 		return err
@@ -80,11 +80,11 @@ func timeFromString(s string) (Time, error) {
 // Data is a representation of an enriched activities enriched object,
 // such as the the user or the object
 type Data struct {
-	ID    string                 `json:"id"`
-	Extra map[string]interface{} `json:"-"`
+	ID    string         `json:"id"`
+	Extra map[string]any `json:"-"`
 }
 
-func (a *Data) decode(data map[string]interface{}) error {
+func (a *Data) decode(data map[string]any) error {
 	// We are not using decodeData here because we do not need the DecodeHook
 	// since it leads to a stack overflow
 	cfg := &mapstructure.DecoderConfig{
@@ -101,7 +101,7 @@ func (a *Data) decode(data map[string]interface{}) error {
 	}
 
 	if len(cfg.Metadata.Unused) > 0 {
-		a.Extra = make(map[string]interface{})
+		a.Extra = make(map[string]any)
 		for _, k := range cfg.Metadata.Unused {
 			a.Extra[k] = data[k]
 		}
@@ -111,11 +111,11 @@ func (a *Data) decode(data map[string]interface{}) error {
 
 // MarshalJSON encodes data into json.
 func (a Data) MarshalJSON() ([]byte, error) {
-	m := make(map[string]interface{}, len(a.Extra))
+	m := make(map[string]any, len(a.Extra))
 	for k, v := range a.Extra {
 		m[k] = v
 	}
-	result := map[string]interface{}{
+	result := map[string]any{
 		"id":   a.ID,
 		"data": m,
 	}
@@ -426,9 +426,9 @@ type updateToTargetsRequest struct {
 // UpdateToTargetsResponse is the response for updating to targets of an activity.
 type UpdateToTargetsResponse struct {
 	response
-	Activity map[string]interface{} `json:"activity"`
-	Added    []string               `json:"added"`
-	Removed  []string               `json:"removed"`
+	Activity map[string]any `json:"activity"`
+	Added    []string       `json:"added"`
+	Removed  []string       `json:"removed"`
 }
 
 // UnfollowRelationship represents a single follow relationship to remove, used for
@@ -464,8 +464,8 @@ type UnfollowRelationshipOption func(r *UnfollowRelationship)
 
 // CollectionObject is a collection's object.
 type CollectionObject struct {
-	ID   string                 `json:"id,omitempty"`
-	Data map[string]interface{} `json:"data"`
+	ID   string         `json:"id,omitempty"`
+	Data map[string]any `json:"data"`
 }
 
 type CollectionObjectResponse struct {
@@ -475,7 +475,7 @@ type CollectionObjectResponse struct {
 
 // MarshalJSON marshals the CollectionObject to a flat JSON object.
 func (o CollectionObject) MarshalJSON() ([]byte, error) {
-	m := map[string]interface{}{
+	m := map[string]any{
 		"id": o.ID,
 	}
 	for k, v := range o.Data {
@@ -490,7 +490,7 @@ type addCollectionRequest struct {
 }
 
 func (r addCollectionRequest) MarshalJSON() ([]byte, error) {
-	m := map[string]interface{}{
+	m := map[string]any{
 		"id":   r.ID,
 		"data": r.Data,
 	}
@@ -504,8 +504,8 @@ func (r addCollectionRequest) MarshalJSON() ([]byte, error) {
 // GetCollectionResponseObject represents a single response coming from a Collection
 // Get request after a CollectionsClient.Get call.
 type GetCollectionResponseObject struct {
-	ForeignID string                 `json:"foreign_id"`
-	Data      map[string]interface{} `json:"data"`
+	ForeignID string         `json:"foreign_id"`
+	Data      map[string]any `json:"data"`
 }
 
 type getCollectionResponse struct {
@@ -526,8 +526,8 @@ type GetCollectionResponse struct {
 
 // User represents a user
 type User struct {
-	ID   string                 `json:"id"`
-	Data map[string]interface{} `json:"data,omitempty"`
+	ID   string         `json:"id"`
+	Data map[string]any `json:"data,omitempty"`
 }
 
 type UserResponse struct {
@@ -540,7 +540,7 @@ type Reaction struct {
 	AddReactionRequestObject
 	ChildrenReactions map[string][]*Reaction `json:"latest_children,omitempty"`
 	OwnChildren       map[string][]*Reaction `json:"own_children,omitempty"`
-	ChildrenCounters  map[string]interface{} `json:"children_counts,omitempty"`
+	ChildrenCounters  map[string]any         `json:"children_counts,omitempty"`
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
 }
@@ -552,14 +552,14 @@ type ReactionResponse struct {
 
 // AddReactionRequestObject is an object used only when calling the Add* reaction endpoints
 type AddReactionRequestObject struct {
-	ID                   string                 `json:"id,omitempty"`
-	Kind                 string                 `json:"kind"`
-	ActivityID           string                 `json:"activity_id"`
-	UserID               string                 `json:"user_id"`
-	Data                 map[string]interface{} `json:"data,omitempty"`
-	TargetFeeds          []string               `json:"target_feeds,omitempty"`
-	TargetFeedsExtraData map[string]interface{} `json:"target_feeds_extra_data,omitempty"`
-	ParentID             string                 `json:"parent,omitempty"`
+	ID                   string         `json:"id,omitempty"`
+	Kind                 string         `json:"kind"`
+	ActivityID           string         `json:"activity_id"`
+	UserID               string         `json:"user_id"`
+	Data                 map[string]any `json:"data,omitempty"`
+	TargetFeeds          []string       `json:"target_feeds,omitempty"`
+	TargetFeedsExtraData map[string]any `json:"target_feeds_extra_data,omitempty"`
+	ParentID             string         `json:"parent,omitempty"`
 }
 
 // filterResponse is the part of StreamAPI responses common for FilterReactions API requests.
@@ -630,8 +630,8 @@ func (r filterResponse) parseNext() ([]FilterReactionsOption, error) {
 // FilterReactionResponse is the response received from the ReactionsClient.Filter call.
 type FilterReactionResponse struct {
 	filterResponse
-	Results  []Reaction             `json:"results"`
-	Activity map[string]interface{} `json:"activity"`
+	Results  []Reaction     `json:"results"`
+	Activity map[string]any `json:"activity"`
 	meta     filterReactionsRequestMetadata
 }
 
@@ -645,19 +645,19 @@ type filterReactionsRequestMetadata struct {
 // Common JSON fields are directly available as struct fields, while non-standard
 // JSON fields can be retrieved using the Extra() method.
 type PersonalizationResponse struct {
-	AppID    int                      `json:"app_id"`
-	Duration Duration                 `json:"duration"`
-	Rate     Rate                     `json:"ratelimit"`
-	Limit    int                      `json:"limit"`
-	Offset   int                      `json:"offset"`
-	Version  string                   `json:"version"`
-	Next     string                   `json:"next"`
-	Results  []map[string]interface{} `json:"results"`
-	extra    map[string]interface{}
+	AppID    int              `json:"app_id"`
+	Duration Duration         `json:"duration"`
+	Rate     Rate             `json:"ratelimit"`
+	Limit    int              `json:"limit"`
+	Offset   int              `json:"offset"`
+	Version  string           `json:"version"`
+	Next     string           `json:"next"`
+	Results  []map[string]any `json:"results"`
+	extra    map[string]any
 }
 
-// Extra returns the non-common response fields as a map[string]interface{}.
-func (r *PersonalizationResponse) Extra() map[string]interface{} {
+// Extra returns the non-common response fields as a map[string]any.
+func (r *PersonalizationResponse) Extra() map[string]any {
 	return r.extra
 }
 
@@ -665,7 +665,7 @@ func (r *PersonalizationResponse) Extra() map[string]interface{} {
 // for storing non-standard fields without losing their values, so they can be retrieved
 // later on with the Extra() function.
 func (r *PersonalizationResponse) UnmarshalJSON(data []byte) error {
-	var m map[string]interface{}
+	var m map[string]any
 	err := json.Unmarshal(data, &m)
 	if err != nil {
 		return err
@@ -674,7 +674,7 @@ func (r *PersonalizationResponse) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	r.extra = make(map[string]interface{})
+	r.extra = make(map[string]any)
 	for _, k := range meta.Unused {
 		r.extra[k] = m[k]
 	}
@@ -732,15 +732,15 @@ func NewForeignIDTimePair(foreignID string, timestamp Time) ForeignIDTimePair {
 
 // UpdateActivityRequest is the API request body for partially updating an activity.
 type UpdateActivityRequest struct {
-	ID        *string                `json:"id,omitempty"`
-	ForeignID *string                `json:"foreign_id,omitempty"`
-	Time      *Time                  `json:"time,omitempty"`
-	Set       map[string]interface{} `json:"set,omitempty"`
-	Unset     []string               `json:"unset,omitempty"`
+	ID        *string        `json:"id,omitempty"`
+	ForeignID *string        `json:"foreign_id,omitempty"`
+	Time      *Time          `json:"time,omitempty"`
+	Set       map[string]any `json:"set,omitempty"`
+	Unset     []string       `json:"unset,omitempty"`
 }
 
 // NewUpdateActivityRequestByID creates a new UpdateActivityRequest to be used by PartialUpdateActivities
-func NewUpdateActivityRequestByID(id string, set map[string]interface{}, unset []string) UpdateActivityRequest {
+func NewUpdateActivityRequestByID(id string, set map[string]any, unset []string) UpdateActivityRequest {
 	return UpdateActivityRequest{
 		ID:    &id,
 		Set:   set,
@@ -749,7 +749,7 @@ func NewUpdateActivityRequestByID(id string, set map[string]interface{}, unset [
 }
 
 // NewUpdateActivityRequestByForeignID creates a new UpdateActivityRequest to be used by PartialUpdateActivities
-func NewUpdateActivityRequestByForeignID(foreignID string, timestamp Time, set map[string]interface{}, unset []string) UpdateActivityRequest {
+func NewUpdateActivityRequestByForeignID(foreignID string, timestamp Time, set map[string]any, unset []string) UpdateActivityRequest {
 	return UpdateActivityRequest{
 		ForeignID: &foreignID,
 		Time:      &timestamp,

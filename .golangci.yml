@@ -53,7 +53,7 @@ linters-settings:
         skipTestFuncs: true
   govet:
     enable-all: true
-    disable: 
+    disable:
       - shadow
   gci:
     sections:

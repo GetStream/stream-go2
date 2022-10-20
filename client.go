@@ -337,7 +337,7 @@ func (c *Client) PartialUpdateActivities(ctx context.Context, changesets ...Upda
 
 // UpdateActivityByID performs a partial activity update with the given set and unset operations, returning the
 // affected activity, on the activity with the given ID.
-func (c *Client) UpdateActivityByID(ctx context.Context, id string, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
+func (c *Client) UpdateActivityByID(ctx context.Context, id string, set map[string]any, unset []string) (*UpdateActivityResponse, error) {
 	return c.updateActivity(ctx, UpdateActivityRequest{
 		ID:    &id,
 		Set:   set,
@@ -347,7 +347,7 @@ func (c *Client) UpdateActivityByID(ctx context.Context, id string, set map[stri
 
 // UpdateActivityByForeignID performs a partial activity update with the given set and unset operations, returning the
 // affected activity, on the activity with the given foreign ID and timestamp.
-func (c *Client) UpdateActivityByForeignID(ctx context.Context, foreignID string, timestamp Time, set map[string]interface{}, unset []string) (*UpdateActivityResponse, error) {
+func (c *Client) UpdateActivityByForeignID(ctx context.Context, foreignID string, timestamp Time, set map[string]any, unset []string) (*UpdateActivityResponse, error) {
 	return c.updateActivity(ctx, UpdateActivityRequest{
 		ForeignID: &foreignID,
 		Time:      &timestamp,
@@ -403,7 +403,7 @@ func (e *endpoint) addQueryParam(v valuer) {
 	e.query.Add(v.values())
 }
 
-func (c *Client) makeEndpoint(format string, a ...interface{}) endpoint {
+func (c *Client) makeEndpoint(format string, a ...any) endpoint {
 	host := c.urlBuilder.url()
 
 	path := fmt.Sprintf(format, a...)
@@ -418,19 +418,19 @@ func (c *Client) makeEndpoint(format string, a ...interface{}) endpoint {
 	}
 }
 
-func (c *Client) get(ctx context.Context, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) get(ctx context.Context, endpoint endpoint, data any, authFn authFunc) ([]byte, error) {
 	return c.request(ctx, http.MethodGet, endpoint, data, authFn)
 }
 
-func (c *Client) post(ctx context.Context, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) post(ctx context.Context, endpoint endpoint, data any, authFn authFunc) ([]byte, error) {
 	return c.request(ctx, http.MethodPost, endpoint, data, authFn)
 }
 
-func (c *Client) put(ctx context.Context, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) put(ctx context.Context, endpoint endpoint, data any, authFn authFunc) ([]byte, error) {
 	return c.request(ctx, http.MethodPut, endpoint, data, authFn)
 }
 
-func (c *Client) delete(ctx context.Context, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) delete(ctx context.Context, endpoint endpoint, data any, authFn authFunc) ([]byte, error) {
 	return c.request(ctx, http.MethodDelete, endpoint, data, authFn)
 }
 
@@ -439,7 +439,7 @@ func (c *Client) setBaseHeaders(r *http.Request) {
 	r.Header.Set("X-Stream-Client", fmt.Sprintf("stream-go2-client-%s", Version))
 }
 
-func (c *Client) request(ctx context.Context, method string, endpoint endpoint, data interface{}, authFn authFunc) ([]byte, error) {
+func (c *Client) request(ctx context.Context, method string, endpoint endpoint, data any, authFn authFunc) ([]byte, error) {
 	var reader io.Reader
 	if data != nil {
 		payload, err := json.Marshal(data)
@@ -478,7 +478,7 @@ func (c *Client) request(ctx context.Context, method string, endpoint endpoint, 
 		return nil, fmt.Errorf("cannot read response: %w", err)
 	}
 
-	out := map[string]interface{}{}
+	out := map[string]any{}
 	if err := json.Unmarshal(body, &out); err != nil {
 		return nil, fmt.Errorf("cannot read response: %w", err)
 	}
@@ -663,7 +663,7 @@ func (c *Client) CreateUserToken(userID string) (string, error) {
 	return c.authenticator.jwtSignatureFromClaims(claims)
 }
 
-func (c *Client) CreateUserTokenWithClaims(userID string, claims map[string]interface{}) (string, error) {
+func (c *Client) CreateUserTokenWithClaims(userID string, claims map[string]any) (string, error) {
 	claims["user_id"] = userID
 	jwtclaims := jwt.MapClaims{}
 	for k, v := range claims {
