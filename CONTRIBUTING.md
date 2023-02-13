@@ -39,7 +39,7 @@ You can read about conventional commits [here](https://www.conventionalcommits.o
 
 Releasing this package involves two GitHub Action steps:
 
-- Kick off a job called `initiate_release` ([link](https://github.com/GetStream/stream-chat-go/actions/workflows/initiate_release.yml)).
+- Kick off a job called `initiate_release` ([link](https://github.com/GetStream/stream-go2/actions/workflows/initiate_release.yml)).
 
 The job creates a pull request with the changelog. Check if it looks good.
 
