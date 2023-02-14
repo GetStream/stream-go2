@@ -2,7 +2,7 @@ module github.com/GetStream/stream-go2/v8
 
 require (
 	github.com/fatih/structs v1.1.0
-	github.com/golang-jwt/jwt/v4 v4.4.1
+	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/stretchr/testify v1.7.1
 )

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.1](https://github.com/GetStream/stream-go2/compare/v8.0.0...v8.0.1) (2023-02-13)
+
+
+### Bug Fixes
+
+* link to correct repo ([c771c1f](https://github.com/GetStream/stream-go2/commit/c771c1fe49c1ae1ef502fd3015383effe0bbc317))
+* use v8 in tests ([a9406ad](https://github.com/GetStream/stream-go2/commit/a9406adb46678089d6e957299efcfea134494334))
+
 ## [8.0.0](https://github.com/GetStream/stream-go2/compare/v7.1.0...v8.0.0) (2022-10-20)
 
 

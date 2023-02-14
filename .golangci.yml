@@ -5,7 +5,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - dupl
     - errcheck
     - gas
@@ -24,7 +23,6 @@ linters:
     - staticcheck
     - unconvert
     - unused
-    - varcheck
 
 linters-settings:
   goconst:
