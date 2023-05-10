@@ -60,9 +60,9 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// MarshalJSON marshals Time into a string formatted with the TimeLayout format.
+// MarshalJSON marshals Time (NOTE! in UTC) into a string formatted with the TimeLayout format.
 func (t Time) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t.Format(TimeLayout))
+	return json.Marshal(t.UTC().Format(TimeLayout))
 }
 
 func timeFromString(s string) (Time, error) {
