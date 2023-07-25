@@ -220,6 +220,10 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 		opts = append(opts, WithEnrichOwnReactions())
 	}
 
+	if enrichOpt := values.Get("user_id"); enrichOpt != "" {
+		opts = append(opts, WithEnrichUserReactions(enrichOpt))
+	}
+
 	if enrichOpt := values.Get("withFirstReactions"); parseBool(enrichOpt) {
 		opts = append(opts, WithEnrichFirstReactions())
 	}
