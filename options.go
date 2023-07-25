@@ -129,6 +129,10 @@ func WithEnrichOwnReactions() GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("withOwnReactions", true)}
 }
 
+func WithEnrichUserReactions(userID string) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("user_id", userID)}
+}
+
 // WithEnrichRecentReactions enriches the activities with the first reactions to them.
 func WithEnrichFirstReactions() GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("withFirstReactions", true)}
