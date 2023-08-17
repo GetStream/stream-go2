@@ -635,6 +635,10 @@ func (c *Client) followStats(ctx context.Context, feed Feed, opts ...FollowStatO
 }
 
 func (c *Client) updateToTargets(ctx context.Context, feed Feed, activity Activity, opts ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error) {
+	if len(opts) == 0 {
+		return nil, errToTargetsNoChanges
+	}
+
 	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets/", feed.Slug(), feed.UserID())
 
 	req := &updateToTargetsRequest{
@@ -646,6 +650,38 @@ func (c *Client) updateToTargets(ctx context.Context, feed Feed, activity Activi
 	}
 
 	resp, err := c.post(ctx, endpoint, req, c.authenticator.feedAuth(resFeedTargets, feed))
+	if err != nil {
+		return nil, err
+	}
+	var out UpdateToTargetsResponse
+	if err := json.Unmarshal(resp, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *Client) batchUpdateToTargets(ctx context.Context, feed Feed, reqs []UpdateToTargetsRequest) (*UpdateToTargetsResponse, error) {
+	endpoint := c.makeEndpoint("feed_targets/%s/%s/activity_to_targets/", feed.Slug(), feed.UserID())
+
+	convertedReqs := make([]*updateToTargetsRequest, 0, len(reqs))
+	for _, r := range reqs {
+		if len(r.Opts) == 0 {
+			return nil, errToTargetsNoChanges
+		}
+
+		rr := &updateToTargetsRequest{
+			ForeignID: r.ForeignID,
+			Time:      r.Time.Format(TimeLayout),
+		}
+
+		for _, opt := range r.Opts {
+			opt(rr)
+		}
+
+		convertedReqs = append(convertedReqs, rr)
+	}
+
+	resp, err := c.post(ctx, endpoint, convertedReqs, c.authenticator.feedAuth(resFeedTargets, feed))
 	if err != nil {
 		return nil, err
 	}
