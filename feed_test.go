@@ -226,6 +226,59 @@ func TestUpdateToTargets(t *testing.T) {
 	require.NoError(t, err)
 	body = fmt.Sprintf(`{"foreign_id":"bob:123","time":%q,"new_targets":["flat:f3"]}`, now.Format(stream.TimeLayout))
 	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
+
+	// should error since we have not specified any changes
+	_, err = flat.UpdateToTargets(ctx, activity)
+	require.Error(t, err)
+}
+
+func TestBatchUpdateToTargets(t *testing.T) {
+	var (
+		client, requester = newClient(t)
+		ctx               = context.Background()
+		flat, _           = newFlatFeedWithUserID(client, "123")
+		f1, _             = newFlatFeedWithUserID(client, "f1")
+		f2, _             = newFlatFeedWithUserID(client, "f2")
+		now               = getTime(time.Now())
+	)
+
+	reqs := []stream.UpdateToTargetsRequest{
+		{
+			ForeignID: "bob:123",
+			Time:      now,
+			Opts: []stream.UpdateToTargetsOption{
+				stream.WithToTargetsAdd(f2.ID()),
+				stream.WithToTargetsRemove(f1.ID()),
+			},
+		},
+	}
+
+	_, err := flat.BatchUpdateToTargets(ctx, reqs)
+	require.NoError(t, err)
+	body := fmt.Sprintf(`[{"foreign_id":"bob:123","time":%q,"added_targets":["flat:f2"],"removed_targets":["flat:f1"]}]`, now.Format(stream.TimeLayout))
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
+
+	reqs = append(reqs, stream.UpdateToTargetsRequest{
+		ForeignID: "bob:234",
+		Time:      now,
+		Opts: []stream.UpdateToTargetsOption{
+			stream.WithToTargetsNew(f1.ID(), f2.ID()),
+		},
+	})
+
+	_, err = flat.BatchUpdateToTargets(ctx, reqs)
+	require.NoError(t, err)
+	body = fmt.Sprintf(`[{"foreign_id":"bob:123","time":%q,"added_targets":["flat:f2"],"removed_targets":["flat:f1"]},{"foreign_id":"bob:234","time":%q,"new_targets":["flat:f1","flat:f2"]}]`, now.Format(stream.TimeLayout), now.Format(stream.TimeLayout))
+	testRequest(t, requester.req, http.MethodPost, "https://api.stream-io-api.com/api/v1.0/feed_targets/flat/123/activity_to_targets/?api_key=key", body)
+
+	reqs = append(reqs, stream.UpdateToTargetsRequest{
+		ForeignID: "bob:345",
+		Time:      now,
+	})
+
+	// this should error since we have not specified any changes to the last request
+	_, err = flat.BatchUpdateToTargets(ctx, reqs)
+	require.Error(t, err)
 }
 
 func TestRealtimeToken(t *testing.T) {
