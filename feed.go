@@ -26,6 +26,7 @@ type Feed interface {
 	GetFollowing(context.Context, ...FollowingOption) (*FollowingResponse, error)
 	Unfollow(context.Context, Feed, ...UnfollowOption) (*BaseResponse, error)
 	UpdateToTargets(context.Context, Activity, ...UpdateToTargetsOption) (*UpdateToTargetsResponse, error)
+	BatchUpdateToTargets(context.Context, []UpdateToTargetsRequest) (*UpdateToTargetsResponse, error)
 	RealtimeToken(bool) string
 }
 
