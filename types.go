@@ -427,6 +427,13 @@ type updateToTargetsRequest struct {
 	Removes   []string `json:"removed_targets,omitempty"`
 }
 
+// UpdateToTargetsRequest is a helper type for batch updating TO targets.
+type UpdateToTargetsRequest struct {
+	ForeignID string
+	Time      Time
+	Opts      []UpdateToTargetsOption
+}
+
 // UpdateToTargetsResponse is the response for updating to targets of an activity.
 type UpdateToTargetsResponse struct {
 	response

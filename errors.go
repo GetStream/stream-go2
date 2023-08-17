@@ -7,6 +7,7 @@ import (
 var (
 	errMissingCredentials = errors.New("missing API key or secret")
 	errInvalidUserID      = errors.New("invalid userID provided")
+	errToTargetsNoChanges = errors.New("no changes specified, please supply new targets or added/removed targets")
 )
 
 // Rate limit headers

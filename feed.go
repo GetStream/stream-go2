@@ -118,6 +118,13 @@ func (f *feed) UpdateToTargets(ctx context.Context, activity Activity, opts ...U
 	return f.client.updateToTargets(ctx, f, activity, opts...)
 }
 
+// BatchUpdateToTargets updates the "to" targets for up to 100 activities, with the options passed
+// as argument for replacing, adding, or removing to targets.
+// NOTE: Only the first update is executed synchronously (same response as UpdateToTargets()), the remaining N-1 updates will be put in a worker queue and executed asynchronously.
+func (f *feed) BatchUpdateToTargets(ctx context.Context, reqs []UpdateToTargetsRequest) (*UpdateToTargetsResponse, error) {
+	return f.client.batchUpdateToTargets(ctx, f, reqs)
+}
+
 // RealtimeToken returns a token that can be used client-side to listen in real-time to feed changes.
 func (f *feed) RealtimeToken(readonly bool) string {
 	var action action
