@@ -186,6 +186,26 @@ func TestFilterReactions(t *testing.T) {
 	}
 }
 
+func TestSoftDeleteReaction(t *testing.T) {
+	ctx := context.Background()
+	client, requester := newClient(t)
+
+	err := client.Reactions().SoftDelete(ctx, "rid")
+	require.NoError(t, err)
+
+	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/reaction/rid/?api_key=key&soft=true", "")
+}
+
+func TestRestoreReaction(t *testing.T) {
+	ctx := context.Background()
+	client, requester := newClient(t)
+
+	err := client.Reactions().Restore(ctx, "rid")
+	require.NoError(t, err)
+
+	testRequest(t, requester.req, http.MethodPut, "https://api.stream-io-api.com/api/v1.0/reaction/rid/restore/?api_key=key", "")
+}
+
 func TestGetNextPageReactions(t *testing.T) {
 	ctx := context.Background()
 	client, requester := newClient(t)
