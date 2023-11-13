@@ -62,6 +62,8 @@ func (c *ReactionsClient) Get(ctx context.Context, id string) (*ReactionResponse
 }
 
 // Delete deletes a reaction having the given id.
+// The reaction is permanently deleted and cannot be restored.
+// Returned reaction is empty.
 func (c *ReactionsClient) Delete(ctx context.Context, id string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
