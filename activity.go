@@ -20,6 +20,7 @@ type Activity struct {
 	To        []string       `json:"to,omitempty"`
 	Score     float64        `json:"score,omitempty"`
 	Extra     map[string]any `json:"-"`
+	ScoreVars map[string]any `json:"score_vars,omitempty"`
 }
 
 // UnmarshalJSON decodes the provided JSON payload into the Activity. It's required

@@ -101,6 +101,10 @@ func withActivitiesRanking(ranking string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking", ranking)}
 }
 
+func WithRankingScoreVars() GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("withScoreVars", true)}
+}
+
 // WithNotificationsMarkSeen marks as seen the given activity ids in a notification
 // feed. If the all parameter is true, every activity in the feed is marked as seen.
 func WithNotificationsMarkSeen(all bool, activityIDs ...string) GetActivitiesOption {
