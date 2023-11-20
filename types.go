@@ -555,6 +555,7 @@ type Reaction struct {
 	ChildrenCounters  map[string]any         `json:"children_counts,omitempty"`
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
+	DeletedAt         *time.Time             `json:"deleted_at,omitempty"`
 }
 
 type ReactionResponse struct {

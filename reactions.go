@@ -62,10 +62,29 @@ func (c *ReactionsClient) Get(ctx context.Context, id string) (*ReactionResponse
 }
 
 // Delete deletes a reaction having the given id.
+// The reaction is permanently deleted and cannot be restored.
+// Returned reaction is empty.
 func (c *ReactionsClient) Delete(ctx context.Context, id string) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 
 	return c.decode(c.client.delete(ctx, endpoint, nil, c.client.authenticator.reactionsAuth))
+}
+
+// SoftDelete soft-deletes a reaction having the given id. It is possible to restore this reaction using ReactionsClient.Restore.
+func (c *ReactionsClient) SoftDelete(ctx context.Context, id string) error {
+	endpoint := c.client.makeEndpoint("reaction/%s/", id)
+	endpoint.addQueryParam(makeRequestOption("soft", true))
+
+	_, err := c.client.delete(ctx, endpoint, nil, c.client.authenticator.reactionsAuth)
+	return err
+}
+
+// Restore restores a soft deleted reaction having the given id.
+func (c *ReactionsClient) Restore(ctx context.Context, id string) error {
+	endpoint := c.client.makeEndpoint("reaction/%s/restore/", id)
+
+	_, err := c.client.put(ctx, endpoint, nil, c.client.authenticator.reactionsAuth)
+	return err
 }
 
 // Filter lists reactions based on the provided criteria and with the specified pagination.
