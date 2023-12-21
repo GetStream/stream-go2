@@ -105,7 +105,7 @@ func WithRankingScoreVars() GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("withScoreVars", true)}
 }
 
-func WithExternalRankingVars(externalRankingVars string) GetActivitiesOption {
+func WithExternalRankingVars(externalRankingVars map[string]any) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking_vars", externalRankingVars)}
 }
 
