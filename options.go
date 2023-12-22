@@ -97,7 +97,7 @@ func WithActivitiesIDLT(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_lt", id)}
 }
 
-func withActivitiesRanking(ranking string) GetActivitiesOption {
+func WithActivitiesRanking(ranking string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking", ranking)}
 }
 
