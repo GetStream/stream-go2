@@ -213,7 +213,7 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 	}
 
 	if ranking := values.Get("ranking"); ranking != "" {
-		opts = append(opts, withActivitiesRanking(ranking))
+		opts = append(opts, WithActivitiesRanking(ranking))
 	}
 
 	if enrichOpt := values.Get("withOwnReactions"); parseBool(enrichOpt) {
