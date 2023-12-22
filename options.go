@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -106,7 +107,8 @@ func WithRankingScoreVars() GetActivitiesOption {
 }
 
 func WithExternalRankingVars(externalRankingVars map[string]any) GetActivitiesOption {
-	return GetActivitiesOption{makeRequestOption("ranking_vars", externalRankingVars)}
+	js, _ := json.Marshal(externalRankingVars) //TODO err
+	return GetActivitiesOption{makeRequestOption("ranking_vars", string(js))}
 }
 
 // WithNotificationsMarkSeen marks as seen the given activity ids in a notification
