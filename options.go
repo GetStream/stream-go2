@@ -106,9 +106,18 @@ func WithRankingScoreVars() GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("withScoreVars", true)}
 }
 
-func WithExternalRankingVars(externalRankingVars map[string]any) GetActivitiesOption {
-	js, _ := json.Marshal(externalRankingVars) //TODO err
-	return GetActivitiesOption{makeRequestOption("ranking_vars", string(js))}
+// Added a private struct `jsonString` to ensure WithExternalRankingVars accepts only encoded json string created by `MakeExternalVarJson` function
+type jsonString struct {
+	value string
+}
+
+func MakeExternalVarJson(externalRankingVars map[string]any) (jsonString, error) {
+	str, err := json.Marshal(externalRankingVars)
+	return jsonString{string(str)}, err
+}
+
+func WithExternalRankingVars(externalVarJson jsonString) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("ranking_vars", externalVarJson.value)}
 }
 
 // WithNotificationsMarkSeen marks as seen the given activity ids in a notification
