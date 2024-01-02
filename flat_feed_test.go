@@ -79,7 +79,6 @@ func TestFlatFeedGetActivitiesExternalRanking(t *testing.T) {
 		enrichedURL string
 	}{
 		{
-			name : "external ranking vars",
 			opts: []stream.GetActivitiesOption{
 				stream.WithExternalRankingVars(map[string]any{
 					"music":   1,
@@ -88,10 +87,8 @@ func TestFlatFeedGetActivitiesExternalRanking(t *testing.T) {
 					"string":  "str",
 				}),
 			},
-			//url:         "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&ranking_vars=%7B%22boolVal%22%3Atrue%2C%22music%22%3A1%2C%22sports%22%3A2.1%2C%22string%22%3A%22str%22%7D&ranking=popularity",
 			url:         "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&ranking_vars=%7B%22boolVal%22%3Atrue%2C%22music%22%3A1%2C%22sports%22%3A2.1%2C%22string%22%3A%22str%22%7D",
 			enrichedURL: "https://api.stream-io-api.com/api/v1.0/enrich/feed/flat/123/?api_key=key&ranking_vars=%7B%22boolVal%22%3Atrue%2C%22music%22%3A1%2C%22sports%22%3A2.1%2C%22string%22%3A%22str%22%7D",
-			//enrichedURL: "https://api.stream-io-api.com/api/v1.0/enrich/feed/flat/123/?api_key=key&ranking_vars=%7B%22boolVal%22%3Atrue%2C%22music%22%3A1%2C%22sports%22%3A2.1%2C%22string%22%3A%22str%22%7D&ranking=popularity",
 		},
 	}
 
