@@ -1,7 +1,6 @@
 package stream
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -106,18 +105,9 @@ func WithRankingScoreVars() GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("withScoreVars", true)}
 }
 
-// Added a private struct `jsonString` to ensure WithExternalRankingVars accepts only encoded json string created by `MakeExternalVarJson` function
-type jsonString struct {
-	value string
-}
-
-func MakeExternalVarJson(externalRankingVars map[string]any) (jsonString, error) {
-	str, err := json.Marshal(externalRankingVars)
-	return jsonString{string(str)}, err
-}
-
-func WithExternalRankingVars(externalVarJson jsonString) GetActivitiesOption {
-	return GetActivitiesOption{makeRequestOption("ranking_vars", externalVarJson.value)}
+// externalVarJson should be valid json
+func WithExternalRankingVars(externalVarJson string) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("ranking_vars", externalVarJson)}
 }
 
 // WithNotificationsMarkSeen marks as seen the given activity ids in a notification
