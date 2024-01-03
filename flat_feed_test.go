@@ -75,7 +75,7 @@ func TestFlatFeedGetActivitiesExternalRanking(t *testing.T) {
 	client, requester := newClient(t)
 	flat, _ := newFlatFeedWithUserID(client, "123")
 
-	externalVarJson, err := json.Marshal(map[string]any{
+	externalVarJSON, err := json.Marshal(map[string]any{
 		"music":   1,
 		"sports":  2.1,
 		"boolVal": true,
@@ -90,7 +90,7 @@ func TestFlatFeedGetActivitiesExternalRanking(t *testing.T) {
 	}{
 		{
 			opts: []stream.GetActivitiesOption{
-				stream.WithExternalRankingVars(string(externalVarJson)),
+				stream.WithExternalRankingVars(string(externalVarJSON)),
 			},
 			url:         "https://api.stream-io-api.com/api/v1.0/feed/flat/123/?api_key=key&ranking_vars=%7B%22boolVal%22%3Atrue%2C%22music%22%3A1%2C%22sports%22%3A2.1%2C%22string%22%3A%22str%22%7D",
 			enrichedURL: "https://api.stream-io-api.com/api/v1.0/enrich/feed/flat/123/?api_key=key&ranking_vars=%7B%22boolVal%22%3Atrue%2C%22music%22%3A1%2C%22sports%22%3A2.1%2C%22string%22%3A%22str%22%7D",

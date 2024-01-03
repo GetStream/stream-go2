@@ -105,9 +105,9 @@ func WithRankingScoreVars() GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("withScoreVars", true)}
 }
 
-// externalVarJson should be valid json
-func WithExternalRankingVars(externalVarJson string) GetActivitiesOption {
-	return GetActivitiesOption{makeRequestOption("ranking_vars", externalVarJson)}
+// externalVarJSON should be valid json
+func WithExternalRankingVars(externalVarJSON string) GetActivitiesOption {
+	return GetActivitiesOption{makeRequestOption("ranking_vars", externalVarJSON)}
 }
 
 // WithNotificationsMarkSeen marks as seen the given activity ids in a notification
