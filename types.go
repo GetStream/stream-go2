@@ -213,7 +213,7 @@ func (r readResponse) parseNext() ([]GetActivitiesOption, error) {
 	}
 
 	if ranking := values.Get("ranking"); ranking != "" {
-		opts = append(opts, withActivitiesRanking(ranking))
+		opts = append(opts, WithActivitiesRanking(ranking))
 	}
 
 	if enrichOpt := values.Get("withOwnReactions"); parseBool(enrichOpt) {
@@ -556,6 +556,7 @@ type Reaction struct {
 	CreatedAt         time.Time              `json:"created_at"`
 	UpdatedAt         time.Time              `json:"updated_at"`
 	DeletedAt         *time.Time             `json:"deleted_at,omitempty"`
+	Score             float64                `json:"score,omitempty"`
 }
 
 type ReactionResponse struct {

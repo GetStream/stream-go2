@@ -37,7 +37,7 @@ func (f *FlatFeed) GetNextPageActivities(ctx context.Context, resp *FlatFeedResp
 // GetActivitiesWithRanking returns the activities (filtered) for the given FlatFeed,
 // using the provided ranking method.
 func (f *FlatFeed) GetActivitiesWithRanking(ctx context.Context, ranking string, opts ...GetActivitiesOption) (*FlatFeedResponse, error) {
-	return f.GetActivities(ctx, append(opts, withActivitiesRanking(ranking))...)
+	return f.GetActivities(ctx, append(opts, WithActivitiesRanking(ranking))...)
 }
 
 // GetFollowers returns the feeds following the given FlatFeed.
@@ -72,7 +72,7 @@ func (f *FlatFeed) GetNextPageEnrichedActivities(ctx context.Context, resp *Enri
 // GetEnrichedActivitiesWithRanking returns the enriched activities (filtered) for the given FlatFeed,
 // using the provided ranking method.
 func (f *FlatFeed) GetEnrichedActivitiesWithRanking(ctx context.Context, ranking string, opts ...GetActivitiesOption) (*EnrichedFlatFeedResponse, error) {
-	return f.GetEnrichedActivities(ctx, append(opts, withActivitiesRanking(ranking))...)
+	return f.GetEnrichedActivities(ctx, append(opts, WithActivitiesRanking(ranking))...)
 }
 
 // FollowStats returns the follower/following counts of the feed.

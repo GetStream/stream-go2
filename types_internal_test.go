@@ -64,7 +64,7 @@ func TestReadResponse_parseNext(t *testing.T) {
 				WithActivitiesLimit(1),
 				WithActivitiesOffset(2),
 				WithActivitiesIDLT("foo"),
-				withActivitiesRanking("bar"),
+				WithActivitiesRanking("bar"),
 			},
 		},
 		{

@@ -97,7 +97,7 @@ func WithActivitiesIDLT(id string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("id_lt", id)}
 }
 
-func withActivitiesRanking(ranking string) GetActivitiesOption {
+func WithActivitiesRanking(ranking string) GetActivitiesOption {
 	return GetActivitiesOption{makeRequestOption("ranking", ranking)}
 }
 
@@ -360,6 +360,12 @@ func WithOwnUserID(userID string) FilterReactionsOption {
 // It's different than FilterReactionsAttribute user id.
 func WithChildrenUserID(userID string) FilterReactionsOption {
 	return FilterReactionsOption{makeRequestOption("children_user_id", userID)}
+}
+
+// WithRanking adds the ranking parameter to API calls, used when retrieving
+// ranked reactions.
+func WithRanking(ranking string) FilterReactionsOption {
+	return FilterReactionsOption{makeRequestOption("ranking", ranking)}
 }
 
 // FilterReactionsAttribute specifies the filtering method of Reactions.Filter()

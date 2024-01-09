@@ -28,7 +28,7 @@ func (f *AggregatedFeed) GetActivities(ctx context.Context, opts ...GetActivitie
 // GetActivitiesWithRanking returns the activities and groups for the given AggregatedFeed,
 // using the provided ranking method.
 func (f *AggregatedFeed) GetActivitiesWithRanking(ctx context.Context, ranking string, opts ...GetActivitiesOption) (*AggregatedFeedResponse, error) {
-	return f.GetActivities(ctx, append(opts, withActivitiesRanking(ranking))...)
+	return f.GetActivities(ctx, append(opts, WithActivitiesRanking(ranking))...)
 }
 
 // GetNextPageActivities returns the activities for the given AggregatedFeed at the "next" page
@@ -68,5 +68,5 @@ func (f *AggregatedFeed) GetNextPageEnrichedActivities(ctx context.Context, resp
 // GetEnrichedActivitiesWithRanking returns the enriched activities and groups for the given AggregatedFeed,
 // using the provided ranking method.
 func (f *AggregatedFeed) GetEnrichedActivitiesWithRanking(ctx context.Context, ranking string, opts ...GetActivitiesOption) (*EnrichedAggregatedFeedResponse, error) {
-	return f.GetEnrichedActivities(ctx, append(opts, withActivitiesRanking(ranking))...)
+	return f.GetEnrichedActivities(ctx, append(opts, WithActivitiesRanking(ranking))...)
 }
