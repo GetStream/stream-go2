@@ -60,14 +60,18 @@ func (u regionalURLBuilder) makeRegion(subdomain string) string {
 }
 
 type apiURLBuilder struct {
+	addr string
 	regionalURLBuilder
 }
 
-func newAPIURLBuilder(region, version string) apiURLBuilder {
-	return apiURLBuilder{newRegionalURLBuilder(region, version)}
+func newAPIURLBuilder(addr, region, version string) apiURLBuilder {
+	return apiURLBuilder{addr, newRegionalURLBuilder(region, version)}
 }
 
 func (u apiURLBuilder) url() string {
+	if u.addr != "" {
+		return fmt.Sprintf("%s/api/v%s/", u.addr, u.makeVersion())
+	}
 	return fmt.Sprintf("%s/api/v%s/", u.makeHost("api"), u.makeVersion())
 }
 
