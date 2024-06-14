@@ -26,6 +26,7 @@ type Client struct {
 	region        string
 	version       string
 	timeout       time.Duration
+	addr          string
 }
 
 // Requester performs HTTP requests.
@@ -50,7 +51,7 @@ func New(key, secret string, opts ...ClientOption) (*Client, error) {
 	if c.requester == nil {
 		c.requester = newRequester(c.timeout)
 	}
-	c.urlBuilder = newAPIURLBuilder(c.region, c.version)
+	c.urlBuilder = newAPIURLBuilder(c.addr, c.region, c.version)
 	return c, nil
 }
 
@@ -81,6 +82,13 @@ func NewFromEnv(extraOptions ...ClientOption) (*Client, error) {
 // ClientOption is a function used for adding specific configuration options to
 // a Stream client.
 type ClientOption func(*Client)
+
+// WithAPIAddr overrides the address for the API
+func WithAPIAddr(addr string) ClientOption {
+	return func(c *Client) {
+		c.addr = addr
+	}
+}
 
 // WithAPIRegion sets the region for a given Client.
 func WithAPIRegion(region string) ClientOption {
@@ -207,19 +215,19 @@ func (c *Client) Analytics() *AnalyticsClient {
 
 // Collections returns a new CollectionsClient.
 func (c *Client) Collections() *CollectionsClient {
-	b := newAPIURLBuilder(c.region, c.version)
+	b := newAPIURLBuilder(c.addr, c.region, c.version)
 	return &CollectionsClient{client: c.cloneWithURLBuilder(b)}
 }
 
 // Users returns a new UsersClient.
 func (c *Client) Users() *UsersClient {
-	b := newAPIURLBuilder(c.region, c.version)
+	b := newAPIURLBuilder(c.addr, c.region, c.version)
 	return &UsersClient{client: c.cloneWithURLBuilder(b)}
 }
 
 // Reactions returns a new ReactionsClient.
 func (c *Client) Reactions() *ReactionsClient {
-	b := newAPIURLBuilder(c.region, c.version)
+	b := newAPIURLBuilder(c.addr, c.region, c.version)
 	return &ReactionsClient{client: c.cloneWithURLBuilder(b)}
 }
 

@@ -17,16 +17,28 @@ func Test_URLString(t *testing.T) {
 			expected:   fmt.Sprintf("https://api.%s/api/v1.0/", domain),
 		},
 		{
-			urlBuilder: newAPIURLBuilder("us-east", "2.0"),
+			urlBuilder: newAPIURLBuilder("", "us-east", "2.0"),
 			expected:   fmt.Sprintf("https://us-east-api.%s/api/v2.0/", domain),
 		},
 		{
-			urlBuilder: newAPIURLBuilder("eu-west", "2.0"),
+			urlBuilder: newAPIURLBuilder("", "eu-west", "2.0"),
 			expected:   fmt.Sprintf("https://eu-west-api.%s/api/v2.0/", domain),
 		},
 		{
-			urlBuilder: newAPIURLBuilder("singapore", "2.0"),
+			urlBuilder: newAPIURLBuilder("", "singapore", "2.0"),
 			expected:   fmt.Sprintf("https://singapore-api.%s/api/v2.0/", domain),
+		},
+		{
+			urlBuilder: newAPIURLBuilder("http://localhost:8000", "singapore", "1.0"),
+			expected:   "http://localhost:8000/api/v1.0/",
+		},
+		{
+			urlBuilder: newAPIURLBuilder("http://localhost:8000", "", "1.0"),
+			expected:   "http://localhost:8000/api/v1.0/",
+		},
+		{
+			urlBuilder: newAPIURLBuilder("http://localhost:8000", "", "2.0"),
+			expected:   "http://localhost:8000/api/v2.0/",
 		},
 	}
 

@@ -87,6 +87,10 @@ func Test_makeEndpoint(t *testing.T) {
 			args:       []any{42, "asd"},
 			expected:   "http://localhost:8000/api/v1.0/test-42-asd?api_key=test",
 		},
+		{
+			urlBuilder: apiURLBuilder{addr: "http://localhost:1234"},
+			expected:   "http://localhost:1234/api/v1.0/?api_key=test",
+		},
 	}
 
 	for _, tc := range testCases {
