@@ -231,6 +231,12 @@ func (c *Client) Reactions() *ReactionsClient {
 	return &ReactionsClient{client: c.cloneWithURLBuilder(b)}
 }
 
+// Moderation returns a new ModerationClient.
+func (c *Client) Moderation() *ModerationClient {
+	b := newAPIURLBuilder(c.addr, c.region, c.version)
+	return &ModerationClient{client: c.cloneWithURLBuilder(b)}
+}
+
 // Personalization returns a new PersonalizationClient.
 func (c *Client) Personalization() *PersonalizationClient {
 	b := newPersonalizationURLBuilder(c.region)
