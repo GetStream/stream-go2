@@ -77,3 +77,21 @@ func TestUpdateReactionModerationStatus(t *testing.T) {
 		`{"entity_id":"foo", "entity_type":"stream:feeds:v2:reaction", "latest_moderator_action":"mark_safe", "recommended_action":"watch", "status":"complete"}`,
 	)
 }
+
+func TestInvalidateUserCache(t *testing.T) {
+	ctx := context.Background()
+	client, requester := newClient(t)
+	err := client.Moderation().InvalidateUserCache(ctx, "foo")
+	require.NoError(t, err)
+	testRequest(
+		t,
+		requester.req,
+		http.MethodDelete,
+		"https://api.stream-io-api.com/api/v1.0/moderation/user/cache/foo/?api_key=key",
+		"",
+	)
+
+	err = client.Moderation().InvalidateUserCache(ctx, "")
+	require.Error(t, err)
+	require.Equal(t, "empty userID", err.Error())
+}

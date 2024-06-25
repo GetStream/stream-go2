@@ -2,6 +2,7 @@ package stream
 
 import (
 	"context"
+	"fmt"
 )
 
 const (
@@ -93,5 +94,16 @@ func (c *ModerationClient) updateStatus(ctx context.Context, r updateStatusReque
 	endpoint := c.client.makeEndpoint("moderation/status/")
 
 	_, err := c.client.post(ctx, endpoint, r, c.client.authenticator.moderationAuth)
+	return err
+}
+
+func (c *ModerationClient) InvalidateUserCache(ctx context.Context, userID string) error {
+	if userID == "" {
+		return fmt.Errorf("empty userID")
+	}
+
+	endpoint := c.client.makeEndpoint("moderation/user/cache/%s/", userID)
+
+	_, err := c.client.delete(ctx, endpoint, nil, c.client.authenticator.moderationAuth)
 	return err
 }
