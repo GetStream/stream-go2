@@ -285,6 +285,22 @@ func (c *Client) GetEnrichedActivitiesByID(ctx context.Context, ids []string, op
 	return c.getAppEnrichedActivities(ctx, append(options, opts...)...)
 }
 
+// GetReactions returns reactions for the current app having the given IDs.
+func (c *Client) GetReactions(ctx context.Context, ids []string) (*GetReactionsByIDsResponse, error) {
+	endpoint := c.makeEndpoint("reaction/get_many/")
+	endpoint.addQueryParam(makeRequestOption("ids", strings.Join(ids, ",")))
+	data, err := c.get(ctx, endpoint, nil, c.authenticator.reactionsAuth)
+	if err != nil {
+		return nil, err
+	}
+	var resp GetReactionsByIDsResponse
+	err = json.Unmarshal(data, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // GetEnrichedActivitiesByForeignID returns enriched activities for the current app having the given foreign IDs and timestamps.
 func (c *Client) GetEnrichedActivitiesByForeignID(ctx context.Context, values []ForeignIDTimePair, opts ...GetActivitiesOption) (*GetEnrichedActivitiesResponse, error) {
 	foreignIDs := make([]string, len(values))

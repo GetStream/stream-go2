@@ -730,6 +730,11 @@ type GetEnrichedActivitiesResponse struct {
 	Results []EnrichedActivity `json:"results"`
 }
 
+type GetReactionsByIDsResponse struct {
+	response
+	Results []Reaction `json:"reactions"`
+}
+
 // ForeignIDTimePair couples an activity's foreignID and timestamp.
 type ForeignIDTimePair struct {
 	ForeignID string
