@@ -147,6 +147,14 @@ func TestGetEnrichedActivities(t *testing.T) {
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/enrich/activities/?api_key=key&foreign_ids=foo%2Cbar&timestamps=0001-01-01T00%3A00%3A00%2C0001-01-01T00%3A00%3A01&withReactionCounts=true", "")
 }
 
+func TestGetReactions(t *testing.T) {
+	ctx := context.Background()
+	client, requester := newClient(t)
+	_, err := client.GetReactions(ctx, []string{"foo", "bar", "baz"})
+	require.NoError(t, err)
+	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/reaction/get_many/?api_key=key&ids=foo%2Cbar%2Cbaz", "")
+}
+
 func TestUpdateActivityByID(t *testing.T) {
 	ctx := context.Background()
 	client, requester := newClient(t)
