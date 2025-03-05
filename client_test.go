@@ -153,7 +153,6 @@ func TestGetReactions(t *testing.T) {
 	_, err := client.GetReactions(ctx, []string{"foo", "bar", "baz"})
 	require.NoError(t, err)
 	testRequest(t, requester.req, http.MethodGet, "https://api.stream-io-api.com/api/v1.0/reaction/get_many/?api_key=key&ids=foo%2Cbar%2Cbaz", "")
-
 }
 
 func TestUpdateActivityByID(t *testing.T) {

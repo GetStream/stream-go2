@@ -70,6 +70,7 @@ func TestFlatFeedGetActivities(t *testing.T) {
 		assert.NoError(t, err)
 	}
 }
+
 func TestFlatFeedGetActivitiesExternalRanking(t *testing.T) {
 	ctx := context.Background()
 	client, requester := newClient(t)
