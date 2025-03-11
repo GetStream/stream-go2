@@ -73,7 +73,7 @@ func TestQueryAuditLogs(t *testing.T) {
 	assert.Equal(t, "create", resp.AuditLogs[0].Action)
 	assert.Equal(t, "user-42", resp.AuditLogs[0].UserID)
 	assert.Equal(t, "value", resp.AuditLogs[0].Custom["key"])
-	assert.Equal(t, now.Truncate(time.Second), resp.AuditLogs[0].CreatedAt.Truncate(time.Second))
+	assert.Equal(t, now.Truncate(time.Second).UTC(), resp.AuditLogs[0].CreatedAt.Truncate(time.Second).UTC())
 	assert.Equal(t, "next-page-token", resp.Next)
 	assert.Equal(t, "prev-page-token", resp.Prev)
 }
