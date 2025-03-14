@@ -286,9 +286,13 @@ func (c *Client) GetEnrichedActivitiesByID(ctx context.Context, ids []string, op
 }
 
 // GetReactions returns reactions for the current app having the given IDs.
-func (c *Client) GetReactions(ctx context.Context, ids []string) (*GetReactionsByIDsResponse, error) {
+func (c *Client) GetReactions(ctx context.Context, ids []string, opts ...GetReactionsOption) (*GetReactionsByIDsResponse, error) {
 	endpoint := c.makeEndpoint("reaction/get_many/")
 	endpoint.addQueryParam(makeRequestOption("ids", strings.Join(ids, ",")))
+
+	for _, opt := range opts {
+		endpoint.addQueryParam(opt)
+	}
 	data, err := c.get(ctx, endpoint, nil, c.authenticator.reactionsAuth)
 	if err != nil {
 		return nil, err
