@@ -53,28 +53,28 @@ func TestFlagUser(t *testing.T) {
 func TestUpdateActivityModerationStatus(t *testing.T) {
 	ctx := context.Background()
 	client, requester := newClient(t)
-	err := client.Moderation().UpdateActivityModerationStatus(ctx, "foo", "complete", "watch", "mark_safe")
+	err := client.Moderation().UpdateActivityModerationStatus(ctx, "foo", "moderator_123", "complete", "watch", "mark_safe")
 	require.NoError(t, err)
 	testRequest(
 		t,
 		requester.req,
 		http.MethodPost,
 		"https://api.stream-io-api.com/api/v1.0/moderation/status/?api_key=key",
-		`{"entity_id":"foo", "entity_type":"stream:feeds:v2:activity", "latest_moderator_action":"mark_safe", "recommended_action":"watch", "status":"complete"}`,
+		`{"entity_id":"foo", "entity_type":"stream:feeds:v2:activity", "moderator_id": "moderator_123", "latest_moderator_action":"mark_safe", "recommended_action":"watch", "status":"complete"}`,
 	)
 }
 
 func TestUpdateReactionModerationStatus(t *testing.T) {
 	ctx := context.Background()
 	client, requester := newClient(t)
-	err := client.Moderation().UpdateReactionModerationStatus(ctx, "foo", "complete", "watch", "mark_safe")
+	err := client.Moderation().UpdateReactionModerationStatus(ctx, "foo", "moderator_123", "complete", "watch", "mark_safe")
 	require.NoError(t, err)
 	testRequest(
 		t,
 		requester.req,
 		http.MethodPost,
 		"https://api.stream-io-api.com/api/v1.0/moderation/status/?api_key=key",
-		`{"entity_id":"foo", "entity_type":"stream:feeds:v2:reaction", "latest_moderator_action":"mark_safe", "recommended_action":"watch", "status":"complete"}`,
+		`{"entity_id":"foo", "entity_type":"stream:feeds:v2:reaction", "moderator_id": "moderator_123", "latest_moderator_action":"mark_safe", "recommended_action":"watch", "status":"complete"}`,
 	)
 }
 

@@ -64,24 +64,42 @@ func (c *ReactionsClient) Get(ctx context.Context, id string) (*ReactionResponse
 // Delete deletes a reaction having the given id.
 // The reaction is permanently deleted and cannot be restored.
 // Returned reaction is empty.
-func (c *ReactionsClient) Delete(ctx context.Context, id string) (*ReactionResponse, error) {
+// Optional ReactionOption parameters can be provided, such as WithReactionUserID
+// to specify a user ID in the query string.
+func (c *ReactionsClient) Delete(ctx context.Context, id string, opts ...ReactionOption) (*ReactionResponse, error) {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
+
+	for _, opt := range opts {
+		endpoint.addQueryParam(opt)
+	}
 
 	return c.decode(c.client.delete(ctx, endpoint, nil, c.client.authenticator.reactionsAuth))
 }
 
 // SoftDelete soft-deletes a reaction having the given id. It is possible to restore this reaction using ReactionsClient.Restore.
-func (c *ReactionsClient) SoftDelete(ctx context.Context, id string) error {
+// Optional ReactionOption parameters can be provided, such as WithReactionUserID
+// to specify a user ID in the query string.
+func (c *ReactionsClient) SoftDelete(ctx context.Context, id string, opts ...ReactionOption) error {
 	endpoint := c.client.makeEndpoint("reaction/%s/", id)
 	endpoint.addQueryParam(makeRequestOption("soft", true))
+
+	for _, opt := range opts {
+		endpoint.addQueryParam(opt)
+	}
 
 	_, err := c.client.delete(ctx, endpoint, nil, c.client.authenticator.reactionsAuth)
 	return err
 }
 
 // Restore restores a soft deleted reaction having the given id.
-func (c *ReactionsClient) Restore(ctx context.Context, id string) error {
+// Optional ReactionOption parameters can be provided, such as WithReactionUserID
+// to specify a user ID in the query string.
+func (c *ReactionsClient) Restore(ctx context.Context, id string, opts ...ReactionOption) error {
 	endpoint := c.client.makeEndpoint("reaction/%s/restore/", id)
+
+	for _, opt := range opts {
+		endpoint.addQueryParam(opt)
+	}
 
 	_, err := c.client.put(ctx, endpoint, nil, c.client.authenticator.reactionsAuth)
 	return err

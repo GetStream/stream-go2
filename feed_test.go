@@ -303,3 +303,14 @@ func TestRealtimeToken(t *testing.T) {
 		assert.Equal(t, tc.expected, token)
 	}
 }
+
+func TestRemoveActivityByIDWithUserID(t *testing.T) {
+	ctx := context.Background()
+	client, requester := newClient(t)
+	flat, _ := newFlatFeedWithUserID(client, "123")
+
+	_, err := flat.RemoveActivityByID(ctx, "activity-id", stream.WithRemoveByUserID("user-id"))
+	require.NoError(t, err)
+
+	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/feed/flat/123/activity-id/?api_key=key&user_id=user-id", "")
+}

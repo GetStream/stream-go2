@@ -23,6 +23,7 @@ const (
 	resAnalytics         resource = "analytics"
 	resAnalyticsRedirect resource = "redirect_and_track"
 	resModeration        resource = "moderation"
+	resAuditLogs         resource = "audit_logs"
 )
 
 type action string
@@ -117,6 +118,15 @@ func (a authenticator) moderationAuth(req *http.Request) error {
 		"action":   "*",
 		"feed_id":  "*",
 		"resource": resModeration,
+	}
+	return a.jwtSignRequest(req, claims)
+}
+
+func (a authenticator) auditLogsAuth(req *http.Request) error {
+	claims := jwt.MapClaims{
+		"action":   "*",
+		"feed_id":  "*",
+		"resource": resAuditLogs,
 	}
 	return a.jwtSignRequest(req, claims)
 }

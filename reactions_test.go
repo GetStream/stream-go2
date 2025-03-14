@@ -263,3 +263,31 @@ func TestGetNextPageReactions(t *testing.T) {
 	_, err = client.Reactions().GetNextPageFilteredReactions(ctx, resp)
 	require.Error(t, err)
 }
+
+func TestDeleteReactionWithUserID(t *testing.T) {
+	ctx := context.Background()
+	client, requester := newClient(t)
+	_, err := client.Reactions().Delete(ctx, "id1", stream.WithReactionUserID("user1"))
+	require.NoError(t, err)
+	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/reaction/id1/?api_key=key&user_id=user1", "")
+}
+
+func TestSoftDeleteReactionWithUserID(t *testing.T) {
+	ctx := context.Background()
+	client, requester := newClient(t)
+
+	err := client.Reactions().SoftDelete(ctx, "rid", stream.WithReactionUserID("user1"))
+	require.NoError(t, err)
+
+	testRequest(t, requester.req, http.MethodDelete, "https://api.stream-io-api.com/api/v1.0/reaction/rid/?api_key=key&soft=true&user_id=user1", "")
+}
+
+func TestRestoreReactionWithUserID(t *testing.T) {
+	ctx := context.Background()
+	client, requester := newClient(t)
+
+	err := client.Reactions().Restore(ctx, "rid", stream.WithReactionUserID("user1"))
+	require.NoError(t, err)
+
+	testRequest(t, requester.req, http.MethodPut, "https://api.stream-io-api.com/api/v1.0/reaction/rid/restore/?api_key=key&user_id=user1", "")
+}

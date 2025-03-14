@@ -63,15 +63,17 @@ func (c *ModerationClient) flagContent(ctx context.Context, r flagRequest) error
 type updateStatusRequest struct {
 	EntityType            string `json:"entity_type"`
 	EntityID              string `json:"entity_id"`
+	ModeratorID           string `json:"moderator_id"`
 	Status                string `json:"status"`
 	RecommendedAction     string `json:"recommended_action"`
 	LatestModeratorAction string `json:"latest_moderator_action"`
 }
 
-func (c *ModerationClient) UpdateActivityModerationStatus(ctx context.Context, activityID, status, recAction, modAction string) error {
+func (c *ModerationClient) UpdateActivityModerationStatus(ctx context.Context, activityID, modID, status, recAction, modAction string) error {
 	r := updateStatusRequest{
 		EntityType:            ModerationActivity,
 		EntityID:              activityID,
+		ModeratorID:           modID,
 		Status:                status,
 		RecommendedAction:     recAction,
 		LatestModeratorAction: modAction,
@@ -79,10 +81,11 @@ func (c *ModerationClient) UpdateActivityModerationStatus(ctx context.Context, a
 	return c.updateStatus(ctx, r)
 }
 
-func (c *ModerationClient) UpdateReactionModerationStatus(ctx context.Context, reactionID, status, recAction, modAction string) error {
+func (c *ModerationClient) UpdateReactionModerationStatus(ctx context.Context, reactionID, modID, status, recAction, modAction string) error {
 	r := updateStatusRequest{
 		EntityType:            ModerationReaction,
 		EntityID:              reactionID,
+		ModeratorID:           modID,
 		Status:                status,
 		RecommendedAction:     recAction,
 		LatestModeratorAction: modAction,
