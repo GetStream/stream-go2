@@ -414,3 +414,25 @@ func (nop) values() (key, value string) {
 func (nop) valid() bool {
 	return false
 }
+
+// RemoveActivityOption is an option usable by RemoveActivityByID method.
+type RemoveActivityOption struct {
+	requestOption
+}
+
+// WithRemoveByUserID adds the user_id parameter to API calls, used when removing activities
+// to specify which user ID should be used.
+func WithRemoveByUserID(userID string) RemoveActivityOption {
+	return RemoveActivityOption{makeRequestOption("user_id", userID)}
+}
+
+// ReactionOption is an option usable by Reactions methods.
+type ReactionOption struct {
+	requestOption
+}
+
+// WithReactionUserID adds the user_id parameter to API calls, used when performing
+// reaction operations to specify which user ID should be used.
+func WithReactionUserID(userID string) ReactionOption {
+	return ReactionOption{makeRequestOption("user_id", userID)}
+}

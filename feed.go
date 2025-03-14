@@ -20,7 +20,7 @@ type Feed interface {
 	UserID() string
 	AddActivity(context.Context, Activity) (*AddActivityResponse, error)
 	AddActivities(context.Context, ...Activity) (*AddActivitiesResponse, error)
-	RemoveActivityByID(context.Context, string) (*RemoveActivityResponse, error)
+	RemoveActivityByID(context.Context, string, ...RemoveActivityOption) (*RemoveActivityResponse, error)
 	RemoveActivityByForeignID(context.Context, string) (*RemoveActivityResponse, error)
 	Follow(context.Context, *FlatFeed, ...FollowFeedOption) (*BaseResponse, error)
 	GetFollowing(context.Context, ...FollowingOption) (*FollowingResponse, error)
@@ -79,8 +79,10 @@ func (f *feed) AddActivities(ctx context.Context, activities ...Activity) (*AddA
 
 // RemoveActivityByID removes an activity from the feed (if present), using the provided
 // id string argument as the ID field of the activity.
-func (f *feed) RemoveActivityByID(ctx context.Context, id string) (*RemoveActivityResponse, error) {
-	return f.client.removeActivityByID(ctx, f, id)
+// Optional RemoveActivityOption parameters can be provided, such as WithRemoveByUserID
+// to specify a user ID in the query string.
+func (f *feed) RemoveActivityByID(ctx context.Context, id string, opts ...RemoveActivityOption) (*RemoveActivityResponse, error) {
+	return f.client.removeActivityByID(ctx, f, id, opts...)
 }
 
 // RemoveActivityByForeignID removes an activity from the feed (if present), using the provided

@@ -559,8 +559,11 @@ func (c *Client) addActivities(ctx context.Context, feed Feed, activities ...Act
 	return &out, nil
 }
 
-func (c *Client) removeActivityByID(ctx context.Context, feed Feed, activityID string) (*RemoveActivityResponse, error) {
+func (c *Client) removeActivityByID(ctx context.Context, feed Feed, activityID string, opts ...RemoveActivityOption) (*RemoveActivityResponse, error) {
 	endpoint := c.makeEndpoint("feed/%s/%s/%s/", feed.Slug(), feed.UserID(), activityID)
+	for _, opt := range opts {
+		endpoint.addQueryParam(opt)
+	}
 	resp, err := c.delete(ctx, endpoint, nil, c.authenticator.feedAuth(resFeed, feed))
 	if err != nil {
 		return nil, err

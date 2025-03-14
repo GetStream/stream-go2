@@ -15,7 +15,7 @@ type AuditLog struct {
 	EntityID   string         `json:"entity_id"`
 	Action     string         `json:"action"`
 	UserID     string         `json:"user_id"`
-	Custom     map[string]any `json:"diff"`
+	Custom     map[string]any `json:"custom"`
 	CreatedAt  time.Time      `json:"created_at"`
 }
 
