@@ -414,3 +414,11 @@ func (nop) values() (key, value string) {
 func (nop) valid() bool {
 	return false
 }
+
+type GetReactionsOption struct {
+	requestOption
+}
+
+func WithReactionsIncludeDeleted() GetReactionsOption {
+	return GetReactionsOption{makeRequestOption("include_deleted", true)}
+}
