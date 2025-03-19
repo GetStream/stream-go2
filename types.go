@@ -557,6 +557,7 @@ type Reaction struct {
 	UpdatedAt         time.Time              `json:"updated_at"`
 	DeletedAt         *time.Time             `json:"deleted_at,omitempty"`
 	Score             float64                `json:"score,omitempty"`
+	Moderation        map[string]any         `json:"moderation,omitempty"`
 }
 
 type ReactionResponse struct {

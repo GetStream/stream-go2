@@ -436,3 +436,11 @@ type ReactionOption struct {
 func WithReactionUserID(userID string) ReactionOption {
 	return ReactionOption{makeRequestOption("user_id", userID)}
 }
+
+type GetReactionsOption struct {
+	requestOption
+}
+
+func WithReactionsIncludeDeleted() GetReactionsOption {
+	return GetReactionsOption{makeRequestOption("include_deleted", true)}
+}
