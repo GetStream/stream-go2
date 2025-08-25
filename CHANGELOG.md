@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.9.0](https://github.com/GetStream/stream-go2/compare/v8.8.0...v8.9.0) (2025-08-25)
+
 ## [8.8.0](https://github.com/GetStream/stream-go2/compare/v8.7.0...v8.8.0) (2025-03-20)
 
 ## [8.7.0](https://github.com/GetStream/stream-go2/compare/v8.6.0...v8.7.0) (2025-03-19)
