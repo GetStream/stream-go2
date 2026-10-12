@@ -1,3 +1,8 @@
+> **`stream-go2` is a Feeds v2 client and is now in maintenance mode.** It will continue to
+> receive critical fixes, so it is safe to keep using with a v2 app. New projects should start
+> with Feeds v3 and [`getstream-go`](https://github.com/GetStream/getstream-go).
+> Migration guide: https://getstream.io/activity-feeds/docs/go-golang/v2-to-v3-migration/
+
 # Official Go SDK for [Stream Feeds](https://getstream.io/activity-feeds/) <!-- omit in toc -->
 
 <p align="center">
